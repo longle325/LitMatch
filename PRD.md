@@ -96,12 +96,11 @@ LitMatch reframes literature study as character discovery. Students meet charact
 - Tác phẩm.
 - Tác giả.
 - Hình ảnh hoặc minh họa dựa trên prompt CSV `Image or illustration`.
-- Bio ngắn từ `Dòng bio ngắn`.
+- Bio từ `Dòng bio ngắn`.
 - Trích dẫn nổi tiếng.
 - Tính cách.
 - Mâu thuẫn cảm xúc từ `Những mâu thuẫn về cảm xúc nếu có`.
 - Bối cảnh xã hội hoặc lịch sử từ `Bối cảnh xã hội`.
-- Mức độ khó.
 
 All user-facing card content, including section labels, generated captions, fallback text, and difficulty-level labels, must be written in Vietnamese.
 
@@ -202,7 +201,7 @@ All user-facing card content, including section labels, generated captions, fall
 - Match with a character: +10 points.
 - Complete a challenge: +50 points.
 - Pass a challenge with at least 4/5: +40 bonus points.
-- Perfect score: +25 bonus points.
+
 
 **MVP Requirements:**
 
@@ -292,20 +291,6 @@ Each character should include:
 - Correct answers and explanations.
 - Character voice instructions for chat.
 
-### Character Design Guidance From `Content_reference.csv`
-
-The character illustrations should feel like literary profile covers: emotionally specific, tied to a recognizable scene or symbol, and consistent with the Modern Literary visual system. Do not use generic portraits when the CSV provides concrete visual direction.
-
-| Character | Visual design direction | Personality and emotional focus | Context focus |
-| --- | --- | --- | --- |
-| Chí Phèo | Scarred, gaunt man in worn brown clothes, holding a bottle of alcohol, staggering through Vũ Đại. | Brutalized exterior versus awakened longing to become an honest human being. | Pre-August Revolution rural village society, class oppression, Bá Kiến, peasant dehumanization. |
-| Mị | Young H'Mông woman sitting by a dark room window, spinning thread, with Tây Bắc mountains outside. | Outward numbness and endurance versus hidden vitality, longing for freedom, and compassion for A Phủ. | Tây Bắc before liberation, chieftain power, debt bondage, spiritual oppression through `cúng trình ma`. |
-| Xuân Tóc Đỏ | Thin red-haired man in flashy Westernized clothing with tennis racket, set against 1930s Hanoi `Âu hóa` signage. | Opportunistic, shameless social climber whose success exposes elite hypocrisy rather than inner tragedy. | Colonial urban Hanoi, fake Westernization, status obsession, inverted moral values. |
-| Lục Vân Tiên | Young scholar-hero in traditional dress, wielding a staff or sword against Phong Lai bandits. | Righteous, filial, loyal, brave, idealized according to Confucian and Southern folk ethics. | Mid-19th-century Vietnamese feudal society, Southern oral verse tradition, `trung-hiếu-tiết-nghĩa`. |
-| Thúy Kiều | Beautiful classical young woman playing đàn nguyệt, with lầu Ngưng Bích, Tiền Đường, or fate-symbol scenery. | Talented, sensitive, filial, loyal, self-aware, torn between filial duty, love, dignity, freedom, and fate. | Chinese Ming setting reflecting late Lê to early Nguyễn Vietnam, patriarchal society, money and power crushing talented women. |
-
-Implementation must preserve Vietnamese names and diacritics exactly as reviewed. Casual/student-friendly bios from the CSV can be used on cards, but chat responses and challenge explanations should keep an educational tone and clearly distinguish textual facts from interpretation.
-
 ## 8. Information Architecture
 
 ### Screens
@@ -392,7 +377,7 @@ The `design reference/` folder contains static HTML and screenshots for the targ
 | Character chat | `/characters/:characterId/chat`, `ChatScreen` | `design reference/chat/` | Use the chat layout, character header, side context panel, quick prompts, and challenge CTA. Translate any remaining English strings such as source titles and helper copy. |
 | Character challenge | `/characters/:characterId/challenge`, `ChallengeScreen` | `design reference/challenge/` | Use the progress bar, question card, option states, review-source link, and submit button. |
 | Leaderboard | `/leaderboard`, `LeaderboardScreen` | `design reference/Leaderboard/` | Use the ranking table, tabs, top-rank styling, current-user highlight, points, and unlocked-character counts. |
-| Onboarding | `/onboarding`, `OnboardingScreen` | Existing app mockup set + `design reference/Design style/DESIGN.md` | Build using the same app shell, palette, typography, and control style used across the provided mockups. |
+| Onboarding | `/onboarding`, `OnboardingScreen` | Provided start-screen screenshot + `design reference/Design style/DESIGN.md` | Standalone first-run screen without authenticated sidebar/topbar chrome; reuse Modern Literary typography, palette, card, input, chip, and primary button styles. |
 | Results modal | Challenge result modal or inline result section | Extend `design reference/challenge/` | Reuse the challenge card style for score, explanations, points earned, and next actions. |
 
 The interface should feel:
@@ -599,3 +584,27 @@ The first milestone should produce a complete local-only prototype:
 - Leaderboard with demo users.
 
 After this milestone works end to end, expand from one complete character challenge to all characters in `Content_reference.csv`, then add new teacher-reviewed profiles as needed.
+
+## 15. Current Prototype Progress
+
+As of 2026-05-07, the local static prototype has implemented:
+
+- Standalone Vietnamese onboarding/start screen matching the supplied screenshot direction.
+- Authenticated app shell aligned to the reference sidebar and top metric treatment.
+- Discovery screen aligned to `design reference/Thuy_Kieu card/screen.png`.
+- Collection screen aligned to `design reference/Character screen/screen.png`.
+- Chat screen aligned to `design reference/chat/screen.png`.
+- Challenge screen aligned to `design reference/challenge/screen.png`.
+- Leaderboard screen aligned to `design reference/Leaderboard/screen.png`.
+- Local profile creation with username and grade selection.
+- Vite development server support through `npm run dev`.
+- Seeded discovery deck for the five MVP CSV characters.
+- Swipe and button-based match/skip behavior with local persistence.
+- Matched character collection, guarded chat routes, five-question challenge flows, points, leaderboard, profile, and demo reset.
+
+Remaining prototype gaps:
+
+- Browser screenshot verification is still needed after local browser tooling is available.
+- Some characters still use generated CSS art placeholders where the design-reference folders did not provide a concrete image asset.
+- Chat response simulation is local and non-streaming.
+- Data remains inline in `app.js` rather than a dedicated seed module or typed store.
