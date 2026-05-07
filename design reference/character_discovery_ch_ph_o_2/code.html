@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LitMatch - Character Discovery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600&amp;family=Noto+Serif:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#5b0005",
+                        "primary-container": "#0d2b45",
+                        "secondary": "#605e57",
+                        "surface": "#fbf9f8",
+                        "on-tertiary-fixed-variant": "#92030f",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f5f3f3",
+                        "surface-dim": "#dbd9d9",
+                        "on-secondary-container": "#66645d",
+                        "on-surface-variant": "#43474d",
+                        "outline": "#73777e",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#ffdad6",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#303030",
+                        "outline-variant": "#c3c6ce",
+                        "tertiary": "#340002",
+                        "on-primary-fixed": "#001d35",
+                        "secondary-fixed": "#e6e2d8",
+                        "surface-variant": "#e4e2e2",
+                        "on-primary-fixed-variant": "#2e4964",
+                        "primary-fixed": "#d0e4ff",
+                        "primary-fixed-dim": "#aec9ea",
+                        "on-tertiary-fixed": "#410003",
+                        "surface-bright": "#fbf9f8",
+                        "primary": "#00162a",
+                        "on-secondary-fixed-variant": "#484740",
+                        "inverse-on-surface": "#f2f0f0",
+                        "tertiary-fixed-dim": "#ffb4ac",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-container": "#7893b2",
+                        "on-surface": "#1b1c1c",
+                        "background": "#fbf9f8",
+                        "surface-container": "#efeded",
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#1c1c16",
+                        "on-tertiary-container": "#fb584f",
+                        "surface-container-high": "#eae8e7",
+                        "secondary-fixed-dim": "#cac6bd",
+                        "on-background": "#1b1c1c",
+                        "secondary-container": "#e6e2d8",
+                        "inverse-primary": "#aec9ea",
+                        "surface-tint": "#46607d",
+                        "surface-container-highest": "#e4e2e2",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-page": "24px",
+                        "stack-md": "24px",
+                        "stack-lg": "48px",
+                        "unit": "8px",
+                        "stack-sm": "12px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-xl": ["Noto Serif"],
+                        "headline-lg": ["Noto Serif"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "headline-md": ["Noto Serif"],
+                        "body-sm": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .parchment-shadow {
+            box-shadow: 0 4px 12px rgba(45, 31, 21, 0.05), 0 1px 3px rgba(45, 31, 21, 0.02);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar (Web) -->
+<nav class="hidden md:flex flex-col bg-surface-container-low border-r border-outline-variant h-full left-0 w-64 fixed left-0 top-0 pt-24 pb-8 z-40">
+<div class="px-margin-page mb-stack-md">
+<h1 class="font-headline-md text-headline-md font-bold text-tertiary-container">LitMatch</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Vietnamese Classics</p>
+</div>
+<div class="flex-1 px-4 space-y-2">
+<!-- Active Tab: Discover -->
+<a class="flex items-center gap-gutter bg-secondary-container text-on-secondary-container rounded-xl px-4 py-3 scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">explore</span>
+<span class="font-body-md text-body-md">Discover</span>
+</a>
+<a class="flex items-center gap-gutter text-on-surface-variant px-4 py-3 hover:bg-surface-variant transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">book_2</span>
+<span class="font-body-md text-body-md">Matched Characters</span>
+</a>
+<a class="flex items-center gap-gutter text-on-surface-variant px-4 py-3 hover:bg-surface-variant transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">emoji_events</span>
+<span class="font-body-md text-body-md">Leaderboard</span>
+</a>
+<a class="flex items-center gap-gutter text-on-surface-variant px-4 py-3 hover:bg-surface-variant transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-body-md text-body-md">User Profile</span>
+</a>
+</div>
+<div class="px-4 mt-auto">
+<button class="w-full bg-tertiary-container text-on-tertiary py-3 rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity">
+                Unlock Premium
+            </button>
+</div>
+</nav>
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-margin-page py-4 max-w-full mx-auto fixed top-0 z-50 bg-surface border-b border-outline-variant md:pl-72">
+<div class="md:hidden">
+<h1 class="font-headline-md text-headline-md font-bold text-tertiary-container">LitMatch</h1>
+</div>
+<div class="hidden md:block">
+<!-- Spacer for alignment when sidebar is present -->
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1 bg-surface-container rounded-full">
+<span class="material-symbols-outlined text-tertiary-container" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="font-label-md text-label-md">12 Day Streak</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-1 bg-surface-container rounded-full">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+<span class="font-label-md text-label-md">2,450 Pts</span>
+</div>
+<div class="w-8 h-8 bg-surface-variant rounded-full overflow-hidden ml-2">
+<img alt="User avatar" class="w-full h-full object-cover" data-alt="A small, circular avatar portrait of a person against a neutral background. The lighting is soft and even. The aesthetic is modern and minimalistic, fitting within a light-mode UI color palette. The image should be high quality and suitable for a profile picture in a digital application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdh9c3esH7j9tJ6MY-Ei4t-u9KmUbGRvzd0xJ2yYAK6ICGYqIiJqFRCn6Vaygl7RsFnbUTKPII7uldaTTz0dZm7ESZq_UWRS1tkGmThCwlbj5viAx_I1hiSLLPGeHprvjROeMLa6IJ6uRGa5rCkWEhlzdY9wAm8EHc8mhG-PHoYaf4iMmwWZS85fAGDGzN9wavfk1HRGfGQyjw8xOeOSFrpretuXB6Hd2vpCX-oOiNPsMkw0UTFWisvh6bdr5D8VPCdAHTBvEUCSta"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 w-full md:ml-64 pt-24 px-margin-page pb-24 min-h-screen flex flex-col items-center justify-center">
+<div class="w-full max-w-2xl mx-auto flex flex-col items-center">
+<!-- Character Card (Bento/Tactile Style) -->
+<div class="w-full bg-surface-container-lowest rounded-xl border border-outline-variant parchment-shadow overflow-hidden relative mb-stack-md">
+<!-- Image Section -->
+<div class="relative w-full h-80 bg-surface-variant">
+<img alt="Chí Phèo Illustration" class="w-full h-full object-cover" data-alt="A dramatic illustration of a rugged, scarred Vietnamese man holding a small clay bottle. He stands against a backdrop of a rustic, rural Vietnamese village with thatched-roof houses and a dirt path. The lighting is moody and cinematic, perhaps during late afternoon or twilight, emphasizing the texture of his weathered face and the earthy tones of the environment. The artistic style is a blend of modern digital painting and traditional Vietnamese folk art, utilizing a color palette of deep browns, muted greens, and a touch of raw red to convey a sense of harsh reality and latent emotion, fitting perfectly within a 'Modern Literary' light-mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjFajlj92FyToSlAHcj9IwMSMqaX1P2iiMXqXTlhao1NmNbetj0B5SZatE7FzcPJ0l6WtvYEKAJGvzgsQrELjrjtdhfC6bku5q-iFG5lOzgSMS4D6zKpHS_eJBBwDve1pVkhOxQiUBhbO34BYBjvc-yuwPDaS9lORgu42Zrb4tw68m9TQozpeUFRZt3VruetV2oVRJMKyo_Q_2LkdP1V-98XfmuyGK4vOZXe-7SJaSp10kLcae-5VrEejVtH7A0BPldqMFPNoJLXN_"/>
+<!-- Ex Libris Tag (Difficulty) -->
+<div class="absolute top-4 right-4 bg-error text-on-error px-3 py-1 rounded font-label-md text-label-md shadow-sm border border-error-container">
+                        Difficulty: Hard
+                    </div>
+</div>
+<!-- Content Section -->
+<div class="p-stack-md">
+<div class="flex justify-between items-start mb-stack-sm">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-1">Chí Phèo</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">by Nam Cao</p>
+</div>
+</div>
+<!-- Prominent Quote -->
+<div class="my-stack-md border-l-2 border-tertiary-container pl-4 py-2">
+<p class="font-headline-md text-headline-md italic text-on-background">
+                            "Ai cho tao lương thiện?"
+                        </p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-2">
+                            (Who gives me the right to be honest?)
+                        </p>
+</div>
+<!-- Bio -->
+<p class="font-body-md text-body-md text-on-surface mb-stack-md leading-relaxed">
+                        A man marginalized by society who turns to a life of recklessness, eventually seeking redemption and human connection.
+                    </p>
+<!-- Traits & Conflict -->
+<div class="space-y-4">
+<div>
+<h3 class="font-label-md text-label-md text-outline mb-2 uppercase tracking-wider">Traits</h3>
+<div class="flex flex-wrap gap-2">
+<span class="bg-surface-container px-3 py-1 rounded-full font-body-sm text-body-sm text-on-surface border border-outline-variant">Outcast</span>
+<span class="bg-surface-container px-3 py-1 rounded-full font-body-sm text-body-sm text-on-surface border border-outline-variant">Traumatized</span>
+<span class="bg-surface-container px-3 py-1 rounded-full font-body-sm text-body-sm text-on-surface border border-outline-variant">Seeking Redemption</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant">
+<h3 class="font-label-md text-label-md text-outline mb-1 uppercase tracking-wider">Emotional Conflict</h3>
+<p class="font-body-md text-body-md font-semibold text-primary">Humanity vs. Social Exclusion</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Interaction Buttons -->
+<div class="flex gap-4 w-full justify-center">
+<button class="flex-1 max-w-[200px] border border-primary-container text-primary-container py-4 rounded-lg font-label-md text-label-md uppercase tracking-wider hover:bg-surface-container transition-colors">
+                    Skip
+                </button>
+<button class="flex-1 max-w-[200px] bg-tertiary-container text-on-tertiary py-4 rounded-lg font-label-md text-label-md uppercase tracking-wider shadow-sm hover:opacity-90 transition-opacity flex justify-center items-center gap-2">
+<span class="material-symbols-outlined">forum</span>
+                    Unlock Chat
+                </button>
+</div>
+</div>
+</main>
+</body></html>
