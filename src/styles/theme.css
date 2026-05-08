@@ -1346,3 +1346,200 @@ small,
 .page {
   position: relative;
 }
+
+/* ============================================================
+ * Collection card — link affordances on portrait + name
+ * ============================================================ */
+.collection-image-link {
+  display: block;
+  position: relative;
+  cursor: pointer;
+}
+
+.collection-image-link:hover img {
+  filter: sepia(0.05) contrast(1.08) brightness(1.04);
+}
+
+.collection-name-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dashed transparent;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.collection-name-link:hover,
+.collection-name-link:focus-visible {
+  color: var(--cinnabar);
+  border-bottom-color: var(--gold-soft);
+}
+
+/* ============================================================
+ * Character profile route — full hồ sơ for matched characters
+ * ============================================================ */
+.reference-character-profile {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.reference-character-profile .back-link {
+  align-self: flex-start;
+  font-family: "Noto Serif", serif;
+  letter-spacing: 0.06em;
+}
+
+.reference-character-profile .back-link .material-symbols-outlined {
+  margin-right: 4px;
+  font-size: 18px;
+}
+
+.character-profile {
+  padding: 28px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.character-profile-hero {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+.character-profile-portrait {
+  border: 2px solid var(--wood);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--wood-dark);
+  aspect-ratio: 3 / 4;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+
+.character-profile-portrait::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px solid var(--gold-soft);
+  pointer-events: none;
+  border-radius: 2px;
+}
+
+.character-profile-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(0.15) contrast(1.05);
+}
+
+.character-profile-heading .kicker {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.character-profile-heading .headline-lg {
+  margin: 4px 0 6px;
+  color: var(--cinnabar);
+}
+
+.character-profile-heading .lead {
+  color: var(--ink-soft);
+  font-style: italic;
+  font-size: 15px;
+}
+
+.character-profile-status {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.character-profile-status small {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.profile-quote {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.character-profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 28px;
+}
+
+.character-profile-grid .profile-section:nth-child(1),
+.character-profile-grid .profile-section:nth-child(4) {
+  grid-column: 1 / -1;
+}
+
+.profile-section h2 {
+  font-family: "Noto Serif", serif;
+  font-size: 14px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cinnabar);
+  margin: 0 0 8px;
+  border-bottom: 1px solid var(--gold-soft);
+  padding-bottom: 4px;
+}
+
+.profile-section .deck-bio {
+  margin: 0;
+}
+
+.profile-sources {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.profile-sources li::marker {
+  color: var(--cinnabar);
+}
+
+.character-profile-actions {
+  border-top: 1px solid var(--gold-soft);
+  padding-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.character-profile-actions .material-symbols-outlined {
+  margin-right: 4px;
+  font-size: 18px;
+}
+
+@media (max-width: 720px) {
+  .character-profile {
+    padding: 20px 18px;
+  }
+  .character-profile-hero {
+    grid-template-columns: 1fr;
+  }
+  .character-profile-portrait {
+    width: 60%;
+    margin: 0 auto;
+  }
+  .character-profile-grid {
+    grid-template-columns: 1fr;
+  }
+  .character-profile-grid .profile-section:nth-child(n) {
+    grid-column: 1 / -1;
+  }
+}
