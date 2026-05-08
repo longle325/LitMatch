@@ -21,6 +21,7 @@ from openai import AsyncOpenAI
 from core.config import settings
 from core.prompt_templates import build_character_prompt
 from services.codex_agent import CodexKnowledgeAgent
+from services.knowledge_retriever import KnowledgeRetriever
 
 logger = logging.getLogger(__name__)
 
@@ -30,11 +31,13 @@ class ChatService:
 
     def __init__(
         self,
-        codex_agent: CodexKnowledgeAgent,
+        codex_agent: Optional[CodexKnowledgeAgent],
+        knowledge_retriever: Optional[KnowledgeRetriever] = None,
         openai_client: Optional[AsyncOpenAI] = None,
         chat_model: Optional[str] = None,
     ):
         self.codex = codex_agent
+        self.retriever = knowledge_retriever
         self.client = openai_client or AsyncOpenAI(
             api_key=settings.OPENAI_API_KEY,
         )
@@ -64,10 +67,16 @@ class ChatService:
         voice_instructions : str | None
             Per-character prompt override (from DB).
         """
-        # Step 1 — retrieve literary context via Codex
-        retrieved_context = await self.codex.search_context(
-            character_name, user_message
-        )
+        # Step 1 — retrieve character-scoped literary context.
+        retrieved_context = ""
+        if self.retriever is not None:
+            retrieved_context = self.retriever.search_context(
+                character_slug, user_message
+            )
+        if not retrieved_context and self.codex is not None:
+            retrieved_context = await self.codex.search_context(
+                character_name, user_message
+            )
         if not retrieved_context:
             retrieved_context = (
                 "(Không tìm thấy ngữ cảnh cụ thể trong kho kiến thức. "
@@ -106,8 +115,14 @@ class ChatService:
 _service: Optional[ChatService] = None
 
 
-def get_chat_service(codex_agent: CodexKnowledgeAgent) -> ChatService:
+def get_chat_service(
+    codex_agent: Optional[CodexKnowledgeAgent],
+    knowledge_retriever: Optional[KnowledgeRetriever] = None,
+) -> ChatService:
     global _service
     if _service is None:
-        _service = ChatService(codex_agent=codex_agent)
+        _service = ChatService(
+            codex_agent=codex_agent,
+            knowledge_retriever=knowledge_retriever,
+        )
     return _service
