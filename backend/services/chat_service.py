@@ -70,9 +70,15 @@ class ChatService:
         # Step 1 — retrieve character-scoped literary context.
         retrieved_context = ""
         if self.retriever is not None:
-            retrieved_context = self.retriever.search_context(
-                character_slug, user_message
-            )
+            if hasattr(self.retriever, "search_context_async"):
+                retrieved_context = await self.retriever.search_context_async(
+                    character_slug,
+                    user_message,
+                )
+            else:
+                retrieved_context = self.retriever.search_context(
+                    character_slug, user_message
+                )
         if not retrieved_context and self.codex is not None:
             retrieved_context = await self.codex.search_context(
                 character_name, user_message
