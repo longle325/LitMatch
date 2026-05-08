@@ -212,9 +212,10 @@ async def seed_demo_users(session) -> int:
 
 
 async def run_seed(include_demo_users: bool = True) -> None:
-    from core.database import Base, async_session_factory, engine
+    from core.database import Base, async_session_factory, engine, ensure_vector_extension
     import models.db_models  # noqa: F401
 
+    await ensure_vector_extension()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 

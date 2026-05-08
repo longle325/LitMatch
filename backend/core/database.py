@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
+from sqlalchemy import text
 from sqlalchemy.orm import DeclarativeBase
 
 from core.config import settings
@@ -30,3 +31,9 @@ class Base(DeclarativeBase):
     """Declarative base for all ORM models."""
 
     pass
+
+
+async def ensure_vector_extension() -> None:
+    """Enable pgvector before creating tables that use vector columns."""
+    async with engine.begin() as conn:
+        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
