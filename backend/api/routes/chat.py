@@ -15,6 +15,9 @@ Pipeline:
 from __future__ import annotations
 
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -118,16 +121,27 @@ async def chat_stream(
                 ensure_ascii=False,
             ),
         }
-        async for chunk in chat_service.stream_response(
-            character_slug=character.slug,
-            character_name=character.name,
-            user_message=body.message,
-            voice_instructions=character.voice_instructions,
-            chat_history=chat_history,
-            retrieval=retrieval,
-        ):
-            assistant_chunks.append(chunk)
-            yield {"data": chunk}
+        try:
+            async for chunk in chat_service.stream_response(
+                character_slug=character.slug,
+                character_name=character.name,
+                user_message=body.message,
+                voice_instructions=character.voice_instructions,
+                chat_history=chat_history,
+                retrieval=retrieval,
+            ):
+                assistant_chunks.append(chunk)
+                yield {"data": chunk}
+        except Exception as exc:
+            logger.exception("Chat stream failed: %s", exc)
+            yield {
+                "event": "error",
+                "data": json.dumps(
+                    {"error": str(exc)},
+                    ensure_ascii=False,
+                ),
+            }
+            return
         assistant_message = "".join(assistant_chunks).strip()
         if assistant_message:
             await db.create_chat_message(

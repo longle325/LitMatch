@@ -5,15 +5,15 @@ dist/
 .venv-*/
 __pycache__/
 *.py[cod]
-
-Techstack.md
 *.tsbuildinfo
 .env
 .env.local
 .env.*.local
+.ruff_cache/
 
-# Knowledge-base SQL dumps — ship via team Drive (see scripts/restore-knowledge-chunks.sh)
+# Knowledge-base SQL dumps — ship via team Drive
 backend/data/*.sql.gz
 
-# Source content reference dropped here by the team — not for git
+# Source content reference — not for git
 Content for Hackathon game *.pdf
+image.png
