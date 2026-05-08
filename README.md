@@ -12,7 +12,7 @@ A gamified Vietnamese literature learning app. Swipe to discover characters, cha
 
 - Node 18+, npm
 - Python 3.11+
-- Docker Desktop running
+- Docker Desktop for Mac installed and running (`docker --version` and `docker compose version` should both work)
 - An OpenAI API key
 
 ## First-time setup
