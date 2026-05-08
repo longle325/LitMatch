@@ -1,9 +1,16 @@
 import tempfile
 import unittest
+import json
 from pathlib import Path
 
-from scripts.ingest_knowledge_base import write_jsonl
 from services.knowledge_retriever import KnowledgeRetriever
+
+
+def write_jsonl(path: Path, rows: list[dict]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as file:
+        for row in rows:
+            file.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
 class KnowledgeRetrieverTests(unittest.TestCase):
