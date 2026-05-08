@@ -4,6 +4,7 @@ import { useAppStore } from "@/stores/useAppStore";
 
 export const queryKeys = {
   deck: ["deck"] as const,
+  characters: ["characters"] as const,
   character: (id: string) => ["character", id] as const,
   challenge: (id: string) => ["challenge", id] as const,
   leaderboard: ["leaderboard"] as const,
@@ -13,6 +14,13 @@ export function useDeck() {
   return useQuery({
     queryKey: queryKeys.deck,
     queryFn: api.getDeck,
+  });
+}
+
+export function useAllCharacters() {
+  return useQuery({
+    queryKey: queryKeys.characters,
+    queryFn: api.getAllCharacters,
   });
 }
 

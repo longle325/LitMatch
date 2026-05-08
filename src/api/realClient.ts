@@ -166,6 +166,13 @@ export const realClient: ApiClient = {
       .filter((c): c is Character => c !== undefined);
   },
 
+  async getAllCharacters(): Promise<Character[]> {
+    const cards = await apiFetch<BackendCharacterCard[]>("/characters");
+    return cards
+      .map((card) => mergeBackendCharacter(card))
+      .filter((c): c is Character => c !== undefined);
+  },
+
   async getCharacter(slug: string): Promise<Character> {
     const uuid = await resolveSlugToUuid(slug);
     const card = await apiFetch<BackendCharacterCard>(

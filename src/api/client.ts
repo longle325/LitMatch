@@ -25,6 +25,11 @@ export const api: ApiClient = {
   getDeck: () =>
     useReal("deck") ? realClient.getDeck() : mockClient.getDeck(),
 
+  getAllCharacters: () =>
+    useReal("characters")
+      ? realClient.getAllCharacters()
+      : mockClient.getAllCharacters(),
+
   getCharacter: (id) =>
     useReal("characters")
       ? realClient.getCharacter(id)
