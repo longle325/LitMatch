@@ -16,3 +16,4 @@ backend/data/*.sql.gz
 
 # Source content reference — not for git
 Content for Hackathon game *.pdf
+image.png
