@@ -110,19 +110,7 @@ async def submit_challenge(
 ):
     await _validate_challenge_access(session, body.user_id, body.character_id)
 
-    # Prevent duplicate point awards. Retry rules are not defined for MVP.
-    existing_attempt = await db.get_challenge_attempt(
-        session,
-        body.user_id,
-        body.character_id,
-    )
-    if existing_attempt:
-        raise HTTPException(
-            status_code=409,
-            detail="Challenge already submitted for this character.",
-        )
-
-    # Load challenge
+    # Load challenge first so we can grade.
     challenge = await db.get_challenge_for_character(session, body.character_id)
     if not challenge:
         raise HTTPException(
@@ -137,42 +125,66 @@ async def submit_challenge(
             detail=f"Expected {len(questions)} answers, got {len(body.answers)}.",
         )
 
-    # Grade
+    # Grade.
     score = 0
     explanations: list[str] = []
+    correct_answers: list[int] = []
     for q, user_answer in zip(questions, body.answers):
-        if user_answer == q["correct_answer_index"]:
+        correct_index = q["correct_answer_index"]
+        correct_answers.append(correct_index)
+        if user_answer == correct_index:
             score += 1
         explanations.append(q.get("explanation", ""))
 
     total = len(questions)
     passed = score >= settings.CHALLENGE_PASS_THRESHOLD
 
-    # Calculate points
+    # Points per PRD §6.5: completion bonus + (optional) pass bonus only.
     points = settings.POINTS_CHALLENGE_COMPLETE
     if passed:
         points += settings.POINTS_CHALLENGE_PASS_BONUS
+
+    # Retake handling: if the user has a previous attempt for this character,
+    # roll back the points they earned then so total_score reflects only the
+    # latest attempt. Then replace the attempt row in place.
+    existing_attempt = await db.get_challenge_attempt(
+        session,
+        body.user_id,
+        body.character_id,
+    )
+    if existing_attempt is not None:
+        await db.add_points(session, body.user_id, -existing_attempt.points_earned)
+
+    await db.add_points(session, body.user_id, points)
+
+    if passed:
         await db.update_match_status(
             session,
             body.user_id,
             body.character_id,
             MatchStatus.CHALLENGE_PASSED,
         )
-    if score == total:
-        points += settings.POINTS_PERFECT_SCORE_BONUS
 
-    await db.add_points(session, body.user_id, points)
-    await db.create_challenge_attempt(
-        session,
-        user_id=body.user_id,
-        character_id=body.character_id,
-        answers=body.answers,
-        score=score,
-        total=total,
-        passed=passed,
-        points_earned=points,
-        explanations=explanations,
-    )
+    if existing_attempt is not None:
+        existing_attempt.answers = body.answers
+        existing_attempt.score = score
+        existing_attempt.total = total
+        existing_attempt.passed = passed
+        existing_attempt.points_earned = points
+        existing_attempt.explanations = explanations
+        await session.commit()
+    else:
+        await db.create_challenge_attempt(
+            session,
+            user_id=body.user_id,
+            character_id=body.character_id,
+            answers=body.answers,
+            score=score,
+            total=total,
+            passed=passed,
+            points_earned=points,
+            explanations=explanations,
+        )
 
     return ChallengeResult(
         score=score,
@@ -180,4 +192,5 @@ async def submit_challenge(
         passed=passed,
         points_earned=points,
         explanations=explanations,
+        correct_answers=correct_answers,
     )

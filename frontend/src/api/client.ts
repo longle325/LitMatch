@@ -1,105 +1,74 @@
-import { characters, getCharacter } from "@/data/characters";
-import { demoLeaders } from "@/data/leaderboard";
-import { scoreChallenge } from "@/lib/scoring";
-import type {
-  Character,
-  ChallengeQuestion,
-  ChallengeResult,
-  LeaderboardEntry,
-} from "@/types";
+/**
+ * API router. Each method picks `realClient` or `mockClient` based on the
+ * `VITE_REAL_ENDPOINTS` env flag, so endpoints can flip from mock to real
+ * one at a time.
+ *
+ * Callers (route files, hooks in queries.ts) import `api` and never reach
+ * past this seam. The two underlying clients implement the same `ApiClient`
+ * interface defined in `./types.ts`.
+ */
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+import { mockClient } from "./mockClient";
+import { realClient } from "./realClient";
+import { useReal } from "./adapter";
+import type { ApiClient, ChatRequest } from "./types";
 
-export interface ApiClient {
-  getDeck: () => Promise<Character[]>;
-  getCharacter: (id: string) => Promise<Character>;
-  recordMatch: (id: string) => Promise<{ ok: true }>;
-  getChallenge: (id: string) => Promise<ChallengeQuestion[]>;
-  submitChallenge: (id: string, answers: number[]) => Promise<ChallengeResult>;
-  getLeaderboard: () => Promise<LeaderboardEntry[]>;
-  streamChat: (input: ChatRequest) => AsyncIterable<string>;
-}
+export type { ApiClient, ChatRequest, CreateUserInput } from "./types";
+export { ApiError } from "./adapter";
 
-export interface ChatRequest {
-  characterId: string;
-  message: string;
-  signal?: AbortSignal;
-}
+export const api: ApiClient = {
+  createUser: (input) =>
+    useReal("auth")
+      ? realClient.createUser(input)
+      : mockClient.createUser(input),
 
-async function* mockStreamChat({
-  characterId,
-  message,
-  signal,
-}: ChatRequest): AsyncIterable<string> {
-  const character = getCharacter(characterId);
-  if (!character) throw new Error(`Unknown character: ${characterId}`);
+  getDeck: () =>
+    useReal("deck") ? realClient.getDeck() : mockClient.getDeck(),
 
-  const reply = composeReply(character, message);
-  const chunks = reply.match(/\S+\s*/g) ?? [reply];
-  for (const chunk of chunks) {
-    if (signal?.aborted) return;
-    await delay(35);
-    yield chunk;
-  }
-}
+  getAllCharacters: () =>
+    useReal("characters")
+      ? realClient.getAllCharacters()
+      : mockClient.getAllCharacters(),
 
-function composeReply(character: Character, text: string): string {
-  const lower = text.toLowerCase();
-  if (
-    lower.includes("essay") ||
-    lower.includes("bài văn mẫu") ||
-    lower.includes("viết bài")
-  ) {
-    return "Mình không tạo bài văn mẫu hoàn chỉnh. Mình có thể giúp bạn lập dàn ý, tìm luận điểm và dẫn chứng để bạn tự viết bằng giọng của mình.";
-  }
-  if (lower.includes("không rõ") || lower.includes("ngoài tác phẩm")) {
-    return "Phần này chưa có đủ nguồn trong bộ ghi chú hiện có, nên mình không khẳng định như sự thật văn bản. Ta có thể quay lại các chi tiết đã duyệt trước.";
-  }
-  const source =
-    character.sources.find((item) =>
-      lower
-        .split(/\s+/)
-        .some(
-          (word) => word.length > 3 && item.toLowerCase().includes(word),
-        ),
-    ) ?? character.sources[0];
-  return `Theo giọng của ${character.name}, câu trả lời nên xuất phát từ mâu thuẫn cốt lõi: ${character.conflict} Ghi chú nguồn liên quan: ${source} Đây là diễn giải học tập, không phải trích dẫn nguyên văn toàn bộ tác phẩm.`;
-}
+  getCharacter: (id) =>
+    useReal("characters")
+      ? realClient.getCharacter(id)
+      : mockClient.getCharacter(id),
 
-export const mockClient: ApiClient = {
-  async getDeck() {
-    await delay(0);
-    return characters;
-  },
-  async getCharacter(id) {
-    await delay(0);
-    const character = getCharacter(id);
-    if (!character) throw new Error(`Unknown character: ${id}`);
-    return character;
-  },
-  async recordMatch(_id) {
-    await delay(0);
-    return { ok: true };
-  },
-  async getChallenge(id) {
-    await delay(0);
-    const character = getCharacter(id);
-    if (!character) throw new Error(`Unknown character: ${id}`);
-    return character.challenge;
-  },
-  async submitChallenge(id, answers) {
-    await delay(0);
-    const character = getCharacter(id);
-    if (!character) throw new Error(`Unknown character: ${id}`);
-    return scoreChallenge(character, answers);
-  },
-  async getLeaderboard() {
-    await delay(0);
-    return demoLeaders;
-  },
-  streamChat(input) {
-    return mockStreamChat(input);
-  },
+  recordMatch: (id) =>
+    useReal("match")
+      ? realClient.recordMatch(id)
+      : mockClient.recordMatch(id),
+
+  recordSkip: (id) =>
+    useReal("match") ? realClient.recordSkip(id) : mockClient.recordSkip(id),
+
+  getChallenge: (id) =>
+    useReal("challenge")
+      ? realClient.getChallenge(id)
+      : mockClient.getChallenge(id),
+
+  submitChallenge: (id, answers) =>
+    useReal("challenge")
+      ? realClient.submitChallenge(id, answers)
+      : mockClient.submitChallenge(id, answers),
+
+  getLeaderboard: () =>
+    useReal("leaderboard")
+      ? realClient.getLeaderboard()
+      : mockClient.getLeaderboard(),
+
+  getChatHistory: (id) =>
+    useReal("chat")
+      ? realClient.getChatHistory(id)
+      : mockClient.getChatHistory(id),
+
+  streamChat: (input: ChatRequest) =>
+    useReal("chat")
+      ? realClient.streamChat(input)
+      : mockClient.streamChat(input),
 };
 
-export const api: ApiClient = mockClient;
+// Underlying clients are exported for tests / advanced wiring. Production
+// code should always go through `api`.
+export { mockClient, realClient };

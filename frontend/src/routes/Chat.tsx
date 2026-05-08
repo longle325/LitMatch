@@ -4,7 +4,7 @@ import { BookOpen, Send, Sparkles, Pencil, AlertCircle } from "lucide-react";
 import { useCharacter } from "@/api/queries";
 import { api } from "@/api/client";
 import { useAppStore } from "@/stores/useAppStore";
-import type { Character, ChatMessage } from "@/types";
+import type { Character, ChatMessage, ChatSource } from "@/types";
 
 const defaultOpening = (character: Character) =>
   `Tôi là ${character.name}. Hãy hỏi tôi về một biểu tượng, xung đột hoặc lựa chọn khiến nhân vật trong ${character.work} trở nên đáng suy nghĩ.`;
@@ -88,8 +88,37 @@ function CharacterMessage({
   return (
     <div className="message-row bot">
       {avatar}
-      <div className="message bot">{message.text}</div>
+      <div className="message bot">
+        {message.text}
+        {message.sources && message.sources.length > 0 && (
+          <ChatSourceChips sources={message.sources} />
+        )}
+      </div>
     </div>
+  );
+}
+
+function ChatSourceChips({ sources }: { sources: ChatSource[] }) {
+  // De-duplicate by title so the same work doesn't render twice when the
+  // retriever surfaces multiple chunks from one document.
+  const seen = new Set<string>();
+  const unique: ChatSource[] = [];
+  for (const s of sources) {
+    if (seen.has(s.title)) continue;
+    seen.add(s.title);
+    unique.push(s);
+  }
+  return (
+    <ul className="chat-sources" aria-label="Nguồn dẫn">
+      {unique.map((source, index) => (
+        <li key={`${source.title}-${index}`} className="chat-source-chip">
+          <span className="chat-source-title">{source.title}</span>
+          {source.snippet && (
+            <span className="chat-source-snippet">{source.snippet}</span>
+          )}
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -138,10 +167,22 @@ function ChatInput({
   onSubmit: (event: React.FormEvent) => void;
 }) {
   const handleTextAreaKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      onSubmit(event);
+    // Guard against the dupe-message bug with Vietnamese IME (macOS, Telex,
+    // Bộ gõ tiếng Việt, etc.): when the user finalises a tone-marked word
+    // and presses Enter, the browser fires *two* keydown events — one from
+    // compositionend (which has `isComposing = true` or `keyCode === 229`)
+    // and a real one. Without this guard, the first call submits the full
+    // draft and the second submits the trailing word residue.
+    if (
+      event.key !== "Enter" ||
+      event.shiftKey ||
+      event.nativeEvent.isComposing ||
+      event.keyCode === 229
+    ) {
+      return;
     }
+    event.preventDefault();
+    onSubmit(event);
   };
 
   return (
@@ -161,9 +202,10 @@ function ChatInput({
       <Link
         className="btn secondary deeper-button"
         to={`/characters/${characterId}/challenge`}
+        aria-label="Mở trang thử thách 5 câu"
       >
         <Sparkles size={19} strokeWidth={1.8} />
-        Hỏi sâu hơn
+        Làm thử thách
       </Link>
       <button
         className="btn ghost send-button"
@@ -268,7 +310,35 @@ export default function Chat() {
   const matches = useAppStore((s) => s.matches);
   const chats = useAppStore((s) => s.chats);
   const appendChat = useAppStore((s) => s.appendChat);
+  const setChat = useAppStore((s) => s.setChat);
   const { data: character, isLoading } = useCharacter(id);
+
+  // Rehydrate chat history from the backend on mount. Mock returns [] so
+  // existing local-only state is left untouched.
+  //
+  // Race guard: if the user types and submits a message before the history
+  // request resolves, `appendChat` has already updated the store. Don't
+  // clobber that local progress — only replace when the local thread is
+  // still empty.
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+    api.getChatHistory(id).then(
+      (history) => {
+        if (cancelled || history.length === 0) return;
+        const localCount =
+          useAppStore.getState().chats[id]?.length ?? 0;
+        if (localCount > 0) return;
+        setChat(id, history);
+      },
+      () => {
+        // Backend down or chat flag off — fall back to whatever Zustand has.
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [id, setChat]);
 
   const [draft, setDraft] = useState("");
   const [streaming, setStreaming] = useState("");
@@ -330,20 +400,33 @@ export default function Chat() {
     appendChat(id, { from: "user", text });
 
     let buffer = "";
+    const sources: ChatSource[] = [];
     setStreaming("");
     try {
-      for await (const chunk of api.streamChat({
+      for await (const event of api.streamChat({
         characterId: id,
         message: text,
       })) {
-        buffer += chunk;
-        setStreaming(buffer);
+        if (event.kind === "token") {
+          buffer += event.text;
+          setStreaming(buffer);
+        } else if (event.kind === "source") {
+          sources.push(event.source);
+        }
       }
-      appendChat(id, { from: "bot", text: buffer });
+      appendChat(id, {
+        from: "bot",
+        text: buffer,
+        sources: sources.length ? sources : undefined,
+      });
     } catch (err) {
       console.error("chat stream failed", err);
       if (buffer) {
-        appendChat(id, { from: "bot", text: buffer });
+        appendChat(id, {
+          from: "bot",
+          text: buffer,
+          sources: sources.length ? sources : undefined,
+        });
       }
       setError(
         "Không tạo được phản hồi. Vui lòng kiểm tra kết nối và thử lại.",

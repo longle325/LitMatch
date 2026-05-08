@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ShieldCheck, LockOpen, ChevronDown } from "lucide-react";
-import { useDeck } from "@/api/queries";
+import { useAllCharacters } from "@/api/queries";
 import { useAppStore } from "@/stores/useAppStore";
 import CharacterArt from "@/components/CharacterArt";
 import type { Character, ChallengeResult } from "@/types";
@@ -88,13 +88,17 @@ function CollectionCard({
 }
 
 export default function Collection() {
-  const { data: deck = [] } = useDeck();
+  // Collection needs the FULL character catalog, not the deck.
+  // `useDeck()` in real mode only returns UNSWIPED characters (backend
+  // filter), so any matched character would be filtered out and the
+  // collection would render empty — which is the bug we're fixing.
+  const { data: catalog = [] } = useAllCharacters();
   const matches = useAppStore((s) => s.matches);
   const completed = useAppStore((s) => s.completed);
   const [sort, setSort] = useState<SortKey>("recent");
   const [open, setOpen] = useState(false);
 
-  const matched = deck
+  const matched = catalog
     .filter((character) => matches.includes(character.id))
     .map((character) => ({
       character,
