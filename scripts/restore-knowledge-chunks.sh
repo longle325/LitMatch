@@ -22,7 +22,11 @@ PGUSER_NAME="${LITMATCH_PG_USER:-postgres}"
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DUMP="$REPO_ROOT/backend/data/knowledge_chunks.sql.gz"
-DUMP_URL="${DUMP_URL:-}"
+
+# Default to the team's Google Drive copy (gzipped pg_dump of the
+# knowledge_chunks table). Override with `DUMP_URL=...` if you've moved it.
+DEFAULT_DUMP_URL="https://drive.google.com/uc?export=download&id=1cGlRIXH9EOJEwfb22USsUhSV6NCAcq_D"
+DUMP_URL="${DUMP_URL:-$DEFAULT_DUMP_URL}"
 
 if [ ! -f "$DUMP" ] && [ -n "$DUMP_URL" ]; then
   echo "Downloading dump from $DUMP_URL ..."
