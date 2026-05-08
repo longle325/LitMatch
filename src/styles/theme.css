@@ -1348,6 +1348,93 @@ small,
 }
 
 /* ============================================================
+ * Voice play button — sits next to character quote
+ * ============================================================ */
+.quote-row {
+  position: relative;
+  display: block;
+}
+
+.quote-row .quote {
+  margin: 0;
+  padding-right: 72px;
+}
+
+.quote-row .voice-play-button {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.quote-row .voice-play-button:hover {
+  transform: translateY(-50%) scale(1.06);
+}
+
+.voice-play-button {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-lowest);
+  border: 1.5px solid var(--cinnabar);
+  color: var(--cinnabar);
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+  box-shadow: 0 2px 6px rgba(74, 51, 28, 0.18);
+}
+
+.voice-play-button.md {
+  width: 44px;
+  height: 44px;
+}
+
+.voice-play-button.sm {
+  width: 36px;
+  height: 36px;
+}
+
+.voice-play-button .material-symbols-outlined {
+  font-size: 26px;
+  font-variation-settings: "FILL" 0, "wght" 400;
+}
+
+.voice-play-button.sm .material-symbols-outlined {
+  font-size: 22px;
+}
+
+.voice-play-button:hover {
+  background: var(--cinnabar);
+  color: var(--surface-lowest);
+  transform: scale(1.04);
+}
+
+.voice-play-button.playing {
+  background: var(--cinnabar);
+  color: var(--surface-lowest);
+  animation: voice-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes voice-pulse {
+  0%,
+  100% {
+    box-shadow: 0 2px 6px rgba(74, 51, 28, 0.18),
+      0 0 0 0 rgba(122, 28, 28, 0.35);
+  }
+  50% {
+    box-shadow: 0 2px 6px rgba(74, 51, 28, 0.18),
+      0 0 0 8px rgba(122, 28, 28, 0);
+  }
+}
+
+.voice-play-button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ============================================================
  * Collection card — link affordances on portrait + name
  * ============================================================ */
 .collection-image-link {

@@ -2,6 +2,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { useCharacter } from "@/api/queries";
 import { useAppStore } from "@/stores/useAppStore";
 import CharacterArt from "@/components/CharacterArt";
+import VoicePlayButton from "@/components/VoicePlayButton";
 import type { Character } from "@/types";
 
 function splitTraits(personality: string): string[] {
@@ -86,9 +87,12 @@ export default function CharacterProfile() {
           </div>
         </div>
 
-        <blockquote className="quote profile-quote">
-          "{character.quote}"
-        </blockquote>
+        <div className="quote-row profile-quote-row">
+          <blockquote className="quote profile-quote">
+            "{character.quote}"
+          </blockquote>
+          <VoicePlayButton characterId={character.id} />
+        </div>
 
         <div className="character-profile-grid">
           <section className="profile-section">
