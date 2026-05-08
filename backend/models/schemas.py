@@ -169,6 +169,16 @@ class ChallengeResult(BaseModel):
     explanations: List[str]
 
 
+class ChallengeAttemptResponse(ChallengeResult):
+    id: UUID
+    user_id: UUID
+    character_id: UUID
+    answers: List[int]
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
 # ── Leaderboard ───────────────────────────────────────────────────────────
 
 

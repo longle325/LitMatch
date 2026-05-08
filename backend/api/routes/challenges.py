@@ -12,13 +12,14 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.deps import get_db
 from core.config import settings
 from models.db_models import MatchStatus
 from models.schemas import (
+    ChallengeAttemptResponse,
     ChallengeQuestion,
     ChallengeQuestionsResponse,
     ChallengeResult,
@@ -27,6 +28,29 @@ from models.schemas import (
 from services import db_postgres as db
 
 router = APIRouter(tags=["challenges"])
+
+
+async def _validate_challenge_access(
+    session: AsyncSession,
+    user_id: UUID,
+    character_id: UUID,
+):
+    user = await db.get_user(session, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    character = await db.get_character(session, character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="Character not found.")
+
+    match = await db.get_match(session, user_id, character_id)
+    if not match or match.status == MatchStatus.SWIPED_LEFT:
+        raise HTTPException(
+            status_code=403,
+            detail="You must match with this character first.",
+        )
+
+    return user, character, match
 
 
 @router.get(
@@ -63,23 +87,28 @@ async def get_challenge(
     )
 
 
+@router.get("/challenges/result", response_model=ChallengeAttemptResponse)
+async def get_challenge_result(
+    user_id: UUID = Query(..., description="Current user's UUID"),
+    character_id: UUID = Query(..., description="Character UUID"),
+    session: AsyncSession = Depends(get_db),
+):
+    await _validate_challenge_access(session, user_id, character_id)
+    attempt = await db.get_challenge_attempt(session, user_id, character_id)
+    if not attempt:
+        raise HTTPException(
+            status_code=404,
+            detail="No submitted challenge result for this character.",
+        )
+    return ChallengeAttemptResponse.model_validate(attempt)
+
+
 @router.post("/challenges/submit", response_model=ChallengeResult)
 async def submit_challenge(
     body: ChallengeSubmission,
     session: AsyncSession = Depends(get_db),
 ):
-    # Validate user
-    user = await db.get_user(session, body.user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
-
-    # Validate match exists
-    match = await db.get_match(session, body.user_id, body.character_id)
-    if not match or match.status == MatchStatus.SWIPED_LEFT:
-        raise HTTPException(
-            status_code=403,
-            detail="You must match with this character first.",
-        )
+    await _validate_challenge_access(session, body.user_id, body.character_id)
 
     # Prevent duplicate point awards. Retry rules are not defined for MVP.
     existing_attempt = await db.get_challenge_attempt(
