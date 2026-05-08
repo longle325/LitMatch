@@ -23,7 +23,14 @@ class Settings(BaseSettings):
     RAG_MIN_SIMILARITY: float = 0.0
 
     # --- CORS ---
-    CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:3000"]
+    # The FE dev server (`npm run dev`) binds to 127.0.0.1:5173 per the
+    # repo's package.json. Browsers treat 127.0.0.1 and localhost as
+    # distinct origins, so list both.
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+    ]
 
     # --- App ---
     APP_TITLE: str = "LitMatch API"

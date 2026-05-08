@@ -1,5 +1,6 @@
 import { useLeaderboard } from "@/api/queries";
 import { useAppStore } from "@/stores/useAppStore";
+import type { LeaderboardEntry } from "@/types";
 
 export default function Leaderboard() {
   const { data: demo = [] } = useLeaderboard();
@@ -7,12 +8,27 @@ export default function Leaderboard() {
   const points = useAppStore((s) => s.points);
   const completed = useAppStore((s) => s.completed);
 
-  const current = {
-    name: profile?.username || "Bạn",
-    points,
-    unlocked: Object.values(completed).filter((r) => r.passed).length,
-  };
-  const rows = [...demo, current].sort((a, b) => b.points - a.points);
+  const currentName = profile?.username || "Bạn";
+  const currentUnlocked = Object.values(completed).filter((r) => r.passed).length;
+
+  // If the backend response already includes the current user (matched by
+  // userId — present in real mode), use those entries verbatim so we don't
+  // double-list. Otherwise fall back to the legacy mock-merge behavior where
+  // we synthesize a "Bạn" row from local Zustand state.
+  const includesCurrentUser =
+    profile?.userId !== undefined &&
+    demo.some((entry) => entry.userId === profile.userId);
+
+  const rows = (
+    includesCurrentUser
+      ? demo
+      : [...demo, { name: currentName, points, unlocked: currentUnlocked }]
+  ).sort((a, b) => b.points - a.points);
+
+  const isCurrentRow = (row: LeaderboardEntry) =>
+    profile?.userId !== undefined
+      ? row.userId === profile.userId
+      : row.name === currentName;
 
   return (
     <section className="page reference-leaderboard">
@@ -34,7 +50,7 @@ export default function Leaderboard() {
           <span>Tổng điểm</span>
         </div>
         {rows.map((row, index) => {
-          const isCurrent = row.name === current.name;
+          const isCurrent = isCurrentRow(row);
           const initials = row.name
             .split(" ")
             .map((part) => part[0])

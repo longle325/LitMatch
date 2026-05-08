@@ -196,6 +196,7 @@ export const realClient: ApiClient = {
       name: entry.username,
       points: entry.total_score,
       unlocked: entry.characters_unlocked,
+      userId: entry.user_id,
     }));
   },
 
