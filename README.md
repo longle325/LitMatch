@@ -1,71 +1,66 @@
 # LitMatch
 
-A gamified Vietnamese literature learning app. Students discover literary characters through swipe cards, chat with source-grounded AI personas, complete character challenges, and compete on a leaderboard.
-
-> **Status:** Frontend prototype. No backend wired yet — all data is mocked locally. See [docs/API.md](./docs/API.md) for the backend contract that will replace the mock layer.
+A gamified Vietnamese literature learning app. Swipe to discover characters, chat with source-grounded AI personas, complete challenges, climb the leaderboard.
 
 ## Stack
 
-- **React 18 + TypeScript** with Vite
-- **React Router DOM** for routing
-- **Zustand** (with `persist` middleware) for client state
-- **TanStack Query** for API state
-- **Tailwind CSS** + legacy custom CSS (in `src/styles/legacy.css`)
-- **react-tinder-card** for the swipe deck
-- **React Hook Form** for onboarding/forms
-- **Framer Motion**, **Lucide React** (installed; used during polish phase)
+- **Frontend**: React 18 + TypeScript + Vite, Zustand, TanStack Query, react-tinder-card
+- **Backend**: FastAPI, SQLAlchemy (async), Postgres + pgvector, OpenAI GPT-4o + `text-embedding-3-large`, SSE streaming
+- **Infra**: Postgres in Docker (`pgvector/pgvector:pg17`)
 
 ## Prerequisites
 
-- **Node.js 18+** (developed against 22.x)
-- **npm** (ships with Node)
+- Node 18+, npm
+- Python 3.11+
+- Docker Desktop running
+- An OpenAI API key
 
-## Local development
+## First-time setup
 
 ```sh
+# 1. Env
+cp .env.example .env   # then add OPENAI_API_KEY
+
+# 2. Frontend
 npm install
-npm run dev
+
+# 3. Backend
+cd backend
+python3 -m venv .venv
+./.venv/bin/pip install -r requirements.txt
+cd ..
+
+# 4. Postgres + schema + seed (characters, challenges, demo users)
+docker compose up -d postgres
+cd backend && ./.venv/bin/python scripts/seed_database.py && cd ..
+
+# 5. Knowledge-base embeddings — restore the team's pre-embedded
+#    pgvector dump from Drive (no OpenAI cost, ~1s):
+#    https://drive.google.com/file/d/1cGlRIXH9EOJEwfb22USsUhSV6NCAcq_D/view
+bash scripts/restore-knowledge-chunks.sh
 ```
 
-Open <http://127.0.0.1:5173/>. First load redirects to `/onboarding` — enter a username and pick a grade to enter the app.
+## Run locally
 
-## Scripts
+```sh
+docker compose up -d postgres                                       # one-time
+cd backend && ./.venv/bin/python -m uvicorn main:app --reload --port 8081   # T1
+npm run dev                                                          # T2
+```
 
-| Script | What it does |
-| --- | --- |
-| `npm run dev` | Start Vite dev server on `127.0.0.1:5173` |
-| `npm run build` | Type-check (`tsc -b`) then produce a production build in `dist/` |
-| `npm run preview` | Serve the production build locally |
-| `npm run typecheck` | Type-check only, no emit |
+Open <http://127.0.0.1:5173/>.
 
 ## Project layout
 
 ```
-src/
-  api/          API client (mock now; swap to HTTP later) and TanStack Query hooks
-  components/   AppShell, RequireProfile guard, CharacterCard, CharacterArt
-  data/         Seed characters and demo leaderboard
-  lib/          Pure helpers (challenge scoring)
-  routes/       One file per route (Onboarding, Discover, Chat, Challenge, Collection, Leaderboard, Profile)
-  stores/       Zustand store (persisted to localStorage)
-  styles/       Global CSS (Tailwind directives + ported legacy stylesheet)
-  types/        Shared TypeScript types
+src/             Frontend (React + TS): api/, components/, routes/, stores/, styles/, types/
+backend/         FastAPI service: api/routes/, services/, models/, knowledge_base/, scripts/, migrations/
+scripts/         Bash: dump/restore knowledge-chunks
+docs/API.md      Backend API contract
+PRD.md, task.md  Product spec + task tracker
 ```
 
-Other top-level folders:
+## Notes
 
-- `design reference/` — design mockups and screenshots used as visual targets
-- `_legacy/` — original vanilla-JS prototype kept for diff reference; not part of the build
-- `Content_reference.csv` / `Content for Hackathon game - Sheet1.pdf` — source content for the five MVP characters
-
-## How state works
-
-User-facing state (profile, points, matches, completed challenges, chat history) lives in a Zustand store and is persisted to `localStorage` under the key `litmatch-state`. To reset: open `/profile` and click **Đặt lại dữ liệu thử nghiệm**, or clear the key from devtools.
-
-The seed character data, demo leaderboard users, and AI replies are all read from local files in `src/data/` and `src/api/client.ts`. None of this hits a network. When the backend is ready, the only file that needs to change is `src/api/client.ts` — the contract is documented in [docs/API.md](./docs/API.md).
-
-## Documentation
-
-- [PRD.md](./PRD.md) — product requirements
-- [docs/API.md](./docs/API.md) — backend API contract
-- [task.md](./task.md) — task tracker
+- `VITE_REAL_ENDPOINTS` in `.env` whitelists which endpoints hit the real backend; empty = all mock (no backend needed for offline UI demos).
+- The FE persists user state to `localStorage` under `litmatch-state`. Reset via `/profile` → **Đặt lại dữ liệu thử nghiệm**.

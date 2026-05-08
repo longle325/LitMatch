@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/stores/useAppStore";
+import { api, ApiError } from "@/api/client";
 import type { Grade } from "@/types";
 
 interface FormValues {
@@ -13,21 +15,39 @@ const grades: Grade[] = [10, 11, 12];
 export default function Onboarding() {
   const setProfile = useAppStore((s) => s.setProfile);
   const navigate = useNavigate();
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [composing, setComposing] = useState(false);
   const {
     register,
     handleSubmit,
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     defaultValues: { username: "", grade: 10 },
   });
 
   const selectedGrade = watch("grade");
 
-  const onSubmit = (values: FormValues) => {
-    setProfile(values.username.trim(), Number(values.grade) as Grade);
-    navigate("/discover", { replace: true });
+  const onSubmit = async (values: FormValues) => {
+    setSubmitError(null);
+    const username = values.username.trim();
+    const grade = Number(values.grade) as Grade;
+    try {
+      const profile = await api.createUser({ username, grade });
+      setProfile(profile.username, profile.grade, profile.userId);
+      navigate("/discover", { replace: true });
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 409) {
+        setSubmitError("Tên này đã được dùng. Hãy chọn tên khác.");
+        return;
+      }
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Không tạo được tài khoản. Vui lòng thử lại.";
+      setSubmitError(message);
+    }
   };
 
   return (
@@ -45,6 +65,8 @@ export default function Onboarding() {
             <input
               autoComplete="off"
               placeholder="Ví dụ: Lan Anh"
+              onCompositionStart={() => setComposing(true)}
+              onCompositionEnd={() => setComposing(false)}
               {...register("username", {
                 required: "Vui lòng nhập tên hiển thị",
                 minLength: { value: 1, message: "Tên không được để trống" },
@@ -71,8 +93,18 @@ export default function Onboarding() {
             </div>
           </div>
 
-          <button className="btn primary" type="submit">
-            Vào khám phá
+          {submitError && (
+            <p className="error-text" role="alert">
+              {submitError}
+            </p>
+          )}
+
+          <button
+            className="btn primary"
+            type="submit"
+            disabled={isSubmitting || composing}
+          >
+            {isSubmitting ? "Đang tạo tài khoản..." : "Vào khám phá"}
           </button>
         </form>
       </div>

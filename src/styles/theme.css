@@ -2649,3 +2649,49 @@ small,
     gap: 12px;
   }
 }
+
+/* ============================================================
+ * Chat source citations — small parchment chips beneath bot bubbles
+ * ============================================================ */
+.chat-sources {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chat-source-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: var(--surface-lowest);
+  border: 1px solid var(--gold-soft);
+  box-shadow: inset 0 0 0 1px rgba(255, 244, 214, 0.55);
+  font-family: "Noto Serif", serif;
+  font-size: 11.5px;
+  line-height: 1.3;
+  color: var(--cinnabar-deep);
+  max-width: 100%;
+}
+
+.chat-source-chip::before {
+  content: "❖";
+  color: var(--gold);
+  font-size: 9px;
+  line-height: 1;
+}
+
+.chat-source-title {
+  font-style: italic;
+  font-weight: 600;
+}
+
+.chat-source-snippet {
+  color: var(--muted);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+}

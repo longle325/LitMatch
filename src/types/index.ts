@@ -3,6 +3,21 @@ export type Grade = 10 | 11 | 12;
 export interface UserProfile {
   username: string;
   grade: Grade;
+  /**
+   * Backend-issued user UUID, present once `POST /users` has run.
+   * Optional for two reasons:
+   *   1. Mock-only mode never sets it.
+   *   2. Migration path — when real auth/sessions land, this field is
+   *      replaced by a session token read from cookies/headers. Always go
+   *      through `getCurrentUserId()` in src/api/adapter.ts rather than
+   *      reading this directly.
+   */
+  userId?: string;
+}
+
+export interface ChatSource {
+  title: string;
+  snippet: string;
 }
 
 export interface ChallengeQuestion {
@@ -52,6 +67,11 @@ export type ChatRole = "user" | "bot";
 export interface ChatMessage {
   from: ChatRole;
   text: string;
+  /**
+   * Retrieval citations attached to bot messages, sourced from the backend
+   * SSE `source` events. Mock layer leaves this undefined.
+   */
+  sources?: ChatSource[];
 }
 
 export interface ChallengeResult {
@@ -60,10 +80,24 @@ export interface ChallengeResult {
   perfect: boolean;
   awarded: number;
   answers: number[];
+  /**
+   * Per-question correct answer indices, populated post-submission.
+   * Real mode receives them in the backend response; mock mode sources
+   * them from the seed `character.challenge[i].answer`. The FE uses
+   * `correctAnswers ?? question.answer` so both modes light up the
+   * "Đáp án đúng" indicator on the result page.
+   */
+  correctAnswers?: number[];
 }
 
 export interface LeaderboardEntry {
   name: string;
   points: number;
   unlocked: number;
+  /**
+   * Backend-issued UUID. Present on real responses, undefined for the mock
+   * `demoLeaders` seed. Used by the leaderboard view to detect whether the
+   * current user is already in the response and avoid double-listing.
+   */
+  userId?: string;
 }
