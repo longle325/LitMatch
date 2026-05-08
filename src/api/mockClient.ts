@@ -8,7 +8,12 @@ import type {
   LeaderboardEntry,
   UserProfile,
 } from "@/types";
-import type { ApiClient, ChatRequest, CreateUserInput } from "./types";
+import type {
+  ApiClient,
+  ChatRequest,
+  ChatStreamEvent,
+  CreateUserInput,
+} from "./types";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -16,7 +21,7 @@ async function* mockStreamChat({
   characterId,
   message,
   signal,
-}: ChatRequest): AsyncIterable<string> {
+}: ChatRequest): AsyncIterable<ChatStreamEvent> {
   const character = getCharacter(characterId);
   if (!character) throw new Error(`Unknown character: ${characterId}`);
 
@@ -25,8 +30,9 @@ async function* mockStreamChat({
   for (const chunk of chunks) {
     if (signal?.aborted) return;
     await delay(35);
-    yield chunk;
+    yield { kind: "token", text: chunk };
   }
+  yield { kind: "done" };
 }
 
 function composeReply(character: Character, text: string): string {

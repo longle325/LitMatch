@@ -4,7 +4,7 @@ import { BookOpen, Send, Sparkles } from "lucide-react";
 import { useCharacter } from "@/api/queries";
 import { api } from "@/api/client";
 import { useAppStore } from "@/stores/useAppStore";
-import type { Character, ChatMessage } from "@/types";
+import type { Character, ChatMessage, ChatSource } from "@/types";
 
 const defaultOpening = (character: Character) =>
   `Tôi là ${character.name}. Hãy hỏi tôi về một biểu tượng, xung đột hoặc lựa chọn khiến nhân vật trong ${character.work} trở nên đáng suy nghĩ.`;
@@ -88,8 +88,37 @@ function CharacterMessage({
   return (
     <div className="message-row bot">
       {avatar}
-      <div className="message bot">{message.text}</div>
+      <div className="message bot">
+        {message.text}
+        {message.sources && message.sources.length > 0 && (
+          <ChatSourceChips sources={message.sources} />
+        )}
+      </div>
     </div>
+  );
+}
+
+function ChatSourceChips({ sources }: { sources: ChatSource[] }) {
+  // De-duplicate by title so the same work doesn't render twice when the
+  // retriever surfaces multiple chunks from one document.
+  const seen = new Set<string>();
+  const unique: ChatSource[] = [];
+  for (const s of sources) {
+    if (seen.has(s.title)) continue;
+    seen.add(s.title);
+    unique.push(s);
+  }
+  return (
+    <ul className="chat-sources" aria-label="Nguồn dẫn">
+      {unique.map((source, index) => (
+        <li key={`${source.title}-${index}`} className="chat-source-chip">
+          <span className="chat-source-title">{source.title}</span>
+          {source.snippet && (
+            <span className="chat-source-snippet">{source.snippet}</span>
+          )}
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -268,7 +297,27 @@ export default function Chat() {
   const matches = useAppStore((s) => s.matches);
   const chats = useAppStore((s) => s.chats);
   const appendChat = useAppStore((s) => s.appendChat);
+  const setChat = useAppStore((s) => s.setChat);
   const { data: character, isLoading } = useCharacter(id);
+
+  // Rehydrate chat history from the backend on mount. Mock returns [] so
+  // existing local-only state is left untouched.
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+    api.getChatHistory(id).then(
+      (history) => {
+        if (cancelled || history.length === 0) return;
+        setChat(id, history);
+      },
+      () => {
+        // Backend down or chat flag off — fall back to whatever Zustand has.
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [id, setChat]);
 
   const [draft, setDraft] = useState("");
   const [streaming, setStreaming] = useState("");
@@ -330,20 +379,33 @@ export default function Chat() {
     appendChat(id, { from: "user", text });
 
     let buffer = "";
+    const sources: ChatSource[] = [];
     setStreaming("");
     try {
-      for await (const chunk of api.streamChat({
+      for await (const event of api.streamChat({
         characterId: id,
         message: text,
       })) {
-        buffer += chunk;
-        setStreaming(buffer);
+        if (event.kind === "token") {
+          buffer += event.text;
+          setStreaming(buffer);
+        } else if (event.kind === "source") {
+          sources.push(event.source);
+        }
       }
-      appendChat(id, { from: "bot", text: buffer });
+      appendChat(id, {
+        from: "bot",
+        text: buffer,
+        sources: sources.length ? sources : undefined,
+      });
     } catch (err) {
       console.error("chat stream failed", err);
       if (buffer) {
-        appendChat(id, { from: "bot", text: buffer });
+        appendChat(id, {
+          from: "bot",
+          text: buffer,
+          sources: sources.length ? sources : undefined,
+        });
       }
       setError(
         "Không tạo được phản hồi. Vui lòng kiểm tra kết nối và thử lại.",

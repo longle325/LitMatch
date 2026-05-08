@@ -1,6 +1,6 @@
 # LitMatch Task Tracker
 
-Last updated: 2026-05-08 (backend wire-up Phase 3 — characters/deck/match/challenge flipped)
+Last updated: 2026-05-08 (backend wire-up Phase 4 — chat SSE flipped, all endpoints real)
 
 ## Completed
 
@@ -107,7 +107,10 @@ Foundation laid for swapping mock endpoints to the FastAPI backend on `origin/ba
 - [x] **Boot-time bootstrap** — `RequireProfile` silently calls `createUser` to back-fill `userId` for anyone with a stale localStorage profile from before auth was real. On 409, redirects to onboarding.
 - [x] **TinderCard fallback** — programmatic `swipe()` returns undefined in the current library version when called without an actual gesture. `triggerSwipe` now falls through to `handleSwipe` directly so heart/skip buttons advance the deck even if the animation doesn't fire.
 - [ ] Minor: when retake fails after a previous pass, backend keeps `MatchStatus.CHALLENGE_PASSED`. Defensible (the achievement once earned isn't lost), but the FE's `passed: false` and the backend status disagree. Re-evaluate when scoring rules tighten.
-- [ ] **Phase 4 — flip `chat`** — implement SSE parser in `realClient.streamChat`, render `source` events as parchment chips below bot bubbles, fetch `GET /chat/history` on Chat mount.
+- [x] **Phase 4 — flipped `chat`** — fetch+SSE parser in `src/api/sse.ts`; `realClient.streamChat` yields structured `ChatStreamEvent`s (`token` / `source` / `done`); `Chat.tsx` collects sources during the stream and saves them onto the bot `ChatMessage`. `GET /chat/history` rehydrates from the server on mount via new `setChat` Zustand action.
+- [x] **Source citation chips** — small parchment chips render below bot bubbles (deduped by title); freshly-streamed replies only, since the backend doesn't persist source metadata with messages.
+- [x] **Env consolidation** — single root `.env` is now canonical for both Vite and the backend; `backend/core/config.py` reads `parents[2]/.env` with `extra: ignore` so Vite-only `VITE_*` keys are silently filtered.
+- [x] **Knowledge base embeddings seeded** — 542 chunks in pgvector via `text-embedding-3-large` (`scripts/embed_knowledge_base.py --batch-size 24`). Idempotent — re-runs skip unchanged chunks via stable `chunk_id` hash.
 
 ### UI polish + ops
 

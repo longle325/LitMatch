@@ -18,11 +18,13 @@ import type {
   ChallengeQuestion,
   ChallengeResult,
   ChatMessage,
+  ChatSource,
   LeaderboardEntry,
   UserProfile,
 } from "@/types";
 import {
   ApiError,
+  API_BASE_URL,
   apiFetch,
   mergeBackendCharacter,
   rememberCharacterId,
@@ -30,7 +32,13 @@ import {
   resolveSlugToUuid,
   type BackendCharacterCard,
 } from "./adapter";
-import type { ApiClient, ChatRequest, CreateUserInput } from "./types";
+import { readSseStream } from "./sse";
+import type {
+  ApiClient,
+  ChatRequest,
+  ChatStreamEvent,
+  CreateUserInput,
+} from "./types";
 
 interface BackendUser {
   id: string;
@@ -83,14 +91,54 @@ interface BackendSwipeResponse {
   match_status: string | null;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────
+// Backend `sources` SSE event payload — see backend/api/routes/chat.py and
+// backend/services/knowledge_retriever.py:_format_sources for the source
+// of truth.
+interface BackendSourceEntry {
+  chunk_id?: string | null;
+  source_path?: string | null;
+  doc_type?: string | null;
+  character_name?: string | null;
+  work_title?: string | null;
+  author?: string | null;
+}
 
-function notImplemented(method: string): never {
-  throw new ApiError(
-    `realClient.${method} chưa được triển khai (Phase 4). ` +
-      `Tắt cờ tương ứng trong VITE_REAL_ENDPOINTS để dùng mock.`,
-    501,
-  );
+interface BackendSourcesPayload {
+  retrieval_mode?: string;
+  sources?: BackendSourceEntry[];
+}
+
+interface BackendChatHistoryEntry {
+  id: string;
+  user_id: string;
+  character_id: string;
+  role: "user" | "assistant";
+  content: string;
+  created_at: string;
+}
+
+interface BackendChatHistoryResponse {
+  messages: BackendChatHistoryEntry[];
+}
+
+function basenameNoExt(path?: string | null): string | undefined {
+  if (!path) return undefined;
+  const last = path.split("/").pop() ?? path;
+  return last.replace(/\.[^.]+$/, "").replace(/_/g, " ");
+}
+
+function backendSourceToFe(entry: BackendSourceEntry): ChatSource | null {
+  const title = entry.work_title ?? entry.character_name ?? basenameNoExt(entry.source_path);
+  if (!title) return null;
+  const snippetParts = [
+    entry.author,
+    entry.doc_type,
+    basenameNoExt(entry.source_path),
+  ].filter((part): part is string => Boolean(part) && part !== title);
+  return {
+    title,
+    snippet: snippetParts.slice(0, 2).join(" · "),
+  };
 }
 
 // ─── Client ───────────────────────────────────────────────────────────────
@@ -202,15 +250,81 @@ export const realClient: ApiClient = {
     }));
   },
 
-  async getChatHistory(_slug: string): Promise<ChatMessage[]> {
-    // Phase 4 — wire to GET /chat/history. Stubbed for now so flipping the
-    // `chat` flag fails loudly rather than silently returning empty history.
-    return notImplemented("getChatHistory");
+  async getChatHistory(slug: string): Promise<ChatMessage[]> {
+    const uuid = await resolveSlugToUuid(slug);
+    const userId = requireCurrentUserId();
+    const res = await apiFetch<BackendChatHistoryResponse>("/chat/history", {
+      query: { user_id: userId, character_id: uuid, limit: 100 },
+    });
+    return res.messages.map((m) => ({
+      from: m.role === "assistant" ? "bot" : "user",
+      text: m.content,
+    }));
   },
 
-  streamChat(_input: ChatRequest): AsyncIterable<string> {
-    // Phase 4 — fetch+SSE parser. Until then, hard fail when the `chat` flag
-    // is on so we don't ship a half-working chat path.
-    return notImplemented("streamChat");
+  streamChat(input: ChatRequest): AsyncIterable<ChatStreamEvent> {
+    return streamChatReal(input);
   },
 };
+
+async function* streamChatReal(
+  input: ChatRequest,
+): AsyncGenerator<ChatStreamEvent> {
+  const uuid = await resolveSlugToUuid(input.characterId);
+  const userId = requireCurrentUserId();
+  const url = new URL("/api/v1/chat/stream", API_BASE_URL).toString();
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "text/event-stream",
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        character_id: uuid,
+        message: input.message,
+      }),
+      signal: input.signal,
+    });
+  } catch (err) {
+    throw new ApiError(
+      "Không kết nối được tới máy chủ trò chuyện.",
+      0,
+      err,
+    );
+  }
+
+  if (!response.ok || !response.body) {
+    let detail = `HTTP ${response.status}`;
+    try {
+      const payload = await response.json();
+      if (payload?.detail) detail = String(payload.detail);
+    } catch {
+      // ignore
+    }
+    throw new ApiError(detail, response.status);
+  }
+
+  for await (const event of readSseStream(response.body, input.signal)) {
+    if (event.event === "sources") {
+      try {
+        const payload = JSON.parse(event.data) as BackendSourcesPayload;
+        const sources = payload.sources ?? [];
+        for (const raw of sources) {
+          const fe = backendSourceToFe(raw);
+          if (fe) yield { kind: "source", source: fe };
+        }
+      } catch {
+        // Malformed sources payload — ignore and keep streaming tokens.
+      }
+      continue;
+    }
+    if (event.event === "message" && event.data) {
+      yield { kind: "token", text: event.data };
+    }
+  }
+  yield { kind: "done" };
+}

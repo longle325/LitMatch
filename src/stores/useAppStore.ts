@@ -33,6 +33,7 @@ interface AppState {
   skipCharacter: (id: string) => void;
   resetSkipped: () => void;
   appendChat: (id: string, message: ChatMessage) => void;
+  setChat: (id: string, messages: ChatMessage[]) => void;
   saveChallenge: (id: string, result: ChallengeResult) => void;
   retryChallenge: (id: string) => void;
   setMusicEnabled: (enabled: boolean) => void;
@@ -102,6 +103,11 @@ export const useAppStore = create<AppState>()(
             ...state.chats,
             [id]: [...(state.chats[id] || []), message],
           },
+        })),
+
+      setChat: (id, messages) =>
+        set((state) => ({
+          chats: { ...state.chats, [id]: messages },
         })),
 
       saveChallenge: (id, result) =>
