@@ -213,13 +213,27 @@ class ChallengeResult(BaseModel):
     passed: bool
     points_earned: int
     explanations: List[str]
+    # Per-question correct answer indices, returned post-submission so the
+    # FE can highlight which option was right without leaking answers in
+    # the pre-submission `GET /characters/:id/challenge` response.
+    correct_answers: List[int]
 
 
-class ChallengeAttemptResponse(ChallengeResult):
+class ChallengeAttemptResponse(BaseModel):
+    """Persisted attempt row. Does not include `correct_answers` because
+    the DB doesn't store them — they're derived from the challenge questions
+    at submission time. If a caller needs them, hit `POST /challenges/submit`
+    or fetch the underlying challenge separately."""
+
     id: UUID
     user_id: UUID
     character_id: UUID
     answers: List[int]
+    score: int
+    total: int
+    passed: bool
+    points_earned: int
+    explanations: List[str]
     created_at: datetime
 
     model_config = {"from_attributes": True}

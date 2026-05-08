@@ -1,7 +1,7 @@
 import { useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import TinderCard from "react-tinder-card";
-import { useDeck, useMatchMutation } from "@/api/queries";
+import { useDeck, useMatchMutation, useSkipMutation } from "@/api/queries";
 import { useAppStore } from "@/stores/useAppStore";
 import CharacterCard from "@/components/CharacterCard";
 import type { Character } from "@/types";
@@ -14,9 +14,9 @@ export default function Discover() {
   const skipped = useAppStore((s) => s.skipped);
   const points = useAppStore((s) => s.points);
   const completed = useAppStore((s) => s.completed);
-  const skipCharacter = useAppStore((s) => s.skipCharacter);
   const resetSkipped = useAppStore((s) => s.resetSkipped);
   const matchMutation = useMatchMutation();
+  const skipMutation = useSkipMutation();
 
   const available = useMemo<Character[]>(
     () =>
@@ -72,12 +72,20 @@ export default function Discover() {
       return;
     }
     if (direction === "left") {
-      skipCharacter(id);
+      skipMutation.mutate(id);
     }
   };
 
   const triggerSwipe = (id: string, direction: SwipeDirection) => {
-    cardRefs.current[id]?.swipe?.(direction);
+    // Best-effort: ask TinderCard to animate the card off-screen. If the
+    // ref-forwarded `swipe` method isn't available (library version drift),
+    // fall through to the state update directly so the deck still advances.
+    const animation = cardRefs.current[id]?.swipe?.(direction);
+    if (animation && typeof animation.then === "function") {
+      animation.catch(() => handleSwipe(id, direction));
+    } else {
+      handleSwipe(id, direction);
+    }
   };
 
   return (

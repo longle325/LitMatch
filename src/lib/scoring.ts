@@ -18,5 +18,12 @@ export function scoreChallenge(
   const perfect = score === character.challenge.length;
   const awarded =
     POINTS_PER_COMPLETION + (passed ? POINTS_PASS_BONUS : 0);
-  return { score, passed, perfect, awarded, answers: [...answers] };
+  return {
+    score,
+    passed,
+    perfect,
+    awarded,
+    answers: [...answers],
+    correctAnswers: character.challenge.map((q) => q.answer),
+  };
 }

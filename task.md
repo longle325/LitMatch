@@ -1,6 +1,6 @@
 # LitMatch Task Tracker
 
-Last updated: 2026-05-08 (backend wire-up Phase 2 — auth + leaderboard flipped)
+Last updated: 2026-05-08 (backend wire-up Phase 3 — characters/deck/match/challenge flipped)
 
 ## Completed
 
@@ -100,10 +100,13 @@ Foundation laid for swapping mock endpoints to the FastAPI backend on `origin/ba
 - [x] **Phase 2B — flipped `leaderboard`** — Returns 4 seed users + the current user (server-included). FE dedupes by `userId` so "Bạn" no longer appears twice. Mock mode behavior preserved (legacy `name === currentName` path).
 - [x] **Backend CORS** — added `http://127.0.0.1:5173` to `backend/core/config.py:CORS_ORIGINS` since the FE dev server binds to 127.0.0.1, which browsers treat as a separate origin from `localhost`.
 - [ ] **Bootstrap (deferred to Phase 3)** — when `profile.username` exists but `profile.userId` is missing on app boot AND `auth` is real, transparently call `createUser` to back-fill (or redirect to `/onboarding` on 409). Not blocking until Phase 3 endpoints (which actually need `userId`) flip.
-- [ ] **Phase 3A — flip `characters` + `deck`** — depends on slug-map cold-load via `GET /characters`. Verify deck filters out already-swiped cards correctly.
-- [ ] **Phase 3B — flip `match`** — `POST /interactions/swipe` for both `right` (match) and `left` (skip) directions. FE currently doesn't call backend on skip; mock parity needs `recordSkip` wiring in `Discover.tsx`.
-- [ ] **Phase 3C — flip `challenge`** — needs backend to echo `correct_answers: int[]` in `ChallengeResult` so the FE result page can keep showing "Đáp án đúng: X". Also remove `POINTS_PERFECT_SCORE_BONUS=25` from `backend/core/config.py` (drift from PRD §6.5).
-- [ ] **Phase 3D — backend tweaks** — allow challenge retake (replace 409 with upsert/append latest attempt). Surface `ChallengeQuestion.id` in JSON.
+- [x] **Phase 3A — flipped `characters` + `deck`** — slug↔UUID map populates from `GET /characters` cold-load (and from any deck/profile call). Backend uses `chi_pheo` snake_case while FE keeps `chi-pheo` kebab; adapter normalizes on the wire.
+- [x] **Phase 3B — flipped `match`** — `POST /interactions/swipe` for both directions. Added `useSkipMutation` in queries.ts; `Discover.tsx` calls `recordSkip` on left swipes. Backend deck call now correctly filters out swiped characters.
+- [x] **Phase 3C — flipped `challenge`** — backend echoes `correct_answers: int[]` in `ChallengeResult`. FE Challenge result view uses `result.correctAnswers ?? question.answer` so both modes light up "Đáp án đúng".
+- [x] **Phase 3D — backend tweaks** — dropped `POINTS_PERFECT_SCORE_BONUS=25` (PRD §6.5 drift); allowed challenge retake (rolls back prior attempt's points, replaces row in place); separated `ChallengeAttemptResponse` from `ChallengeResult` since the persisted row doesn't include derived `correct_answers`.
+- [x] **Boot-time bootstrap** — `RequireProfile` silently calls `createUser` to back-fill `userId` for anyone with a stale localStorage profile from before auth was real. On 409, redirects to onboarding.
+- [x] **TinderCard fallback** — programmatic `swipe()` returns undefined in the current library version when called without an actual gesture. `triggerSwipe` now falls through to `handleSwipe` directly so heart/skip buttons advance the deck even if the animation doesn't fire.
+- [ ] Minor: when retake fails after a previous pass, backend keeps `MatchStatus.CHALLENGE_PASSED`. Defensible (the achievement once earned isn't lost), but the FE's `passed: false` and the backend status disagree. Re-evaluate when scoring rules tighten.
 - [ ] **Phase 4 — flip `chat`** — implement SSE parser in `realClient.streamChat`, render `source` events as parchment chips below bot bubbles, fetch `GET /chat/history` on Chat mount.
 
 ### UI polish + ops

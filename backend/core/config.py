@@ -38,10 +38,12 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     # --- Points ---
+    # Mirrors PRD §6.5 (and FE `src/lib/scoring.ts`): match awards, completion
+    # bonus, pass bonus only. No perfect-score bonus — the FE explicitly
+    # removed it for parity with the PRD; keep the backend in lockstep.
     POINTS_MATCH: int = 10
     POINTS_CHALLENGE_COMPLETE: int = 50
     POINTS_CHALLENGE_PASS_BONUS: int = 40  # >= 4/5
-    POINTS_PERFECT_SCORE_BONUS: int = 25  # 5/5
     CHALLENGE_PASS_THRESHOLD: int = 4  # out of 5
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
