@@ -29,11 +29,15 @@ function CollectionCard({
     ? "Đã mở khóa hoàn toàn"
     : "Chưa hoàn thành thử thách";
   const progress = progressPercent(result);
-  const image = character.portrait || character.image;
+  const image = character.portrait || character.images?.[0] || character.image;
 
   return (
     <article className="card collection-card">
-      <div className="collection-image">
+      <Link
+        to={`/characters/${character.id}`}
+        className="collection-image collection-image-link"
+        aria-label={`Xem hồ sơ ${character.name}`}
+      >
         {image ? (
           <img src={image} alt={character.name} />
         ) : (
@@ -43,9 +47,13 @@ function CollectionCard({
           {result?.passed ? <ShieldCheck size={14} /> : <LockOpen size={14} />}
           {result?.passed ? "Đã mở khóa" : "Chờ thử thách"}
         </span>
-      </div>
+      </Link>
       <div className="collection-body">
-        <h2>{character.name}</h2>
+        <h2>
+          <Link to={`/characters/${character.id}`} className="collection-name-link">
+            {character.name}
+          </Link>
+        </h2>
         <p>{character.work}</p>
         <div className="collection-progress">
           <span style={{ width: `${progress}%` }} />
@@ -66,6 +74,12 @@ function CollectionCard({
             to={`/characters/${character.id}/challenge`}
           >
             Làm thử thách
+          </Link>
+          <Link
+            className="btn ghost"
+            to={`/characters/${character.id}`}
+          >
+            Hồ sơ
           </Link>
         </div>
       </div>
@@ -111,7 +125,8 @@ export default function Collection() {
               aria-expanded={open}
               onClick={() => setOpen((v) => !v)}
             >
-              {SORT_LABEL[sort]} <ChevronDown size={16} />
+              {SORT_LABEL[sort]}{" "}
+              <ChevronDown size={16} />
             </button>
             {open && (
               <ul role="listbox" className="sort-options">
