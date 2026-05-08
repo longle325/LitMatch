@@ -156,7 +156,7 @@ class ChatService:
         }
 
         if self.chat_model.startswith(("gpt-5", "o1", "o3", "o4")):
-            kwargs["max_completion_tokens"] = 1024
+            kwargs["max_completion_tokens"] = 4096
         else:
             kwargs["temperature"] = 0.7
             kwargs["max_tokens"] = 1024
