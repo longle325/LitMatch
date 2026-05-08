@@ -28,6 +28,8 @@ export interface Character {
   artB: string;
   artTitle: string;
   image?: string;
+  images?: string[];
+  genre?: string;
   portrait?: string;
   avatar?: string;
   imageBrief: string;

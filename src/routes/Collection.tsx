@@ -28,7 +28,7 @@ function CollectionCard({
     ? "Đã mở khóa hoàn toàn"
     : "Chưa hoàn thành thử thách";
   const progress = progressPercent(result);
-  const image = character.portrait || character.image;
+  const image = character.portrait || character.images?.[0] || character.image;
 
   return (
     <article className="card collection-card">

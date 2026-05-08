@@ -22,8 +22,9 @@ function MessageRow({
       </div>
     );
   }
-  const avatar = character.avatar ? (
-    <img className="message-avatar" src={character.avatar} alt={character.name} />
+  const avatarImage = character.avatar || character.images?.[0] || character.image;
+  const avatar = avatarImage ? (
+    <img className="message-avatar" src={avatarImage} alt={character.name} />
   ) : (
     <span className="message-avatar fallback">{character.initial}</span>
   );
@@ -117,15 +118,17 @@ export default function Chat() {
     }
   };
 
+  const chatImage = character.avatar || character.images?.[0] || character.image;
+
   return (
     <section className="page chat-layout reference-chat">
       <div className="chat-card">
         <header className="chat-header">
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {character.avatar ? (
+            {chatImage ? (
               <img
                 className="avatar image-avatar"
-                src={character.avatar}
+                src={chatImage}
                 alt={character.name}
               />
             ) : (
