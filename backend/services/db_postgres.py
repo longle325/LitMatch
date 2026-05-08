@@ -6,13 +6,25 @@ All database queries live here so route handlers stay thin.
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Iterable, List, Optional
 from uuid import UUID
 
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
-from models.db_models import Challenge, Character, Match, MatchStatus, User
+from models.db_models import (
+    Challenge,
+    ChallengeAttempt,
+    Character,
+    CharacterEvent,
+    CharacterRelationship,
+    ChatMessage,
+    ChatRole,
+    Match,
+    MatchStatus,
+    User,
+)
 
 
 # ── Users ─────────────────────────────────────────────────────────────────
@@ -75,14 +87,43 @@ async def list_characters(db: AsyncSession) -> List[Character]:
     return list(result.scalars().all())
 
 
+async def list_character_relationships(
+    db: AsyncSession,
+    character_id: UUID,
+) -> List[CharacterRelationship]:
+    result = await db.execute(
+        select(CharacterRelationship).where(
+            CharacterRelationship.character_id == character_id
+        )
+    )
+    return list(result.scalars().all())
+
+
+async def list_character_events(
+    db: AsyncSession,
+    character_id: UUID,
+) -> List[CharacterEvent]:
+    result = await db.execute(
+        select(CharacterEvent)
+        .where(CharacterEvent.character_id == character_id)
+        .order_by(CharacterEvent.sequence_number.asc())
+    )
+    return list(result.scalars().all())
+
+
 # ── Matches ───────────────────────────────────────────────────────────────
 
 
-async def create_match(db: AsyncSession, user_id: UUID, character_id: UUID) -> Match:
+async def create_match(
+    db: AsyncSession,
+    user_id: UUID,
+    character_id: UUID,
+    status: MatchStatus = MatchStatus.SWIPED_RIGHT,
+) -> Match:
     match = Match(
         user_id=user_id,
         character_id=character_id,
-        status=MatchStatus.SWIPED_RIGHT,
+        status=status,
     )
     db.add(match)
     await db.commit()
@@ -117,8 +158,19 @@ async def update_match_status(
     return await get_match(db, user_id, character_id)
 
 
-async def get_user_matches(db: AsyncSession, user_id: UUID) -> List[Match]:
-    result = await db.execute(select(Match).where(Match.user_id == user_id))
+async def get_user_matches(
+    db: AsyncSession,
+    user_id: UUID,
+    statuses: Optional[Iterable[MatchStatus]] = None,
+) -> List[Match]:
+    stmt = (
+        select(Match)
+        .options(selectinload(Match.character))
+        .where(Match.user_id == user_id)
+    )
+    if statuses is not None:
+        stmt = stmt.where(Match.status.in_(list(statuses)))
+    result = await db.execute(stmt)
     return list(result.scalars().all())
 
 
@@ -132,6 +184,106 @@ async def get_challenge_for_character(
         select(Challenge).where(Challenge.character_id == character_id)
     )
     return result.scalar_one_or_none()
+
+
+async def get_challenge_attempt(
+    db: AsyncSession,
+    user_id: UUID,
+    character_id: UUID,
+) -> Optional[ChallengeAttempt]:
+    result = await db.execute(
+        select(ChallengeAttempt).where(
+            ChallengeAttempt.user_id == user_id,
+            ChallengeAttempt.character_id == character_id,
+        )
+    )
+    return result.scalar_one_or_none()
+
+
+async def create_challenge_attempt(
+    db: AsyncSession,
+    user_id: UUID,
+    character_id: UUID,
+    answers: list[int],
+    score: int,
+    total: int,
+    passed: bool,
+    points_earned: int,
+    explanations: list[str],
+) -> ChallengeAttempt:
+    attempt = ChallengeAttempt(
+        user_id=user_id,
+        character_id=character_id,
+        answers=answers,
+        score=score,
+        total=total,
+        passed=passed,
+        points_earned=points_earned,
+        explanations=explanations,
+    )
+    db.add(attempt)
+    await db.commit()
+    await db.refresh(attempt)
+    return attempt
+
+
+# ── Chat messages ─────────────────────────────────────────────────────────
+
+
+async def create_chat_message(
+    db: AsyncSession,
+    user_id: UUID,
+    character_id: UUID,
+    role: ChatRole,
+    content: str,
+) -> ChatMessage:
+    message = ChatMessage(
+        user_id=user_id,
+        character_id=character_id,
+        role=role,
+        content=content,
+    )
+    db.add(message)
+    await db.commit()
+    await db.refresh(message)
+    return message
+
+
+async def list_chat_messages(
+    db: AsyncSession,
+    user_id: UUID,
+    character_id: UUID,
+    limit: int = 100,
+) -> List[ChatMessage]:
+    result = await db.execute(
+        select(ChatMessage)
+        .where(
+            ChatMessage.user_id == user_id,
+            ChatMessage.character_id == character_id,
+        )
+        .order_by(ChatMessage.created_at.asc())
+        .limit(limit)
+    )
+    return list(result.scalars().all())
+
+
+async def list_recent_chat_messages(
+    db: AsyncSession,
+    user_id: UUID,
+    character_id: UUID,
+    limit: int = 8,
+) -> List[ChatMessage]:
+    result = await db.execute(
+        select(ChatMessage)
+        .where(
+            ChatMessage.user_id == user_id,
+            ChatMessage.character_id == character_id,
+        )
+        .order_by(ChatMessage.created_at.desc())
+        .limit(limit)
+    )
+    messages = list(result.scalars().all())
+    return list(reversed(messages))
 
 
 # ── Leaderboard ───────────────────────────────────────────────────────────

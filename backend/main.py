@@ -14,10 +14,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.config import settings
-from core.database import Base, engine
+from core.database import Base, engine, ensure_vector_extension
 
 # Route modules
 from api.routes import (
+    admin,
     challenges,
     characters,
     chat,
@@ -41,6 +42,7 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """Create tables on startup, dispose engine on shutdown."""
     logger.info("Starting LitMatch API …")
+    await ensure_vector_extension()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
@@ -75,6 +77,7 @@ app.include_router(chat.router, prefix=API_PREFIX)
 app.include_router(challenges.router, prefix=API_PREFIX)
 app.include_router(leaderboard.router, prefix=API_PREFIX)
 app.include_router(characters.router, prefix=API_PREFIX)
+app.include_router(admin.router, prefix=API_PREFIX)
 
 
 @app.get("/health")
