@@ -1,3 +1,11 @@
+/*
+ * Folk Woodblock theme (ported from main branch).
+ * Provides the rich parchment palette, cinnabar accents,
+ * and legacy component classes used by some screens.
+ */
+@import "./styles/legacy.css";
+@import "./styles/theme.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -1,42 +1,67 @@
 # LitMatch Task Tracker
 
-Last updated: 2026-05-07
+Last updated: 2026-05-08
 
 ## Completed
 
 - [x] Read `PRD.md`, `Content_reference.csv`, and provided design references.
-- [x] Created a no-install static app shell with `index.html`, `styles.css`, and `app.js`.
-- [x] Added `package.json` with Vite scripts so the app can run with `npm run dev`.
-- [x] Installed npm dependencies and verified Vite serves the app at `http://127.0.0.1:5173/`.
-- [x] Implemented Vietnamese onboarding with username and grade selection.
-- [x] Recreated the missing onboarding/start screen from the provided screenshot using only the Modern Literary design system and existing reference-screen patterns.
-- [x] Made onboarding a standalone first-run screen outside the authenticated sidebar/topbar app shell.
-- [x] Reworked the authenticated app shell to follow the design-reference sidebar, top metrics, typography, and Material Symbols icon treatment.
-- [x] Recreated the discovery screen from `design reference/Thuy_Kieu card/screen.png` with the image-first literary card, centered character content, quote panel, conflict tile, trait chips, and bottom swipe actions.
-- [x] Recreated the collection screen from `design reference/Character screen/screen.png` with the literary-circle header, sort control, portrait cards, status badges, and progress bars.
-- [x] Recreated the chat screen from `design reference/chat/screen.png` with character header, chapter divider, message rows, contextual quick prompts, challenge CTA, and side context panel.
-- [x] Recreated the challenge screen from `design reference/challenge/screen.png` with the centered progress line, large question card, answer rows, selected state, source-review action, and submit/next action.
-- [x] Recreated the leaderboard screen from `design reference/Leaderboard/screen.png` with tabs, metric chips, ranked table, unlocked-character column, and current-user highlight.
-- [x] Seeded the five MVP characters from the CSV content batch: Chí Phèo, Mị, Xuân Tóc Đỏ, Lục Vân Tiên, and Thúy Kiều.
-- [x] Built discovery cards with Modern Literary styling, Vietnamese labels, profile content, quotes, personality notes, conflict notes, and context notes.
-- [x] Added left/right discovery actions with persistent local session state.
-- [x] Added pointer-based swipe gestures on discovery cards, with `Bỏ qua` and `Chọn` decision stamps.
-- [x] Added matched character collection with challenge status and chat/challenge actions.
-- [x] Added guarded character chat route with local source-grounded mock responses.
-- [x] Added five-question character challenges with score, explanations, pass state, and points.
-- [x] Added leaderboard with demo users and current-user ranking.
-- [x] Added profile view and local demo reset.
-- [x] Verified JavaScript syntax with `node --check app.js`.
+- [x] Built initial static prototype (`_legacy/app.js`, `_legacy/styles.css`).
+- [x] Implemented all 7 screens (onboarding, discovery, collection, chat, challenge, leaderboard, profile) with Vietnamese localization.
+- [x] Seeded the five MVP CSV characters with full content.
 
-## Next
+## Stack migration to PRD specification (2026-05-07)
 
-- [ ] Visually verify the onboarding screen in a browser or Playwright once local browser tooling is available.
-- [ ] Visually verify every recreated reference screen in a browser or Playwright once local browser tooling is available.
-- [ ] Split inline app data into a dedicated data module or JSON seed file.
-- [ ] Add real generated or selected character image assets for each `Image or illustration` brief.
-- [ ] Improve chat response simulation with visible streaming text behavior.
-- [ ] Persist in-progress challenge answers across route changes and reloads.
+- [x] Replaced vanilla JS prototype with React + TypeScript + Vite scaffold.
+- [x] Added Tailwind CSS, PostCSS, Autoprefixer.
+- [x] Added React Router DOM with nested routing and onboarding guard.
+- [x] Added Zustand store with `persist` middleware (key `litmatch-state`).
+- [x] Added TanStack Query with mock API client implementing PRD §9 endpoints.
+- [x] Added Framer Motion, Lucide icons, react-hook-form, react-tinder-card to deps.
+- [x] Defined typed data model in `src/types/`.
+- [x] Ported seed characters into typed `src/data/characters.ts`.
+- [x] Implemented chunked streaming chat in mock API (replaces single-shot `mockReply`).
+- [x] Preserved legacy CSS as `src/styles/legacy.css` for visual parity during polish.
+- [x] Moved legacy files into `_legacy/` for diff reference.
+- [x] `npm install`, `tsc -b`, `npm run build`, and `npm run dev` all succeed.
+- [x] Browser-verified each screen on the React build (onboarding, discover, collection, chat, challenge, leaderboard, profile).
+
+## Documentation + minor PRD-compliance fixes (2026-05-07)
+
+- [x] README.md focused on local dev setup (no backend setup yet).
+- [x] docs/API.md backend contract spec for the backend team (PRD §9 endpoints, SSE chat protocol, type schemas, scoring rules).
+- [x] Replaced English placeholder copy with Vietnamese: `Vietnamese Classics` → `Văn học Việt Nam`; `Chapter I: The Encounter` → `Chương I: Cuộc gặp đầu tiên`.
+- [x] Chat streaming error state handled (PRD §6.3 acceptance) — try/catch around stream loop, partial buffer flushed, Vietnamese error notice.
+- [x] Collection sort dropdown now functional with two real options ("Mới thêm gần đây" / "Tiến độ thử thách").
+- [x] Scoring aligned to PRD §6.5: removed prototype-era +25 perfect bonus.
+- [x] Discover deck overflow bug fixed (was rendering 5 stacked card bottoms at different y-offsets).
+
+## Theme overhaul — folk woodblock direction (2026-05-08)
+
+- [x] New `src/styles/theme.css` overrides legacy modern palette with parchment + cinnabar + gold + wood-frame palette inspired by `mock style images/`.
+- [x] All 7 screens browser-verified in the new theme.
+- [x] Defensive Material Symbols icon reset so heavy serif typography doesn't break ligatures.
+
+## Character images (2026-05-08)
+
+- [x] Drafted Vietnamese-cultural image prompts saved to `docs/image-prompts.md` for team iteration.
+- [x] All 5 character portraits generated by team via ChatGPT Plus and dropped into `public/characters/`.
+- [x] Wired image paths in `src/data/characters.ts` — replaced expiring `lh3.googleusercontent.com/aida-public/...` URLs and added missing images for Mị + Lục Vân Tiên.
+- [x] Browser-verified Discover and Collection with real images.
+
+## API doc alignment with PRD (2026-05-08)
+
+- [x] Added `id` to `ChallengeQuestion` (`src/types/index.ts`); auto-generated in `src/data/characters.ts` as `${characterId}-q${1-based index}` so the seed data stays terse.
+- [x] `docs/API.md` §3.4: documented MVP-1 scope — multiple-choice only, short-answer / quote-ID out of scope, question count and option count are array-length-authoritative.
+- [x] `docs/API.md` §3.5 / §5.3: relaxed hard-coded length 4 / length 5; pass threshold is `4` for MVP-1 only and product owns the rule per PRD §7 if a future character has ≠5 questions.
+- [x] `docs/API.md` §3.7: added "Backend internals (RAG inputs)" subsection enumerating the five LLM-call inputs from PRD §9 RAG Direction.
+
+## Next (post-migration polish + backend)
+
+- [ ] Migrate components from legacy CSS to Tailwind utility classes during polish pass.
+- [ ] Replace mock API client with real backend (`/deck`, `/characters/:id`, `/match`, `/chat` SSE, `/challenge/submit`, `/leaderboard`).
+- [ ] Add Framer Motion animations for swipe, chat streaming, score reveal.
+- [ ] Persist in-progress challenge answers across reloads.
 - [ ] Add keyboard controls for discovery cards.
-- [ ] Add a React + TypeScript scaffold if the prototype needs a framework migration.
-- [ ] Move local state into a typed store during the React migration.
-- [ ] Add automated UI smoke tests after the app has a dev-server setup.
+- [ ] Tighten chat header layout (character name + status wrap awkwardly in narrow column).
+- [ ] Iterate on character images if any need a regen pass (prompts in `docs/image-prompts.md`).
+- [ ] Add automated UI smoke tests.
