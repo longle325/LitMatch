@@ -57,6 +57,38 @@ class KnowledgeRetrieverTests(unittest.TestCase):
 
             self.assertEqual(retriever.search_context("chi_pheo", "tennis"), "")
 
+    def test_vector_literal_formats_float_array_for_pgvector(self):
+        retriever = KnowledgeRetriever()
+
+        self.assertEqual(retriever._vector_literal([0.1, 0.2, 0.3]), "[0.1,0.2,0.3]")
+
+    def test_async_search_falls_back_to_lexical_context_when_vector_fails(self):
+        class FailingVectorRetriever(KnowledgeRetriever):
+            async def _search_vector_chunks(self, character_slug, user_query):
+                raise RuntimeError("vector unavailable")
+
+        async def run_search():
+            with tempfile.TemporaryDirectory() as temp_dir:
+                index_path = Path(temp_dir) / "chunks.jsonl"
+                write_jsonl(
+                    index_path,
+                    [
+                        {
+                            "chunk_id": "chi.chunk_1",
+                            "character_slug": "chi_pheo",
+                            "doc_type": "original",
+                            "source_path": "Chi_Pheo/Chí_Phèo.txt",
+                            "text": "Bát cháo hành làm Chí Phèo muốn trở lại làm người.",
+                        }
+                    ],
+                )
+                retriever = FailingVectorRetriever(index_path=index_path)
+                return await retriever.search_context_async("chi_pheo", "cháo hành")
+
+        context = __import__("asyncio").run(run_search())
+
+        self.assertIn("Bát cháo hành", context)
+
 
 if __name__ == "__main__":
     unittest.main()
