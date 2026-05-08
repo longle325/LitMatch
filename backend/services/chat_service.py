@@ -53,6 +53,7 @@ class ChatService:
         user_message: str,
         voice_instructions: Optional[str] = None,
         chat_history: Optional[list[dict[str, str]]] = None,
+        retrieval: Optional[dict[str, Any]] = None,
     ) -> AsyncIterator[str]:
         """
         Yield streamed text chunks for a character chat turn.
@@ -69,32 +70,17 @@ class ChatService:
             Per-character prompt override (from DB).
         """
         # Step 1 — retrieve character-scoped literary context.
-        retrieved_context = ""
-        if self.retriever is not None:
-            if hasattr(self.retriever, "search_context_async"):
-                retrieved_context = await self.retriever.search_context_async(
-                    character_slug,
-                    user_message,
-                )
-            else:
-                retrieved_context = self.retriever.search_context(
-                    character_slug, user_message
-                )
-        if not retrieved_context and self.codex is not None:
-            retrieved_context = await self.codex.search_context(
-                character_name, user_message
-            )
-        if not retrieved_context:
-            retrieved_context = (
-                "(Không tìm thấy ngữ cảnh cụ thể trong kho kiến thức. "
-                "Hãy trả lời dựa trên hiểu biết chung về nhân vật.)"
-            )
+        retrieval = retrieval or await self.prepare_retrieval(
+            character_slug=character_slug,
+            character_name=character_name,
+            user_message=user_message,
+        )
 
         # Step 2 — build the system prompt
         system_prompt = build_character_prompt(
             character_slug=character_slug,
             character_name=character_name,
-            retrieved_context=retrieved_context,
+            retrieved_context=retrieval["context"],
             voice_instructions=voice_instructions,
             conversation_context=self._format_chat_history(chat_history or []),
         )
@@ -108,6 +94,52 @@ class ChatService:
             delta = chunk.choices[0].delta
             if delta.content:
                 yield delta.content
+
+    async def prepare_retrieval(
+        self,
+        character_slug: str,
+        character_name: str,
+        user_message: str,
+    ) -> dict[str, Any]:
+        if self.retriever is not None:
+            if hasattr(self.retriever, "search_with_sources_async"):
+                result = await self.retriever.search_with_sources_async(
+                    character_slug,
+                    user_message,
+                )
+                if result.get("context"):
+                    return result
+            if hasattr(self.retriever, "search_context_async"):
+                context = await self.retriever.search_context_async(
+                    character_slug,
+                    user_message,
+                )
+            else:
+                context = self.retriever.search_context(character_slug, user_message)
+            if context:
+                return {
+                    "context": context,
+                    "sources": [],
+                    "retrieval_mode": "legacy",
+                }
+
+        if self.codex is not None:
+            context = await self.codex.search_context(character_name, user_message)
+            if context:
+                return {
+                    "context": context,
+                    "sources": [],
+                    "retrieval_mode": "codex",
+                }
+
+        return {
+            "context": (
+                "(Không tìm thấy ngữ cảnh cụ thể trong kho kiến thức. "
+                "Hãy trả lời dựa trên hiểu biết chung về nhân vật.)"
+            ),
+            "sources": [],
+            "retrieval_mode": "none",
+        }
 
     def _completion_kwargs(
         self,

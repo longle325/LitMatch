@@ -144,6 +144,32 @@ class ChatServiceCompletionOptionsTests(unittest.TestCase):
         self.assertIn("Nhân vật: Ta đã nghe tiếng sáo gọi về tuổi trẻ.", system_prompt)
         self.assertEqual(chunks, ["tôi nhớ"])
 
+    def test_prepare_retrieval_returns_sources_for_frontend(self):
+        class FakeRetriever:
+            async def search_with_sources_async(self, character_slug, user_query):
+                return {
+                    "context": "context",
+                    "retrieval_mode": "vector",
+                    "sources": [{"chunk_id": "chunk_1", "source_path": "source.txt"}],
+                }
+
+        async def prepare():
+            service = ChatService(
+                codex_agent=None,
+                knowledge_retriever=FakeRetriever(),
+                openai_client=object(),
+            )
+            return await service.prepare_retrieval(
+                character_slug="chi_pheo",
+                character_name="Chí Phèo",
+                user_message="bát cháo",
+            )
+
+        result = __import__("asyncio").run(prepare())
+
+        self.assertEqual(result["retrieval_mode"], "vector")
+        self.assertEqual(result["sources"][0]["chunk_id"], "chunk_1")
+
 
 if __name__ == "__main__":
     unittest.main()

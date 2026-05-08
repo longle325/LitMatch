@@ -35,21 +35,43 @@ class KnowledgeRetriever:
         self._chunks: Optional[list[dict[str, Any]]] = None
 
     async def search_context_async(self, character_slug: str, user_query: str) -> str:
+        result = await self.search_with_sources_async(character_slug, user_query)
+        return result["context"]
+
+    async def search_with_sources_async(
+        self, character_slug: str, user_query: str
+    ) -> dict[str, Any]:
         try:
             vector_chunks = await self._search_vector_chunks(
                 character_slug,
                 user_query,
             )
             if vector_chunks:
-                return self._format_context(vector_chunks)
+                return {
+                    "context": self._format_context(vector_chunks),
+                    "sources": self._format_sources(vector_chunks),
+                    "retrieval_mode": "vector",
+                }
         except Exception as exc:
             logger.info("Vector retrieval failed; falling back to lexical search: %s", exc)
-        return self.search_context(character_slug, user_query)
+        lexical_chunks = self._search_lexical_chunks(character_slug, user_query)
+        return {
+            "context": self._format_context(lexical_chunks),
+            "sources": self._format_sources(lexical_chunks),
+            "retrieval_mode": "lexical",
+        }
 
     def search_context(self, character_slug: str, user_query: str) -> str:
+        return self._format_context(self._search_lexical_chunks(character_slug, user_query))
+
+    def _search_lexical_chunks(
+        self,
+        character_slug: str,
+        user_query: str,
+    ) -> list[dict[str, Any]]:
         terms = self._tokenize(user_query)
         if not terms:
-            return ""
+            return []
 
         scored: list[tuple[float, dict[str, Any]]] = []
         for chunk in self._load_chunks():
@@ -60,8 +82,7 @@ class KnowledgeRetriever:
                 scored.append((score, chunk))
 
         scored.sort(key=lambda item: item[0], reverse=True)
-        selected = [chunk for _, chunk in scored[: self.top_k]]
-        return self._format_context(selected)
+        return [chunk for _, chunk in scored[: self.top_k]]
 
     def _load_chunks(self) -> list[dict[str, Any]]:
         if self._chunks is not None:
@@ -118,6 +139,25 @@ class KnowledgeRetriever:
                 )
             )
         return "\n\n---\n\n".join(sections)
+
+    @staticmethod
+    def _format_sources(chunks: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        sources: list[dict[str, Any]] = []
+        for chunk in chunks:
+            sources.append(
+                {
+                    "chunk_id": chunk.get("chunk_id"),
+                    "document_id": chunk.get("document_id"),
+                    "source_path": chunk.get("source_path"),
+                    "doc_type": chunk.get("doc_type"),
+                    "character_slug": chunk.get("character_slug"),
+                    "character_name": chunk.get("character_name"),
+                    "work_title": chunk.get("work_title"),
+                    "author": chunk.get("author"),
+                    "similarity": chunk.get("similarity"),
+                }
+            )
+        return sources
 
     async def _search_vector_chunks(
         self,

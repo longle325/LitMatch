@@ -14,6 +14,7 @@ Pipeline:
 
 from __future__ import annotations
 
+import json
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -102,12 +103,28 @@ async def chat_stream(
 
     async def event_generator():
         assistant_chunks: list[str] = []
+        retrieval = await chat_service.prepare_retrieval(
+            character_slug=character.slug,
+            character_name=character.name,
+            user_message=body.message,
+        )
+        yield {
+            "event": "sources",
+            "data": json.dumps(
+                {
+                    "retrieval_mode": retrieval["retrieval_mode"],
+                    "sources": retrieval["sources"],
+                },
+                ensure_ascii=False,
+            ),
+        }
         async for chunk in chat_service.stream_response(
             character_slug=character.slug,
             character_name=character.name,
             user_message=body.message,
             voice_instructions=character.voice_instructions,
             chat_history=chat_history,
+            retrieval=retrieval,
         ):
             assistant_chunks.append(chunk)
             yield {"data": chunk}
