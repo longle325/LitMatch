@@ -53,12 +53,26 @@ Open <http://127.0.0.1:5173/>.
 ## Project layout
 
 ```
-src/             Frontend (React + TS): api/, components/, routes/, stores/, styles/, types/
-backend/         FastAPI service: api/routes/, services/, models/, knowledge_base/, scripts/, migrations/
+frontend/        React 18 + TS + Vite + Capacitor (Android/iOS)
+backend/         FastAPI + PostgreSQL + pgvector + OpenAI
 scripts/         Bash: dump/restore knowledge-chunks
-docs/API.md      Backend API contract
+docs/
+  API.md         Backend API contract
+  DEPLOYMENT.md  Full deployment guide (Cloud Run, Android APK, mobile testing)
 PRD.md, task.md  Product spec + task tracker
 ```
+
+## Deployment
+
+See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for the complete guide covering:
+- Local development (frontend-only and full-stack)
+- Frontend ↔ Backend connection (mock/real endpoint switching)
+- Cloud Run deployment (GCP + Workload Identity Federation)
+- Android APK build (CI and local CLI)
+- Mobile testing (WiFi, ngrok, Capacitor live reload)
+- Environment variables reference
+- CI/CD workflows
+- Troubleshooting
 
 ## Notes
 
