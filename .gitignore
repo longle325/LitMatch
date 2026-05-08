@@ -14,3 +14,6 @@ Techstack.md
 
 # Knowledge-base SQL dumps — ship via team Drive (see scripts/restore-knowledge-chunks.sh)
 backend/data/*.sql.gz
+
+# Source content reference dropped here by the team — not for git
+Content for Hackathon game *.pdf

@@ -117,6 +117,10 @@ Foundation laid for swapping mock endpoints to the FastAPI backend on `origin/ba
   - `src/routes/Onboarding.tsx` — same IME pattern; track composition state via `onCompositionStart/End` and disable submit during composition.
   - `src/api/adapter.ts:handleSessionExpired` + `realClient.streamChat` — when backend returns 404 "User not found." (typical after a DB wipe with stale `userId` in localStorage), `resetAll()` and `window.location.replace("/onboarding")` to recover automatically.
   - `src/components/CharacterCard.tsx:busy` prop + `src/routes/Discover.tsx` re-entrancy guard — heart/skip buttons disabled while `matchMutation.isPending || skipMutation.isPending`. Prevents trackpad double-taps from firing the swipe twice.
+- [x] **Collection lost matched characters after chat (2026-05-08)** — Collection derived its list by intersecting `useDeck()` with `matches[]`. Real mode `/deck` only returns *unswiped* characters, so as soon as you matched, the intersection went empty and Collection rendered nothing. Mock mode masked it. Fixed by adding `getAllCharacters` / `useAllCharacters` (full catalog from `GET /api/v1/characters`) and switching Collection to it; Discover keeps `useDeck`.
+- [x] **Mutation cache invalidation + skip ordering + chat history race** — added `queryClient.invalidateQueries` in `useMatchMutation` (deck + leaderboard), `useSkipMutation` (deck), `useSubmitChallengeMutation` (leaderboard); `useSkipMutation` now goes server-first to avoid local/remote drift on backend failures; chat history rehydration checks local thread length at resolve time and bails if the user already appended a message.
+- [x] **"Hỏi sâu hơn" relabelled** — chat composer button now reads `Làm thử thách` (matching Collection's challenge entry point) since it actually navigates to the quiz.
+- [x] **Repo hygiene** — removed `mock style images/` (legacy design references no longer needed) before opening the wire-up PR.
 
 ### Audit findings deferred (low impact)
 
