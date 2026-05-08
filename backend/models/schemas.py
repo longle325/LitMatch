@@ -117,6 +117,20 @@ class CharacterEventsResponse(BaseModel):
     events: List[CharacterEventResponse]
 
 
+class RagDiagnosticsResponse(BaseModel):
+    vector_extension_enabled: bool
+    embedding_model: str
+    embedding_dimensions: int
+    rag_top_k: int
+    rag_min_similarity: float
+    vector_chunk_count: int
+    vector_chunks_by_character: dict[str, int]
+    lexical_index_path: str
+    lexical_chunk_count: int
+    fallback_available: bool
+    last_error: Optional[str] = None
+
+
 # ── Deck ──────────────────────────────────────────────────────────────────
 
 
