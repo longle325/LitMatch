@@ -19,7 +19,12 @@ class Settings(BaseSettings):
     KNOWLEDGE_BASE_DIR: str = "./knowledge_base"
 
     # --- CORS ---
-    CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:3000"]
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "capacitor://localhost",  # iOS Capacitor
+        "https://localhost",  # Android Capacitor
+    ]
 
     # --- App ---
     APP_TITLE: str = "LitMatch API"

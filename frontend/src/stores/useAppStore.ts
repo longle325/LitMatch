@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { persist } from "zustand/middleware";
+import { appStorage } from "@/lib/storage";
 import type {
   ChallengeResult,
   ChatMessage,
@@ -96,7 +97,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: "litmatch-state",
-      storage: createJSONStorage(() => localStorage),
+      storage: appStorage,
     },
   ),
 );
