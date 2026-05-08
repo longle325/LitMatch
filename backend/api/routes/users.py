@@ -13,7 +13,13 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.deps import get_db
-from models.schemas import UserCreate, UserResponse
+from models.db_models import MatchStatus
+from models.schemas import (
+    MatchedCharacter,
+    MatchedCharactersResponse,
+    UserCreate,
+    UserResponse,
+)
 from services import db_postgres as db
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -47,3 +53,32 @@ async def get_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")
     return user
+
+
+@router.get("/{user_id}/matches", response_model=MatchedCharactersResponse)
+async def get_user_matched_characters(
+    user_id: UUID,
+    session: AsyncSession = Depends(get_db),
+):
+    user = await db.get_user(session, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    matches = await db.get_user_matches(
+        session,
+        user_id,
+        statuses=[
+            MatchStatus.SWIPED_RIGHT,
+            MatchStatus.CHAT_UNLOCKED,
+            MatchStatus.CHALLENGE_PASSED,
+        ],
+    )
+    characters = [
+        MatchedCharacter(
+            **match.character.__dict__,
+            match_status=match.status,
+            matched_at=match.created_at,
+        )
+        for match in matches
+    ]
+    return MatchedCharactersResponse(characters=characters)

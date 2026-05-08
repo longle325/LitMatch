@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 
 
 class MatchStatus(str, Enum):
+    SWIPED_LEFT = "SWIPED_LEFT"
     SWIPED_RIGHT = "SWIPED_RIGHT"
     CHAT_UNLOCKED = "CHAT_UNLOCKED"
     CHALLENGE_PASSED = "CHALLENGE_PASSED"
@@ -72,11 +73,22 @@ class CharacterDetail(CharacterCard):
     voice_instructions: Optional[str] = None
 
 
+class MatchedCharacter(CharacterCard):
+    """Character card with the current user's match state."""
+
+    match_status: MatchStatus
+    matched_at: datetime
+
+
 # ── Deck ──────────────────────────────────────────────────────────────────
 
 
 class DeckResponse(BaseModel):
     characters: List[CharacterCard]
+
+
+class MatchedCharactersResponse(BaseModel):
+    characters: List[MatchedCharacter]
 
 
 # ── Swipe / Match ─────────────────────────────────────────────────────────

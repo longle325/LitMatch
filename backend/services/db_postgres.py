@@ -6,7 +6,7 @@ All database queries live here so route handlers stay thin.
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Iterable, List, Optional
 from uuid import UUID
 
 from sqlalchemy import func, select, update
@@ -78,11 +78,16 @@ async def list_characters(db: AsyncSession) -> List[Character]:
 # ── Matches ───────────────────────────────────────────────────────────────
 
 
-async def create_match(db: AsyncSession, user_id: UUID, character_id: UUID) -> Match:
+async def create_match(
+    db: AsyncSession,
+    user_id: UUID,
+    character_id: UUID,
+    status: MatchStatus = MatchStatus.SWIPED_RIGHT,
+) -> Match:
     match = Match(
         user_id=user_id,
         character_id=character_id,
-        status=MatchStatus.SWIPED_RIGHT,
+        status=status,
     )
     db.add(match)
     await db.commit()
@@ -117,8 +122,15 @@ async def update_match_status(
     return await get_match(db, user_id, character_id)
 
 
-async def get_user_matches(db: AsyncSession, user_id: UUID) -> List[Match]:
-    result = await db.execute(select(Match).where(Match.user_id == user_id))
+async def get_user_matches(
+    db: AsyncSession,
+    user_id: UUID,
+    statuses: Optional[Iterable[MatchStatus]] = None,
+) -> List[Match]:
+    stmt = select(Match).where(Match.user_id == user_id)
+    if statuses is not None:
+        stmt = stmt.where(Match.status.in_(list(statuses)))
+    result = await db.execute(stmt)
     return list(result.scalars().all())
 
 

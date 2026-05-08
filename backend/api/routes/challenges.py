@@ -75,7 +75,7 @@ async def submit_challenge(
 
     # Validate match exists
     match = await db.get_match(session, body.user_id, body.character_id)
-    if not match:
+    if not match or match.status == MatchStatus.SWIPED_LEFT:
         raise HTTPException(
             status_code=403,
             detail="You must match with this character first.",

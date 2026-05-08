@@ -19,6 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sse_starlette.sse import EventSourceResponse
 
 from api.deps import get_chat, get_db
+from models.db_models import MatchStatus
 from models.schemas import ChatRequest
 from services import db_postgres as db
 from services.chat_service import ChatService
@@ -44,7 +45,7 @@ async def chat_stream(
 
     # Verify user has matched with this character
     match = await db.get_match(session, body.user_id, body.character_id)
-    if not match:
+    if not match or match.status == MatchStatus.SWIPED_LEFT:
         raise HTTPException(
             status_code=403,
             detail="You must match with this character before chatting.",
