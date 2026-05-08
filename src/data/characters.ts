@@ -1,13 +1,21 @@
 import type { Character, ChallengeQuestion } from "@/types";
 
+// Question id is auto-generated below, so the seed data only supplies
+// the substantive fields. This mirrors the wire shape from
+// docs/API.md §5.2 once the backend ships.
+type SeedChallengeQuestion = Omit<ChallengeQuestion, "id">;
+type SeedCharacter = Omit<Character, "challenge"> & {
+  challenge: SeedChallengeQuestion[];
+};
+
 const q = (
   text: string,
   options: string[],
   answer: number,
   explanation: string,
-): ChallengeQuestion => ({ text, options, answer, explanation });
+): SeedChallengeQuestion => ({ text, options, answer, explanation });
 
-export const characters: Character[] = [
+const rawCharacters: SeedCharacter[] = [
   {
     id: "chi-pheo",
     name: "Chí Phèo",
@@ -431,6 +439,17 @@ export const characters: Character[] = [
     ],
   },
 ];
+
+// Inject question ids of the form `${characterId}-q${1-based index}`.
+// Keeps seed data terse and guarantees stable, predictable ids without
+// any handwritten boilerplate.
+export const characters: Character[] = rawCharacters.map((character) => ({
+  ...character,
+  challenge: character.challenge.map((question, index) => ({
+    ...question,
+    id: `${character.id}-q${index + 1}`,
+  })),
+}));
 
 export const getCharacter = (id: string): Character | undefined =>
   characters.find((character) => character.id === id);

@@ -91,7 +91,7 @@ Idempotent: matching the same character twice should return `{ "ok": true }` wit
 
 ### 3.4 `GET /characters/:id/challenge`
 
-Returns the five challenge questions for a character. **Important:** the response must NOT include the correct-answer index or the explanation — those move to the server in §3.5.
+Returns the challenge questions for a character. **Important:** the response must NOT include the correct-answer index or the explanation — those move to the server in §3.5.
 
 **Response 200**
 
@@ -112,7 +112,12 @@ Returns the five challenge questions for a character. **Important:** the respons
 }
 ```
 
-> Migration note: The current mock returns `answer` and `explanation` inline (see `src/data/characters.ts`). When the backend ships, those fields move server-side and the frontend `ChallengeQuestion` type drops them. Frontend will adapt — answers and explanations only need to be sent back from `/submit`.
+#### MVP scope
+
+- **Question count.** PRD §6.4 mandates 5 questions per character, with 4/5 required to fully unlock. The current seed has exactly 5 per character. The schema below does NOT hard-code 5 — backend should treat the array length as authoritative so future characters can ship with different counts (PRD §7 explicitly notes Thúy Kiều had 6 candidate questions; we trimmed to 5 for MVP-1 but the contract should not block 6+ later).
+- **Question types.** PRD §6.4 lists six categories (Multiple choice, Quote identification, Motivation analysis, Relationship analysis, Theme connection, Short explanation). MVP-1 ships **multiple-choice only**. All current questions have exactly 4 options, but again — `options.length` should be treated as authoritative, not fixed. Short-answer / quote-identification question types are **explicitly out of scope** for MVP-1 and would need a follow-up spec (free-text grading, partial credit, etc.).
+
+> Migration note: The current mock returns `answer` and `explanation` inline (see `src/data/characters.ts` — those fields are stripped on the wire when the backend ships). The mock auto-generates `id` from the character id and 1-based index (`chi-pheo-q1`, `chi-pheo-q2`, …). The backend should preserve this id format so the FE doesn't need a mapping table during the cutover.
 
 ### 3.5 `POST /characters/:id/challenge/submit`
 
@@ -126,7 +131,7 @@ Grades a challenge submission and returns the per-question explanation set.
 }
 ```
 
-`answers[i]` is the option index (0-based) the user picked for question `i`. Length must equal the number of questions.
+`answers[i]` is the option index (0-based) the user picked for question `i`. Length must equal the number of questions returned by `GET /characters/:id/challenge` for the same character (5 in MVP-1, but not hard-coded — see §3.4 MVP scope).
 
 **Response 200**
 
@@ -256,6 +261,16 @@ data: {"messageId":"msg_abc123"}
 - Cancellation: frontend will close the connection if the user navigates away. Backend should abort generation on disconnect.
 - Streaming is the only mode. There is no non-streaming `/chat` endpoint.
 
+**Backend internals (RAG inputs — informative)**
+
+Per PRD §9 RAG Direction, the LLM call the backend assembles for `/chat` should include all five of the following. The frontend only sends `characterId`, `message`, and optional `history` — everything else is server-resolved from the curated knowledge base keyed by `characterId`:
+
+1. **Character persona instructions** — voice, register, social-historical positioning. Mapped from the FE seed's `voice` and `personality` fields (see `Character` in §5.1).
+2. **Retrieved source snippets** — text excerpts from the curated character knowledge base, retrieved by relevance to the user message. MVP-1 can use keyword retrieval; embedding-based retrieval is fine.
+3. **Curated notes** — teacher-reviewed character analysis, conflict notes, social context. Mapped from the seed's `sources`, `conflict`, `context` fields.
+4. **User message** — the `message` field from the request, plus any prior `history` for continuity.
+5. **Guardrail instructions** — refuse essay generation, admit uncertainty when sources are insufficient, separate interpretation from cited fact, do not invent plot details (PRD §6.3, §12).
+
 > **Migration path from mock:** the mock chat (`mockClient.streamChat` in `src/api/client.ts`) is an `AsyncIterable<string>` that yields word-sized chunks. The HTTP client adapter will parse SSE events into the same shape, so the route component (`src/routes/Chat.tsx`) doesn't change.
 
 ## 4. Streaming protocol details
@@ -305,19 +320,21 @@ Note: the current frontend ships `challenge` inline on `Character` for the mock.
 {
   id: string;              // "chi-pheo-q1"
   text: string;
-  options: string[];       // length 4 (always 4 for MVP)
+  options: string[];       // 4 options for every MVP-1 question; not fixed in the schema
 }
 ```
+
+`id` is required and must match the FE auto-generated format (`${characterId}-q${1-based index}`). The FE type now carries `id` (`src/types/index.ts`).
 
 ### 5.3 `ChallengeResult`
 
 ```ts
 {
-  score: number;           // 0..5
-  passed: boolean;         // score >= 4
-  perfect: boolean;        // score === 5
+  score: number;           // 0..N where N = number of questions for this character
+  passed: boolean;         // score >= 4 (PRD §6.4 — fixed threshold even if N > 5)
+  perfect: boolean;        // score === N
   awarded: number;         // total points awarded by this submission
-  answers: number[];       // echoed back, length 5
+  answers: number[];       // echoed back, same length as the submitted answers array
   questions: Array<{
     id: string;
     correctIndex: number;
@@ -325,6 +342,8 @@ Note: the current frontend ships `challenge` inline on `Character` for the mock.
   }>;
 }
 ```
+
+For MVP-1 every character has exactly 5 questions and the pass threshold is **4 correct** (PRD §6.4). The FE currently hard-codes `PASS_THRESHOLD = 4` in `src/lib/scoring.ts`. PRD §7 explicitly notes that any non-5-question challenge would need product to revisit the scoring rule, so the backend should treat 4 as MVP-1-specific rather than a permanent invariant.
 
 ### 5.4 `ChatMessage`
 
