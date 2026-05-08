@@ -14,7 +14,7 @@ The route layer wraps the generator in an SSE EventSourceResponse.
 from __future__ import annotations
 
 import logging
-from typing import AsyncIterator, Optional
+from typing import Any, AsyncIterator, Optional
 
 from openai import AsyncOpenAI
 
@@ -93,20 +93,35 @@ class ChatService:
 
         # Step 3 — stream the LLM response
         stream = await self.client.chat.completions.create(
-            model=self.chat_model,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message},
-            ],
-            stream=True,
-            temperature=0.7,
-            max_tokens=1024,
+            **self._completion_kwargs(system_prompt, user_message)
         )
 
         async for chunk in stream:
             delta = chunk.choices[0].delta
             if delta.content:
                 yield delta.content
+
+    def _completion_kwargs(
+        self,
+        system_prompt: str,
+        user_message: str,
+    ) -> dict[str, Any]:
+        kwargs: dict[str, Any] = {
+            "model": self.chat_model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message},
+            ],
+            "stream": True,
+        }
+
+        if self.chat_model.startswith(("gpt-5", "o1", "o3", "o4")):
+            kwargs["max_completion_tokens"] = 1024
+        else:
+            kwargs["temperature"] = 0.7
+            kwargs["max_tokens"] = 1024
+
+        return kwargs
 
 
 # ---------------------------------------------------------------------------
