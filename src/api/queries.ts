@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/api/client";
 import { useAppStore } from "@/stores/useAppStore";
 
@@ -49,35 +49,52 @@ export function useLeaderboard() {
 
 export function useMatchMutation() {
   const matchCharacter = useAppStore((state) => state.matchCharacter);
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
       await api.recordMatch(id);
       matchCharacter(id);
       return id;
     },
+    onSuccess: () => {
+      // Backend dropped this character from the deck and added points to
+      // the user; refresh both views so a navigation hits fresh data.
+      queryClient.invalidateQueries({ queryKey: queryKeys.deck });
+      queryClient.invalidateQueries({ queryKey: queryKeys.leaderboard });
+    },
   });
 }
 
 export function useSkipMutation() {
   const skipCharacter = useAppStore((state) => state.skipCharacter);
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      // Optimistic local update first so the deck advances even if the
-      // backend call fails (e.g. mock mode is a no-op anyway).
-      skipCharacter(id);
+      // Server-first so a backend failure leaves local state in sync with
+      // the server (the deck won't lie about a swipe that didn't persist).
       await api.recordSkip(id);
+      skipCharacter(id);
       return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.deck });
     },
   });
 }
 
 export function useSubmitChallengeMutation() {
   const saveChallenge = useAppStore((state) => state.saveChallenge);
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, answers }: { id: string; answers: number[] }) => {
       const result = await api.submitChallenge(id, answers);
       saveChallenge(id, result);
       return result;
+    },
+    onSuccess: () => {
+      // Points and characters_unlocked changed on the backend; refresh
+      // the leaderboard so /leaderboard reflects the new score.
+      queryClient.invalidateQueries({ queryKey: queryKeys.leaderboard });
     },
   });
 }

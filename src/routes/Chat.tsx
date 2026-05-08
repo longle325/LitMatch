@@ -314,12 +314,20 @@ export default function Chat() {
 
   // Rehydrate chat history from the backend on mount. Mock returns [] so
   // existing local-only state is left untouched.
+  //
+  // Race guard: if the user types and submits a message before the history
+  // request resolves, `appendChat` has already updated the store. Don't
+  // clobber that local progress — only replace when the local thread is
+  // still empty.
   useEffect(() => {
     if (!id) return;
     let cancelled = false;
     api.getChatHistory(id).then(
       (history) => {
         if (cancelled || history.length === 0) return;
+        const localCount =
+          useAppStore.getState().chats[id]?.length ?? 0;
+        if (localCount > 0) return;
         setChat(id, history);
       },
       () => {
