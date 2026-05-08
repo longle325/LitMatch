@@ -1,41 +1,26 @@
 """
-Codex Knowledge Agent  --  replaces the GraphRAG + Vector Store pipeline.
+Codex Knowledge Agent — searches literary knowledge files using OpenAI Codex.
 
-Instead of Neo4j graph queries with a pgvector fallback, this service uses
-the OpenAI Codex SDK to search through literary knowledge files stored under
-`knowledge_base/characters/`.
+Reads character-specific text files from knowledge_base/, passes them as
+context to the Codex model (gpt-5.2-codex), and returns the most relevant
+excerpts for the character chat prompt.
 
 Architecture
 ------------
-                                    ┌──────────────────────┐
-  user query ──►  CodexKnowledgeAgent  ──► Codex model reads   │
-                  (this module)          │  knowledge_base/*    │
-                                    └──────────────────────┘
-                                              │
-                                    retrieved literary context
-                                              │
-                                              ▼
-                                    ChatService builds prompt
-                                    and streams LLM response
-
-The knowledge base is a set of markdown / text files organised per character.
-Codex searches and reads these files to find relevant quotes, events,
-relationships, and historical context.
-
-Usage
------
-    from services.codex_agent import CodexKnowledgeAgent
-
-    agent = CodexKnowledgeAgent(
-        api_key="sk-...",
-        knowledge_dir="./knowledge_base",
-    )
-    context = await agent.search_context("Chí Phèo", "Tại sao anh ghét Bá Kiến?")
+  user query ──► CodexKnowledgeAgent
+                   │
+                   ├── reads knowledge_base/{character}/*.txt locally
+                   ├── sends files + query to gpt-5.2-codex
+                   └── returns extracted literary context
+                         │
+                         ▼
+                   ChatService builds prompt and streams LLM response
 """
 
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from typing import Optional
 
 from openai import AsyncOpenAI
@@ -44,13 +29,29 @@ from core.config import settings
 
 logger = logging.getLogger(__name__)
 
+# Map character names to knowledge_base folder names
+CHARACTER_FOLDER_MAP: dict[str, str] = {
+    "Chí Phèo": "Chi_Pheo",
+    "chi_pheo": "Chi_Pheo",
+    "Mị": "Mi",
+    "mi": "Mi",
+    "Xuân Tóc Đỏ": "Xuan_red_hair",
+    "xuan_toc_do": "Xuan_red_hair",
+    "Lục Vân Tiên": "Luc_Van_Tien",
+    "luc_van_tien": "Luc_Van_Tien",
+    "Thúy Kiều": "Thuy_Kieu",
+    "thuy_kieu": "Thuy_Kieu",
+}
+
+MAX_CONTEXT_CHARS = 12_000  # Stay within token limits
+
 
 class CodexKnowledgeAgent:
     """
-    Searches the literary knowledge base using OpenAI Codex.
+    Searches the literary knowledge base using OpenAI Codex model.
 
-    The Codex tool operates in *workspace-read* mode so it can browse
-    the knowledge files but never modify them.
+    Reads character knowledge files from disk, passes them as context
+    to the Codex model, and asks it to extract relevant passages.
     """
 
     def __init__(
@@ -60,8 +61,8 @@ class CodexKnowledgeAgent:
         model: Optional[str] = None,
     ):
         self.client = AsyncOpenAI(api_key=api_key or settings.OPENAI_API_KEY)
-        self.knowledge_dir = knowledge_dir or settings.KNOWLEDGE_BASE_DIR
-        self.model = model or settings.CODEX_MODEL
+        self.knowledge_dir = Path(knowledge_dir or settings.KNOWLEDGE_BASE_DIR)
+        self.model = model or "gpt-5.2-codex"
 
     # ------------------------------------------------------------------
     # Public API
@@ -78,29 +79,29 @@ class CodexKnowledgeAgent:
         Returns a plain-text block of retrieved excerpts that can be
         injected into the character chat prompt.
         """
-        search_instruction = (
-            f"You are a literary research assistant specialising in "
-            f"Vietnamese literature. Search the knowledge base for "
-            f'information about the character "{character_name}". '
-            f"Return the most relevant quotes, events, character "
-            f"relationships, personality details, and historical context. "
-            f"Output only the retrieved excerpts — no commentary."
-        )
+        # Load knowledge files for this character
+        knowledge_text = self._load_character_files(character_name)
+        if not knowledge_text:
+            logger.warning("No knowledge files found for %s", character_name)
+            return ""
 
         try:
             response = await self.client.responses.create(
                 model=self.model,
-                instructions=search_instruction,
-                input=user_query,
-                tools=[
-                    {
-                        "type": "codex_search",
-                        "codex_search": {
-                            "sandbox_mode": "workspace-read",
-                            "working_directory": self.knowledge_dir,
-                        },
-                    }
-                ],
+                instructions=(
+                    "You are a literary research assistant specialising in "
+                    "Vietnamese literature. You have been given the full text "
+                    "of knowledge files about a character. Extract ONLY the "
+                    "passages, quotes, events, relationships, and historical "
+                    "context that are relevant to the user's question. "
+                    "Output only the extracted excerpts — no commentary, "
+                    "no summarisation. If nothing is relevant, say so."
+                ),
+                input=(
+                    f"=== KNOWLEDGE FILES FOR {character_name.upper()} ===\n\n"
+                    f"{knowledge_text}\n\n"
+                    f"=== USER QUESTION ===\n{user_query}"
+                ),
             )
             return self._extract_text(response)
 
@@ -111,15 +112,48 @@ class CodexKnowledgeAgent:
     # ------------------------------------------------------------------
     # Internals
     # ------------------------------------------------------------------
+    def _load_character_files(self, character_name: str) -> str:
+        """Read all .txt and .md files for a character, concatenated."""
+        folder_name = CHARACTER_FOLDER_MAP.get(character_name)
+        if not folder_name:
+            # Try matching by folder name directly
+            folder_name = character_name.replace(" ", "_").replace("-", "_")
+
+        char_dir = self.knowledge_dir / folder_name
+        if not char_dir.is_dir():
+            return ""
+
+        parts: list[str] = []
+        total_chars = 0
+        for path in sorted(char_dir.glob("*.txt")):
+            text = path.read_text(encoding="utf-8", errors="replace").strip()
+            if not text:
+                continue
+            # Prefer analysis files over full text to stay within limits
+            if total_chars + len(text) > MAX_CONTEXT_CHARS:
+                remaining = MAX_CONTEXT_CHARS - total_chars
+                if remaining > 500:
+                    parts.append(f"--- {path.name} (truncated) ---\n{text[:remaining]}")
+                break
+            parts.append(f"--- {path.name} ---\n{text}")
+            total_chars += len(text)
+
+        # Also check .md files
+        for path in sorted(char_dir.glob("*.md")):
+            text = path.read_text(encoding="utf-8", errors="replace").strip()
+            if not text or total_chars + len(text) > MAX_CONTEXT_CHARS:
+                break
+            parts.append(f"--- {path.name} ---\n{text}")
+            total_chars += len(text)
+
+        return "\n\n".join(parts)
+
     @staticmethod
     def _extract_text(response) -> str:
         """Pull the final text out of a Responses API result."""
-        # The Responses API exposes `output_text` as a convenience
-        # attribute that concatenates all message text in the output.
         if hasattr(response, "output_text") and response.output_text:
             return response.output_text
 
-        # Fallback: iterate output items manually
         parts: list[str] = []
         for item in getattr(response, "output", []):
             if hasattr(item, "text"):
@@ -132,7 +166,7 @@ class CodexKnowledgeAgent:
 
 
 # ---------------------------------------------------------------------------
-# Module-level singleton (lazy-initialised via deps.py)
+# Module-level singleton
 # ---------------------------------------------------------------------------
 _agent: Optional[CodexKnowledgeAgent] = None
 
