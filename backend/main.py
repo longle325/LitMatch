@@ -58,9 +58,25 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+
+def _expand_origins(origins: list[str]) -> list[str]:
+    """Allow any localhost port in dev so Vite port changes don't break CORS."""
+    expanded = list(origins)
+    for origin in origins:
+        if "://localhost:" in origin or "://127.0.0.1:" in origin:
+            # Add a wildcard-port variant isn't supported by CORS spec,
+            # so just add common Vite ports.
+            host = origin.rsplit(":", 1)[0]  # e.g. "http://localhost"
+            for port in (3000, 4173, 5169, 5173, 5174, 8080):
+                candidate = f"{host}:{port}"
+                if candidate not in expanded:
+                    expanded.append(candidate)
+    return expanded
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=_expand_origins(settings.CORS_ORIGINS),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
