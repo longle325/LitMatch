@@ -142,6 +142,111 @@ DEMO_USER_SEEDS: list[dict[str, Any]] = [
 ]
 
 
+CHARACTER_RELATIONSHIP_SEEDS: dict[str, list[dict[str, Any]]] = {
+    "chi_pheo": [
+        {
+            "related_slug": None,
+            "related_name": "Thị Nở",
+            "relationship_type": "cứu rỗi / tình thương",
+            "description": "Thị Nở và bát cháo hành đánh thức khát vọng làm người lương thiện trong Chí.",
+            "evidence": "Bát cháo hành là khoảnh khắc Chí lần đầu được chăm sóc như một con người.",
+            "source_path": "Chi_Pheo/analysis.txt",
+        },
+        {
+            "related_slug": None,
+            "related_name": "Bá Kiến",
+            "relationship_type": "áp bức / nguồn gốc bi kịch",
+            "description": "Bá Kiến là thế lực cường hào đẩy Chí vào tù và cướp đường trở về lương thiện.",
+            "evidence": "Chí tìm đến Bá Kiến ở đoạn cuối để đòi quyền làm người.",
+            "source_path": "Chi_Pheo/Chí_Phèo.txt",
+        },
+    ],
+    "mi": [
+        {
+            "related_slug": None,
+            "related_name": "A Phủ",
+            "relationship_type": "đồng cảnh / giải phóng",
+            "description": "Dòng nước mắt của A Phủ khiến Mị nhận ra thân phận chung và hành động cắt dây cứu người.",
+            "evidence": "Mị cứu A Phủ cũng là tự cứu mình khỏi nhà thống lý.",
+            "source_path": "Mi/analysis.txt",
+        },
+        {
+            "related_slug": None,
+            "related_name": "A Sử",
+            "relationship_type": "áp chế hôn nhân",
+            "description": "A Sử đại diện cho quyền lực gia trưởng giam hãm tuổi trẻ của Mị.",
+            "evidence": "A Sử trói Mị trong đêm tình mùa xuân.",
+            "source_path": "Mi/Vo_chong_A_Phu.txt",
+        },
+    ],
+    "xuan_toc_do": [
+        {
+            "related_slug": None,
+            "related_name": "Bà Phó Đoan",
+            "relationship_type": "bảo trợ / xã hội thượng lưu",
+            "description": "Bà Phó Đoan và giới thượng lưu góp phần nâng Xuân từ kẻ vô lại thành nhân vật danh giá.",
+            "evidence": "Sự thăng tiến của Xuân phơi bày xã hội sính danh và Âu hóa rởm.",
+            "source_path": "Xuan_red_hair/So_do.txt",
+        },
+    ],
+    "luc_van_tien": [
+        {
+            "related_slug": None,
+            "related_name": "Kiều Nguyệt Nga",
+            "relationship_type": "nghĩa hiệp / tri ân",
+            "description": "Vân Tiên cứu Nguyệt Nga khỏi cướp, thể hiện lý tưởng kiến nghĩa bất vi.",
+            "evidence": "Vân Tiên làm việc nghĩa không mong báo đáp.",
+            "source_path": "Luc_Van_Tien/Luc_Van_Tien.txt",
+        },
+    ],
+    "thuy_kieu": [
+        {
+            "related_slug": None,
+            "related_name": "Kim Trọng",
+            "relationship_type": "tình yêu / lời thề",
+            "description": "Tình yêu với Kim Trọng bị chia cắt bởi chữ hiếu và tai biến gia đình.",
+            "evidence": "Trao duyên là bi kịch khi Kiều nhờ Thúy Vân thay mình giữ lời thề.",
+            "source_path": "Thuy_Kieu/Truyen_Kieu.txt",
+        },
+        {
+            "related_slug": None,
+            "related_name": "Từ Hải",
+            "relationship_type": "tri kỷ / bi kịch quyền lực",
+            "description": "Từ Hải cho Kiều vị thế tự do, nhưng lựa chọn hàng triều đình dẫn tới bi kịch.",
+            "evidence": "Kiều vừa mong yên ổn vừa dằn vặt vì cái chết của Từ Hải.",
+            "source_path": "Thuy_Kieu/Truyen_Kieu.txt",
+        },
+    ],
+}
+
+
+CHARACTER_EVENT_SEEDS: dict[str, list[dict[str, Any]]] = {
+    "chi_pheo": [
+        {"title": "Bị Bá Kiến đẩy vào tù", "description": "Từ anh canh điền hiền lành, Chí bị nhà tù thực dân làm biến dạng.", "source_path": "Chi_Pheo/Chí_Phèo.txt"},
+        {"title": "Gặp Thị Nở và bát cháo hành", "description": "Tình thương giản dị làm Chí khao khát trở lại làm người.", "source_path": "Chi_Pheo/analysis.txt"},
+        {"title": "Đâm Bá Kiến rồi tự sát", "description": "Khi đường về lương thiện bị chặn, Chí hướng tới nguồn gốc bi kịch.", "source_path": "Chi_Pheo/Chí_Phèo.txt"},
+    ],
+    "mi": [
+        {"title": "Bị bắt làm con dâu gạt nợ", "description": "Mị mất tự do vì món nợ truyền đời và quyền lực nhà thống lý.", "source_path": "Mi/Vo_chong_A_Phu.txt"},
+        {"title": "Đêm tình mùa xuân", "description": "Tiếng sáo và men rượu đánh thức khát vọng sống bị vùi lấp.", "source_path": "Mi/analysis.txt"},
+        {"title": "Cắt dây cứu A Phủ", "description": "Lòng thương người chuyển thành hành động phản kháng.", "source_path": "Mi/Vo_chong_A_Phu.txt"},
+    ],
+    "xuan_toc_do": [
+        {"title": "Bước vào xã hội Âu hóa", "description": "Xuân được giới thượng lưu giả trá nhặt lên và tô vẽ.", "source_path": "Xuan_red_hair/So_do.txt"},
+        {"title": "Trở thành đốc tờ và vĩ nhân", "description": "Danh hão của Xuân mỉa mai sự đảo lộn giá trị xã hội.", "source_path": "Xuan_red_hair/analysis.txt"},
+    ],
+    "luc_van_tien": [
+        {"title": "Đánh cướp cứu Kiều Nguyệt Nga", "description": "Hành động mở đầu xác lập phẩm chất nghĩa hiệp của Vân Tiên.", "source_path": "Luc_Van_Tien/Luc_Van_Tien.txt"},
+        {"title": "Gặp hoạn nạn và bị phản bội", "description": "Bi kịch thử thách khí tiết người quân tử.", "source_path": "Luc_Van_Tien/analysis.txt"},
+    ],
+    "thuy_kieu": [
+        {"title": "Bán mình chuộc cha", "description": "Kiều đặt chữ hiếu lên trên tình yêu, mở đầu mười lăm năm lưu lạc.", "source_path": "Thuy_Kieu/Truyen_Kieu.txt"},
+        {"title": "Trao duyên", "description": "Kiều gửi Thúy Vân nối duyên với Kim Trọng trong giằng xé đau đớn.", "source_path": "Thuy_Kieu/Truyen_Kieu.txt"},
+        {"title": "Gặp Từ Hải", "description": "Kiều có khoảnh khắc được nâng đỡ và tự do trước khi bi kịch quyền lực ập đến.", "source_path": "Thuy_Kieu/analysis.txt"},
+    ],
+}
+
+
 def challenge_payload(character: dict[str, Any]) -> list[dict[str, Any]]:
     return [
         {
@@ -192,6 +297,63 @@ async def seed_characters_and_challenges(session) -> int:
     return seeded_count
 
 
+async def seed_relationships_and_events(session) -> tuple[int, int]:
+    from models.db_models import Character, CharacterEvent, CharacterRelationship
+    from sqlalchemy import delete, select  # type: ignore[reportMissingImports]
+
+    characters_by_slug: dict[str, Character] = {}
+    result = await session.execute(select(Character))
+    for character in result.scalars().all():
+        characters_by_slug[character.slug] = character
+
+    relationship_count = 0
+    event_count = 0
+    for slug, character in characters_by_slug.items():
+        await session.execute(
+            delete(CharacterRelationship).where(
+                CharacterRelationship.character_id == character.id
+            )
+        )
+        await session.execute(
+            delete(CharacterEvent).where(CharacterEvent.character_id == character.id)
+        )
+
+        for relationship in CHARACTER_RELATIONSHIP_SEEDS.get(slug, []):
+            related_slug = relationship.get("related_slug")
+            related_character = (
+                characters_by_slug.get(related_slug) if related_slug else None
+            )
+            session.add(
+                CharacterRelationship(
+                    character_id=character.id,
+                    related_character_id=related_character.id if related_character else None,
+                    related_name=relationship["related_name"],
+                    relationship_type=relationship["relationship_type"],
+                    description=relationship["description"],
+                    evidence=relationship.get("evidence"),
+                    source_path=relationship.get("source_path"),
+                )
+            )
+            relationship_count += 1
+
+        for sequence_number, event in enumerate(
+            CHARACTER_EVENT_SEEDS.get(slug, []),
+            start=1,
+        ):
+            session.add(
+                CharacterEvent(
+                    character_id=character.id,
+                    sequence_number=sequence_number,
+                    title=event["title"],
+                    description=event["description"],
+                    source_path=event.get("source_path"),
+                )
+            )
+            event_count += 1
+
+    return relationship_count, event_count
+
+
 async def seed_demo_users(session) -> int:
     from models.db_models import User
     from sqlalchemy import select  # type: ignore[reportMissingImports]
@@ -221,10 +383,12 @@ async def run_seed(include_demo_users: bool = True) -> None:
 
     async with async_session_factory() as session:
         character_count = await seed_characters_and_challenges(session)
+        relationship_count, event_count = await seed_relationships_and_events(session)
         user_count = await seed_demo_users(session) if include_demo_users else 0
         await session.commit()
 
     print(f"Seeded {character_count} characters with challenges.")
+    print(f"Seeded {relationship_count} relationships and {event_count} events.")
     if include_demo_users:
         print(f"Seeded {user_count} demo users.")
 

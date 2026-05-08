@@ -8,6 +8,8 @@ Tables:
   challenges  - per-character quiz questions (JSONB)
   challenge_attempts - one graded submission per user/character
   knowledge_chunks - embedded RAG chunks from knowledge_base/index/chunks.jsonl
+  character_relationships - graph-like relationship facts
+  character_events - ordered character timeline events
 """
 
 from __future__ import annotations
@@ -109,6 +111,13 @@ class Character(Base):
         back_populates="character",
         lazy="selectin",
     )
+    relationships = relationship(
+        "CharacterRelationship",
+        foreign_keys="CharacterRelationship.character_id",
+        back_populates="character",
+        lazy="selectin",
+    )
+    events = relationship("CharacterEvent", back_populates="character", lazy="selectin")
 
 
 # ---------------------------------------------------------------------------
@@ -282,3 +291,57 @@ class KnowledgeChunk(Base):
         onupdate=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
+
+
+# ---------------------------------------------------------------------------
+# Character graph data
+# ---------------------------------------------------------------------------
+class CharacterRelationship(Base):
+    __tablename__ = "character_relationships"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    character_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("characters.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    related_character_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("characters.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    related_name = Column(String(100), nullable=False)
+    relationship_type = Column(String(100), nullable=False)
+    description = Column(Text, nullable=False)
+    evidence = Column(Text)
+    source_path = Column(Text)
+
+    character = relationship(
+        "Character",
+        foreign_keys=[character_id],
+        back_populates="relationships",
+    )
+    related_character = relationship("Character", foreign_keys=[related_character_id])
+
+
+class CharacterEvent(Base):
+    __tablename__ = "character_events"
+    __table_args__ = (
+        UniqueConstraint("character_id", "sequence_number", name="uq_character_event_sequence"),
+    )
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    character_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("characters.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    sequence_number = Column(Integer, nullable=False)
+    title = Column(String(200), nullable=False)
+    description = Column(Text, nullable=False)
+    source_path = Column(Text)
+
+    character = relationship("Character", back_populates="events")

@@ -85,6 +85,38 @@ class MatchedCharacter(CharacterCard):
     matched_at: datetime
 
 
+class CharacterRelationshipResponse(BaseModel):
+    id: UUID
+    character_id: UUID
+    related_character_id: Optional[UUID] = None
+    related_name: str
+    relationship_type: str
+    description: str
+    evidence: Optional[str] = None
+    source_path: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+class CharacterRelationshipsResponse(BaseModel):
+    relationships: List[CharacterRelationshipResponse]
+
+
+class CharacterEventResponse(BaseModel):
+    id: UUID
+    character_id: UUID
+    sequence_number: int
+    title: str
+    description: str
+    source_path: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+class CharacterEventsResponse(BaseModel):
+    events: List[CharacterEventResponse]
+
+
 # ── Deck ──────────────────────────────────────────────────────────────────
 
 
