@@ -1,3 +1,4 @@
+import { X, Heart, Scale } from "lucide-react";
 import type { Character } from "@/types";
 import CharacterArt from "./CharacterArt";
 
@@ -29,7 +30,7 @@ export default function CharacterCard({ character, onSkip, onMatch }: Props) {
         <div className="conflict-tile">
           <span>Xung đột</span>
           <strong>
-            <span className="material-symbols-outlined">balance</span>
+            <Scale size={16} style={{ display: "inline", verticalAlign: "middle", marginRight: 4 }} />
             {character.conflict.split(";")[0]}
           </strong>
         </div>
@@ -45,14 +46,14 @@ export default function CharacterCard({ character, onSkip, onMatch }: Props) {
           aria-label="Bỏ qua"
           onClick={onSkip}
         >
-          <span className="material-symbols-outlined">close</span>
+          <X size={24} />
         </button>
         <button
           className="btn circle primary"
           aria-label="Chọn nhân vật"
           onClick={onMatch}
         >
-          <span className="material-symbols-outlined">favorite</span>
+          <Heart size={24} />
         </button>
       </div>
     </article>

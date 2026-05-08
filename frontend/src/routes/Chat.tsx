@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
+import { BookOpen, Pencil, AlertCircle, Swords } from "lucide-react";
 import { useCharacter } from "@/api/queries";
 import { api } from "@/api/client";
 import { useAppStore } from "@/stores/useAppStore";
@@ -142,15 +143,15 @@ export default function Chat() {
               </div>
             )}
             <div>
-              <h1 style={{ fontSize: 28 }}>{character.name}</h1>
-              <p style={{ margin: "4px 0 0", color: "var(--muted)" }}>
+              <h1 style={{ fontSize: 22 }}>{character.name}</h1>
+              <p style={{ margin: "4px 0 0", color: "var(--muted)", fontSize: 13 }}>
                 <span className="online-dot" />
                 Đang trò chuyện
               </p>
             </div>
           </div>
           <span className="work-pill">
-            <span className="material-symbols-outlined">local_library</span>
+            <BookOpen size={14} />
             {character.work}
           </span>
         </header>
@@ -171,13 +172,13 @@ export default function Chat() {
           )}
           {streaming && (
             <div className="typing-line">
-              <span className="material-symbols-outlined">edit</span>
+              <Pencil size={14} />
               {character.name} đang suy ngẫm...
             </div>
           )}
           {error && !streaming && (
             <div className="chat-error" role="alert">
-              <span className="material-symbols-outlined">error</span>
+              <AlertCircle size={16} />
               <span>{error}</span>
             </div>
           )}
@@ -205,8 +206,8 @@ export default function Chat() {
             className="btn secondary"
             to={`/characters/${id}/challenge`}
           >
-            <span className="material-symbols-outlined">swords</span>
-            Thử thách tôi
+            <Swords size={16} />
+            Thử thách
           </Link>
           <button
             className="btn primary"
@@ -229,7 +230,7 @@ export default function Chat() {
         </div>
         <p className="kicker">Bối cảnh văn học</p>
         <div className="source-book">
-          <span className="material-symbols-outlined">menu_book</span>
+          <BookOpen size={16} />
           <div>
             <strong>{character.work}</strong>
             <small>{character.author}</small>
