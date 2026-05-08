@@ -1,13 +1,6 @@
-/**
- * TanStack Query hooks — ported from main branch.
- *
- * These wrap the ApiClient so components get caching, loading states,
- * and automatic refetch for free.
- */
-
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { api } from "@/api/mock-client";
-import { useGameStore } from "@/stores/game-store";
+import { api } from "@/api/client";
+import { useAppStore } from "@/stores/useAppStore";
 
 export const queryKeys = {
   deck: ["deck"] as const,
@@ -47,7 +40,7 @@ export function useLeaderboard() {
 }
 
 export function useMatchMutation() {
-  const matchCharacter = useGameStore((state) => state.matchCharacter);
+  const matchCharacter = useAppStore((state) => state.matchCharacter);
   return useMutation({
     mutationFn: async (id: string) => {
       await api.recordMatch(id);
@@ -58,14 +51,11 @@ export function useMatchMutation() {
 }
 
 export function useSubmitChallengeMutation() {
-  const saveChallenge = useGameStore((state) => state.completed);
-  const completeChallenge = useGameStore((state) => state.completeChallenge);
+  const saveChallenge = useAppStore((state) => state.saveChallenge);
   return useMutation({
     mutationFn: async ({ id, answers }: { id: string; answers: number[] }) => {
       const result = await api.submitChallenge(id, answers);
-      // Store uses its own scoring, but we can also accept the API result
-      void saveChallenge;
-      void completeChallenge;
+      saveChallenge(id, result);
       return result;
     },
   });

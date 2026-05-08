@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 
+import type { Grade } from "@/types";
+
 interface FormValues {
   username: string;
-  grade: number;
+  grade: Grade;
 }
 
 export function OnboardingScreen() {
