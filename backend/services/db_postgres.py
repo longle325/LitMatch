@@ -241,6 +241,25 @@ async def list_chat_messages(
     return list(result.scalars().all())
 
 
+async def list_recent_chat_messages(
+    db: AsyncSession,
+    user_id: UUID,
+    character_id: UUID,
+    limit: int = 8,
+) -> List[ChatMessage]:
+    result = await db.execute(
+        select(ChatMessage)
+        .where(
+            ChatMessage.user_id == user_id,
+            ChatMessage.character_id == character_id,
+        )
+        .order_by(ChatMessage.created_at.desc())
+        .limit(limit)
+    )
+    messages = list(result.scalars().all())
+    return list(reversed(messages))
+
+
 # ── Leaderboard ───────────────────────────────────────────────────────────
 
 

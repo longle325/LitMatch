@@ -73,6 +73,7 @@ def build_character_prompt(
     character_name: str,
     retrieved_context: str,
     voice_instructions: Optional[str] = None,
+    conversation_context: Optional[str] = None,
 ) -> str:
     """
     Assemble the full system prompt for a character chat turn.
@@ -95,8 +96,15 @@ def build_character_prompt(
         f"bối cảnh văn học của nhân vật.",
     )
 
+    conversation_section = (
+        f"\n\n[LỊCH SỬ HỘI THOẠI GẦN ĐÂY]\n{conversation_context}"
+        if conversation_context
+        else ""
+    )
+
     return (
         f"{BASE_SYSTEM_INSTRUCTIONS}\n\n"
         f"[NHÂN VẬT]\n{voice}\n\n"
         f"[NGỮ CẢNH VĂN HỌC TÌM ĐƯỢC]\n{retrieved_context}\n"
+        f"{conversation_section}\n"
     )
