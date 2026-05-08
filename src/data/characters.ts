@@ -47,6 +47,17 @@ const rawCharacters: SeedCharacter[] = [
       "Bát cháo hành của Thị Nở đánh thức khát vọng sống lương thiện và được yêu thương.",
       "Cái lò gạch cũ gợi vòng luẩn quẩn của những kiếp người bị xã hội bỏ rơi.",
     ],
+    chatOpening:
+      "Tao là Chí Phèo. Người ta nhớ tao qua tiếng chửi, vết sẹo, men rượu và bát cháo hành. Nhưng nếu chỉ nhìn tao như một kẻ say rượu, có lẽ mày đã bỏ lỡ bi kịch lớn nhất của đời tao.",
+    suggestedQuestions: [],
+    interpretationThemes: [
+      "Tha hóa",
+      "Lương thiện",
+      "Định kiến",
+      "Tình thương",
+      "Quyền làm người",
+    ],
+    symbols: ["Tiếng chửi", "Bát cháo hành", "Vết sẹo", "Lò gạch cũ", "Rượu"],
     voice:
       "thô ráp, đau đớn, có lúc bừng lên mong muốn được công nhận là con người",
     challenge: [

@@ -40,6 +40,10 @@ export interface Character {
   context: string;
   sources: string[];
   voice: string;
+  chatOpening?: string;
+  suggestedQuestions?: string[];
+  interpretationThemes?: string[];
+  symbols?: string[];
   challenge: ChallengeQuestion[];
 }
 
