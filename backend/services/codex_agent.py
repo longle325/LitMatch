@@ -62,7 +62,7 @@ class CodexKnowledgeAgent:
     ):
         self.client = AsyncOpenAI(api_key=api_key or settings.OPENAI_API_KEY)
         self.knowledge_dir = Path(knowledge_dir or settings.KNOWLEDGE_BASE_DIR)
-        self.model = model or "gpt-5.2-codex"
+        self.model = model or settings.CHAT_MODEL  # gpt-5-mini
 
     # ------------------------------------------------------------------
     # Public API
@@ -79,31 +79,39 @@ class CodexKnowledgeAgent:
         Returns a plain-text block of retrieved excerpts that can be
         injected into the character chat prompt.
         """
-        # Load knowledge files for this character
         knowledge_text = self._load_character_files(character_name)
         if not knowledge_text:
             logger.warning("No knowledge files found for %s", character_name)
             return ""
 
         try:
-            response = await self.client.responses.create(
+            response = await self.client.chat.completions.create(
                 model=self.model,
-                instructions=(
-                    "You are a literary research assistant specialising in "
-                    "Vietnamese literature. You have been given the full text "
-                    "of knowledge files about a character. Extract ONLY the "
-                    "passages, quotes, events, relationships, and historical "
-                    "context that are relevant to the user's question. "
-                    "Output only the extracted excerpts — no commentary, "
-                    "no summarisation. If nothing is relevant, say so."
-                ),
-                input=(
-                    f"=== KNOWLEDGE FILES FOR {character_name.upper()} ===\n\n"
-                    f"{knowledge_text}\n\n"
-                    f"=== USER QUESTION ===\n{user_query}"
-                ),
+                messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are a literary research assistant specialising "
+                            "in Vietnamese literature. Extract ONLY the passages, "
+                            "quotes, events, relationships, and historical context "
+                            "that are relevant to the user's question from the "
+                            "provided knowledge files. Output only the extracted "
+                            "excerpts — no commentary, no summarisation. "
+                            "If nothing is relevant, say so."
+                        ),
+                    },
+                    {
+                        "role": "user",
+                        "content": (
+                            f"=== KNOWLEDGE FILES FOR {character_name.upper()} ===\n\n"
+                            f"{knowledge_text}\n\n"
+                            f"=== QUESTION ===\n{user_query}"
+                        ),
+                    },
+                ],
+                max_completion_tokens=1024,
             )
-            return self._extract_text(response)
+            return response.choices[0].message.content or ""
 
         except Exception:
             logger.exception("Codex search failed for %s", character_name)
@@ -147,22 +155,6 @@ class CodexKnowledgeAgent:
             total_chars += len(text)
 
         return "\n\n".join(parts)
-
-    @staticmethod
-    def _extract_text(response) -> str:
-        """Pull the final text out of a Responses API result."""
-        if hasattr(response, "output_text") and response.output_text:
-            return response.output_text
-
-        parts: list[str] = []
-        for item in getattr(response, "output", []):
-            if hasattr(item, "text"):
-                parts.append(item.text)
-            elif hasattr(item, "content"):
-                for block in item.content:
-                    if hasattr(block, "text"):
-                        parts.append(block.text)
-        return "\n".join(parts)
 
 
 # ---------------------------------------------------------------------------
