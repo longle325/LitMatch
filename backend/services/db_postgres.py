@@ -15,6 +15,7 @@ from sqlalchemy.orm import selectinload
 
 from models.db_models import (
     Challenge,
+    ChallengeAttempt,
     Character,
     ChatMessage,
     ChatRole,
@@ -157,6 +158,47 @@ async def get_challenge_for_character(
         select(Challenge).where(Challenge.character_id == character_id)
     )
     return result.scalar_one_or_none()
+
+
+async def get_challenge_attempt(
+    db: AsyncSession,
+    user_id: UUID,
+    character_id: UUID,
+) -> Optional[ChallengeAttempt]:
+    result = await db.execute(
+        select(ChallengeAttempt).where(
+            ChallengeAttempt.user_id == user_id,
+            ChallengeAttempt.character_id == character_id,
+        )
+    )
+    return result.scalar_one_or_none()
+
+
+async def create_challenge_attempt(
+    db: AsyncSession,
+    user_id: UUID,
+    character_id: UUID,
+    answers: list[int],
+    score: int,
+    total: int,
+    passed: bool,
+    points_earned: int,
+    explanations: list[str],
+) -> ChallengeAttempt:
+    attempt = ChallengeAttempt(
+        user_id=user_id,
+        character_id=character_id,
+        answers=answers,
+        score=score,
+        total=total,
+        passed=passed,
+        points_earned=points_earned,
+        explanations=explanations,
+    )
+    db.add(attempt)
+    await db.commit()
+    await db.refresh(attempt)
+    return attempt
 
 
 # ── Chat messages ─────────────────────────────────────────────────────────
