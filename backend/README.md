@@ -45,6 +45,32 @@ cd backend
 
 This seeds the five MVP characters, their challenges, and demo leaderboard users.
 
+## Embed Knowledge Base
+
+The backend uses hybrid RAG:
+
+- OpenAI `text-embedding-3-large` embeds chunks from `knowledge_base/index/chunks.jsonl`.
+- Postgres + pgvector stores vectors in `knowledge_chunks`.
+- Chat falls back to the local lexical retriever if vector retrieval is unavailable.
+
+Make sure `.env` has:
+
+```text
+OPENAI_API_KEY=sk-...
+EMBEDDING_MODEL=text-embedding-3-large
+EMBEDDING_DIMENSIONS=3072
+RAG_TOP_K=5
+```
+
+Then run:
+
+```bash
+cd backend
+./.venv/bin/python scripts/embed_knowledge_base.py --batch-size 64
+```
+
+The script upserts by stable `chunk_id` and skips unchanged chunks on later runs.
+
 ## Run API
 
 ```bash
