@@ -1,127 +1,66 @@
 # LitMatch
 
-A gamified Vietnamese literature learning app. Students discover literary characters through swipe cards, chat with source-grounded AI personas, complete character challenges, and compete on a leaderboard.
+A gamified Vietnamese literature learning app. Swipe to discover characters, chat with source-grounded AI personas, complete challenges, climb the leaderboard.
 
 ## Stack
 
-- **Frontend**: React 18 + TypeScript + Vite, Zustand (persisted), TanStack Query, React Router DOM, react-tinder-card, Framer Motion
-- **Backend**: FastAPI + SQLAlchemy (async) + Alembic, pgvector for hybrid RAG, OpenAI Codex/GPT-4o for chat, SSE streaming via `sse-starlette`
-- **Infra**: Postgres in Docker (`pgvector/pgvector:pg17`), `.env` at repo root for both sides
+- **Frontend**: React 18 + TypeScript + Vite, Zustand, TanStack Query, react-tinder-card
+- **Backend**: FastAPI, SQLAlchemy (async), Postgres + pgvector, OpenAI GPT-4o + `text-embedding-3-large`, SSE streaming
+- **Infra**: Postgres in Docker (`pgvector/pgvector:pg17`)
 
 ## Prerequisites
 
-- **Node 18+** (developed against 22.x), npm
-- **Python 3.11+** (developed against 3.13)
-- **Docker Desktop** running (for the Postgres container)
-- **OpenAI API key** in `.env` (`OPENAI_API_KEY=...`) — needed for chat streaming and the embed script
-
-Copy `.env.example` to `.env` and fill in your key. The same `.env` holds the FE `VITE_*` flags too — Vite ignores backend keys and vice versa.
+- Node 18+, npm
+- Python 3.11+
+- Docker Desktop running
+- An OpenAI API key
 
 ## First-time setup
 
 ```sh
-# 1. Frontend deps
+# 1. Env
+cp .env.example .env   # then add OPENAI_API_KEY
+
+# 2. Frontend
 npm install
 
-# 2. Backend deps
+# 3. Backend
 cd backend
 python3 -m venv .venv
 ./.venv/bin/pip install -r requirements.txt
 cd ..
 
-# 3. Postgres + schema + characters/challenges/demo users
+# 4. Postgres + schema + seed (characters, challenges, demo users)
 docker compose up -d postgres
 cd backend && ./.venv/bin/python scripts/seed_database.py && cd ..
 
-# 4. Knowledge-base embeddings (542 RAG chunks, ~$0.02 of OpenAI tokens
-#    if you embed locally). Skip the cost by restoring the team dump:
+# 5. Knowledge-base embeddings — restore the team's pre-embedded
+#    pgvector dump from Drive (no OpenAI cost, ~1s):
+#    https://drive.google.com/file/d/1cGlRIXH9EOJEwfb22USsUhSV6NCAcq_D/view
 bash scripts/restore-knowledge-chunks.sh
-# (Default DUMP_URL points at the team Drive copy. Override with
-#  DUMP_URL=... if you've moved it.)
 ```
 
-If you ever change `backend/knowledge_base/index/chunks.jsonl`, re-run the embed script and refresh the Drive dump:
+## Run locally
 
 ```sh
-cd backend && ./.venv/bin/python scripts/embed_knowledge_base.py --batch-size 24
-cd ..
-bash scripts/dump-knowledge-chunks.sh
-# Then upload backend/data/knowledge_chunks.sql.gz to the team Drive
+docker compose up -d postgres                                       # one-time
+cd backend && ./.venv/bin/python -m uvicorn main:app --reload --port 8081   # T1
+npm run dev                                                          # T2
 ```
 
-## Run locally (3 terminals)
-
-```sh
-# T1 — postgres (one-shot, stays running)
-docker compose up -d postgres
-
-# T2 — backend
-cd backend && ./.venv/bin/python -m uvicorn main:app --reload --port 8081
-
-# T3 — frontend
-npm run dev
-```
-
-Open <http://127.0.0.1:5173/>. First load redirects to `/onboarding`.
-
-## Mock vs real backend
-
-`VITE_REAL_ENDPOINTS` in `.env` is a comma-separated whitelist of endpoints that hit the real backend; anything not listed stays on the in-memory mock. Recognised keys: `auth, deck, characters, match, challenge, leaderboard, chat`. Empty string = all mock (no backend needed).
-
-For a quick offline UI demo: set it to empty. For full RAG-grounded chat: include `chat`.
-
-## NPM scripts
-
-| Script | What it does |
-| --- | --- |
-| `npm run dev` | Start Vite dev server on `127.0.0.1:5173` |
-| `npm run build` | Type-check (`tsc -b`) then produce a production build in `dist/` |
-| `npm run preview` | Serve the production build locally |
-| `npm run typecheck` | Type-check only, no emit |
-
-## Knowledge-base team workflow
-
-The pgvector embeddings (542 chunks, 3072-dim, ~7.4 MB compressed) live in the team's Google Drive instead of git so the repo stays lean. The dump artifact is gitignored under `backend/data/knowledge_chunks.sql.gz`.
-
-- **Refresh** (after changing chunks): `bash scripts/dump-knowledge-chunks.sh` → upload to Drive
-- **Restore** (fresh setup or after DB wipe): `bash scripts/restore-knowledge-chunks.sh`
-
-The current dump: <https://drive.google.com/file/d/1cGlRIXH9EOJEwfb22USsUhSV6NCAcq_D/view>
+Open <http://127.0.0.1:5173/>.
 
 ## Project layout
 
 ```
-src/                 Frontend (React + TS)
-  api/               Per-endpoint mock/real router; SSE parser
-  components/        AppShell, route guards, shared UI
-  data/              Seed characters (FE-side lore: art, prompts, themes)
-  routes/            One file per route
-  stores/            Zustand store (persisted to localStorage)
-  styles/            Global CSS (Tailwind directives + folk-woodblock theme)
-  types/             Shared TypeScript types
-
-backend/             FastAPI service
-  api/routes/        FastAPI routers per resource
-  services/          Chat orchestration, RAG retriever, Codex agent, DB access
-  models/            SQLAlchemy + Pydantic schemas
-  knowledge_base/    Per-character source texts + analyses + chunks.jsonl
-  scripts/           Python: seed_database, embed_knowledge_base, ingest tools
-  migrations/        Alembic migrations
-
-scripts/             Bash: dump-knowledge-chunks.sh, restore-knowledge-chunks.sh
-docs/API.md          Backend API contract
-PRD.md               Product requirements
-task.md              Running task tracker
+src/             Frontend (React + TS): api/, components/, routes/, stores/, styles/, types/
+backend/         FastAPI service: api/routes/, services/, models/, knowledge_base/, scripts/, migrations/
+scripts/         Bash: dump/restore knowledge-chunks
+docs/API.md      Backend API contract
+PRD.md, task.md  Product spec + task tracker
 ```
 
-## How state works
+## Notes
 
-Frontend user-state (profile, `userId` from `POST /users`, points, matches, completed challenges, chat cache) lives in Zustand and persists to `localStorage` under `litmatch-state`. To reset: `/profile` → **Đặt lại dữ liệu thử nghiệm**, or clear that key in devtools.
-
-Backend persists everything authoritative — users, swipes, challenge attempts, full chat history — in Postgres. When `chat` is real, opening a conversation rehydrates from `GET /chat/history`.
-
-## Documentation
-
-- [PRD.md](./PRD.md) — product requirements
-- [docs/API.md](./docs/API.md) — backend API contract
-- [task.md](./task.md) — task tracker
+- `VITE_REAL_ENDPOINTS` in `.env` whitelists which endpoints hit the real backend; empty = all mock (no backend needed for offline UI demos).
+- The FE persists user state to `localStorage` under `litmatch-state`. Reset via `/profile` → **Đặt lại dữ liệu thử nghiệm**.

@@ -112,6 +112,18 @@ Foundation laid for swapping mock endpoints to the FastAPI backend on `origin/ba
 - [x] **Env consolidation** — single root `.env` is now canonical for both Vite and the backend; `backend/core/config.py` reads `parents[2]/.env` with `extra: ignore` so Vite-only `VITE_*` keys are silently filtered.
 - [x] **Knowledge base embeddings seeded** — 542 chunks in pgvector via `text-embedding-3-large` (`scripts/embed_knowledge_base.py --batch-size 24`). Idempotent — re-runs skip unchanged chunks via stable `chunk_id` hash.
 - [x] **KB dump/restore tooling** — `scripts/dump-knowledge-chunks.sh` produces `backend/data/knowledge_chunks.sql.gz` (~7.4 MB compressed, 542 rows); `scripts/restore-knowledge-chunks.sh` truncates and reloads in ~1s, supports `DUMP_URL=…` for fetching from team Drive. Dump artifact gitignored — workflow is upload-to-Drive, share URL with team. Saves ~$0.02 OpenAI cost + ~5 min per fresh-clone setup.
+- [x] **Vietnamese IME / macOS audit fixes (2026-05-08)** — fixed real bugs surfaced by chat testing + a defensive sweep of similar patterns:
+  - `src/routes/Chat.tsx:handleTextAreaKeyDown` — guard on `event.nativeEvent.isComposing` and `event.keyCode === 229` so macOS Vietnamese IME's compositionend Enter doesn't fire submit twice. Was sending "chào ông" then "ông" as two messages.
+  - `src/routes/Onboarding.tsx` — same IME pattern; track composition state via `onCompositionStart/End` and disable submit during composition.
+  - `src/api/adapter.ts:handleSessionExpired` + `realClient.streamChat` — when backend returns 404 "User not found." (typical after a DB wipe with stale `userId` in localStorage), `resetAll()` and `window.location.replace("/onboarding")` to recover automatically.
+  - `src/components/CharacterCard.tsx:busy` prop + `src/routes/Discover.tsx` re-entrancy guard — heart/skip buttons disabled while `matchMutation.isPending || skipMutation.isPending`. Prevents trackpad double-taps from firing the swipe twice.
+
+### Audit findings deferred (low impact)
+
+- `src/components/BackgroundMusic.tsx` autoplay — already retries on first user gesture; could surface a small UI hint if Safari blocks but not blocking.
+- `src/components/VoicePlayButton.tsx` — once `setAvailable(false)` fires (network glitch), button stays hidden forever. Add retry if it bites.
+- Smart-quote / autocorrect normalisation in chat textarea — backend stores whatever Unicode the user types; if downstream parsing breaks, normalise `"`/`'` to ASCII on input.
+- Zustand `persist` config has no `version` / `migrate`. Schema is stable for hackathon; revisit before adding new fields to persisted state.
 
 ### UI polish + ops
 

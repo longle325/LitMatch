@@ -80,6 +80,25 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Detect a "session no longer valid" backend response (typically the user
+ * row was wiped while localStorage still holds its UUID). Clears local
+ * profile and bounces to onboarding so downstream calls don't keep crashing.
+ * Idempotent and safe to call multiple times.
+ */
+export function handleSessionExpired(status: number, detail: string): void {
+  if (status !== 404 || !/user not found/i.test(detail)) return;
+  if (typeof window === "undefined") return;
+  try {
+    useAppStore.getState().resetAll();
+  } catch {
+    // even if Zustand fails, the redirect below still recovers.
+  }
+  if (window.location.pathname !== "/onboarding") {
+    window.location.replace("/onboarding");
+  }
+}
+
 interface FetchOptions {
   method?: "GET" | "POST" | "PUT" | "DELETE";
   body?: unknown;
@@ -135,6 +154,8 @@ export async function apiFetch<T = unknown>(
       (typeof payload === "object" && payload !== null && "detail" in payload
         ? String((payload as { detail: unknown }).detail)
         : undefined) ?? `HTTP ${response.status}`;
+
+    handleSessionExpired(response.status, detail);
     throw new ApiError(detail, response.status, payload);
   }
 

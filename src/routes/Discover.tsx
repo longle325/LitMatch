@@ -67,6 +67,10 @@ export default function Discover() {
   const top = available[0];
 
   const handleSwipe = (id: string, direction: SwipeDirection) => {
+    // Re-entrancy guard for fast double-taps on macOS trackpads / mobile.
+    // TanStack Query's `isPending` flips after dispatch, but two synchronous
+    // clicks can both pass through before the flag flips.
+    if (matchMutation.isPending || skipMutation.isPending) return;
     if (direction === "right") {
       matchMutation.mutate(id);
       return;
@@ -105,6 +109,7 @@ export default function Discover() {
             character={top}
             onSkip={() => triggerSwipe(top.id, "left")}
             onMatch={() => triggerSwipe(top.id, "right")}
+            busy={matchMutation.isPending || skipMutation.isPending}
           />
         </TinderCard>
       </div>
