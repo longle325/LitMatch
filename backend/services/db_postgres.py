@@ -11,8 +11,17 @@ from uuid import UUID
 
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
-from models.db_models import Challenge, Character, Match, MatchStatus, User
+from models.db_models import (
+    Challenge,
+    Character,
+    ChatMessage,
+    ChatRole,
+    Match,
+    MatchStatus,
+    User,
+)
 
 
 # ── Users ─────────────────────────────────────────────────────────────────
@@ -127,7 +136,11 @@ async def get_user_matches(
     user_id: UUID,
     statuses: Optional[Iterable[MatchStatus]] = None,
 ) -> List[Match]:
-    stmt = select(Match).where(Match.user_id == user_id)
+    stmt = (
+        select(Match)
+        .options(selectinload(Match.character))
+        .where(Match.user_id == user_id)
+    )
     if statuses is not None:
         stmt = stmt.where(Match.status.in_(list(statuses)))
     result = await db.execute(stmt)
@@ -144,6 +157,46 @@ async def get_challenge_for_character(
         select(Challenge).where(Challenge.character_id == character_id)
     )
     return result.scalar_one_or_none()
+
+
+# ── Chat messages ─────────────────────────────────────────────────────────
+
+
+async def create_chat_message(
+    db: AsyncSession,
+    user_id: UUID,
+    character_id: UUID,
+    role: ChatRole,
+    content: str,
+) -> ChatMessage:
+    message = ChatMessage(
+        user_id=user_id,
+        character_id=character_id,
+        role=role,
+        content=content,
+    )
+    db.add(message)
+    await db.commit()
+    await db.refresh(message)
+    return message
+
+
+async def list_chat_messages(
+    db: AsyncSession,
+    user_id: UUID,
+    character_id: UUID,
+    limit: int = 100,
+) -> List[ChatMessage]:
+    result = await db.execute(
+        select(ChatMessage)
+        .where(
+            ChatMessage.user_id == user_id,
+            ChatMessage.character_id == character_id,
+        )
+        .order_by(ChatMessage.created_at.asc())
+        .limit(limit)
+    )
+    return list(result.scalars().all())
 
 
 # ── Leaderboard ───────────────────────────────────────────────────────────
