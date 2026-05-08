@@ -81,11 +81,13 @@ jobs:
         run: |
           FRONTEND_URL=$(gcloud run services describe litmatch-frontend --project ${{ env.PROJECT_ID }} --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "")
           BACKEND_URL=${{ steps.get-url.outputs.url }}
-          CORS="[\"${BACKEND_URL}\",\"${FRONTEND_URL}\",\"http://localhost:5173\",\"http://localhost:5169\",\"capacitor://localhost\",\"https://localhost\"]"
+          CORS='["'"${BACKEND_URL}"'","'"${FRONTEND_URL}"'","http://localhost:5173","http://localhost:5169","capacitor://localhost","https://localhost"]'
+
+          # Use ^ as delimiter so commas inside JSON don't break gcloud parsing
           gcloud run services update litmatch-backend \
             --project ${{ env.PROJECT_ID }} \
             --region ${{ env.REGION }} \
-            --update-env-vars "CORS_ORIGINS=${CORS}" \
+            --update-env-vars "^||^CORS_ORIGINS=${CORS}" \
             --quiet
 
   # ── Frontend ─────────────────────────────────────────────────────────────
