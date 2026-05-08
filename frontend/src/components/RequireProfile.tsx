@@ -25,9 +25,7 @@ export default function RequireProfile({ children }: { children: ReactNode }) {
       return;
     }
     // Stale localStorage from before auth was real. Silently back-fill by
-    // re-creating the user; on 409 (username taken — happens after a backend
-    // wipe leaves the same name in seed data), bounce to onboarding so the
-    // user can pick a new name.
+    // re-creating the user; on 409 (username taken), bounce to onboarding.
     api
       .createUser({ username: profile.username, grade: profile.grade })
       .then((created) => {
@@ -38,11 +36,13 @@ export default function RequireProfile({ children }: { children: ReactNode }) {
       .catch((err) => {
         if (cancelled) return;
         if (err instanceof ApiError && err.status === 409) {
+          // Username taken — clear stale session, start fresh
           setBoot("missing");
         } else {
-          // Unknown error — let the user proceed; subsequent API calls will
-          // surface a clearer error in context.
-          setBoot("ready");
+          // Backend unreachable or other error — clear stale profile
+          // so user can re-onboard cleanly instead of being stuck
+          console.warn("Session recovery failed, redirecting to onboarding:", err);
+          setBoot("missing");
         }
       });
     return () => {
