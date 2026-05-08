@@ -3,6 +3,21 @@ export type Grade = 10 | 11 | 12;
 export interface UserProfile {
   username: string;
   grade: Grade;
+  /**
+   * Backend-issued user UUID, present once `POST /users` has run.
+   * Optional for two reasons:
+   *   1. Mock-only mode never sets it.
+   *   2. Migration path — when real auth/sessions land, this field is
+   *      replaced by a session token read from cookies/headers. Always go
+   *      through `getCurrentUserId()` in src/api/adapter.ts rather than
+   *      reading this directly.
+   */
+  userId?: string;
+}
+
+export interface ChatSource {
+  title: string;
+  snippet: string;
 }
 
 export interface ChallengeQuestion {
@@ -52,6 +67,11 @@ export type ChatRole = "user" | "bot";
 export interface ChatMessage {
   from: ChatRole;
   text: string;
+  /**
+   * Retrieval citations attached to bot messages, sourced from the backend
+   * SSE `source` events. Mock layer leaves this undefined.
+   */
+  sources?: ChatSource[];
 }
 
 export interface ChallengeResult {

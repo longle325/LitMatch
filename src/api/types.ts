@@ -1,0 +1,52 @@
+import type {
+  Character,
+  ChallengeQuestion,
+  ChallengeResult,
+  ChatMessage,
+  ChatSource,
+  Grade,
+  LeaderboardEntry,
+  UserProfile,
+} from "@/types";
+
+export interface CreateUserInput {
+  username: string;
+  grade: Grade;
+}
+
+export interface ChatRequest {
+  characterId: string;
+  message: string;
+  signal?: AbortSignal;
+}
+
+/**
+ * Streamed chat output. Mock yields plain text chunks; the real client
+ * yields the same string events but may also emit a `source` event with
+ * retrieval citations to attach to the message once the stream ends.
+ */
+export type ChatStreamEvent =
+  | { kind: "token"; text: string }
+  | { kind: "source"; source: ChatSource }
+  | { kind: "done" };
+
+export interface ApiClient {
+  createUser: (input: CreateUserInput) => Promise<UserProfile>;
+  getDeck: () => Promise<Character[]>;
+  getCharacter: (id: string) => Promise<Character>;
+  recordMatch: (id: string) => Promise<{ ok: true }>;
+  recordSkip: (id: string) => Promise<{ ok: true }>;
+  getChallenge: (id: string) => Promise<ChallengeQuestion[]>;
+  submitChallenge: (
+    id: string,
+    answers: number[],
+  ) => Promise<ChallengeResult>;
+  getLeaderboard: () => Promise<LeaderboardEntry[]>;
+  getChatHistory: (characterId: string) => Promise<ChatMessage[]>;
+  /**
+   * Streams a character reply. Yields plain string chunks for backwards
+   * compatibility with the existing chat UI; structured events are exposed
+   * via `streamChatEvents` (TODO Phase 4) when source citations land.
+   */
+  streamChat: (input: ChatRequest) => AsyncIterable<string>;
+}
