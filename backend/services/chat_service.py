@@ -83,6 +83,7 @@ class ChatService:
             retrieved_context=retrieval["context"],
             voice_instructions=voice_instructions,
             conversation_context=self._format_chat_history(chat_history or []),
+            user_message=user_message,
         )
 
         # Step 3 — stream the LLM response
