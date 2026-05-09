@@ -1,0 +1,1067 @@
+/* ============================================================
+ * LitMatch — Folk Woodblock Theme
+ *
+ * Inspired by Đông Hồ folk prints and aged Vietnamese scroll
+ * manuscripts: parchment paper, cinnabar ink for headlines,
+ * gold and wood-frame accents, subtle vignette and grain.
+ *
+ * This file overrides legacy tokens — load it AFTER legacy.css.
+ * ============================================================ */
+
+:root {
+  /* --- Parchment palette --- */
+  --surface: #efe1bd;            /* base aged paper */
+  --surface-lowest: #faf0d2;     /* lightest cream highlight */
+  --surface-low: #e7d3a4;        /* mid parchment */
+  --surface-mid: #d6bd86;        /* darker parchment */
+  --surface-high: #b89b65;       /* worn edge */
+  --paper: #ead7a7;
+
+  /* --- Ink and type --- */
+  --ink: #2c1c0d;                /* warm dark brown */
+  --ink-soft: #4d3a22;
+  --text: #2c1c0d;
+  --muted: #6b5634;
+  --outline: #b89b65;
+
+  /* --- Accent inks --- */
+  --cinnabar: #7a1c1c;           /* deep maroon — primary headline */
+  --cinnabar-bright: #a52222;    /* brighter red — buttons, seals */
+  --cinnabar-deep: #5b0005;      /* darkest red — hover */
+  --gold: #c69a3e;               /* gold leaf */
+  --gold-soft: #d8b66a;
+  --gold-bright: #e6c87c;
+  --wood: #5a3a1f;               /* wood-frame brown */
+  --wood-light: #7a4f2c;
+  --wood-dark: #3a2412;
+  --jade: #4f6b58;               /* woodblock muted green */
+
+  --ink-15: rgba(44, 28, 13, 0.18);
+  --ink-25: rgba(44, 28, 13, 0.28);
+  --ink-40: rgba(44, 28, 13, 0.42);
+
+  --shadow: 0 8px 24px -8px rgba(74, 51, 28, 0.32),
+            0 2px 4px rgba(74, 51, 28, 0.16);
+  --shadow-deep: 0 16px 40px -12px rgba(58, 36, 18, 0.45),
+                 0 4px 8px rgba(58, 36, 18, 0.18);
+
+  /* SVG noise — subtle parchment grain */
+  --paper-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.3  0 0 0 0 0.18  0 0 0 0 0.05  0 0 0 0.5 0'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='0.18'/></svg>");
+}
+
+/* ============================================================
+ * Defensive icon reset — Material Symbols ligatures must not be
+ * broken by inherited letter-spacing or text-transform from the
+ * heavy serif typography below.
+ * ============================================================ */
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined" !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  font-style: normal !important;
+  font-feature-settings: "liga";
+  font-variant-ligatures: normal;
+}
+
+/* ============================================================
+ * Body — parchment with vignette + grain
+ * ============================================================ */
+body {
+  background-color: var(--surface);
+  background-image:
+    /* warm vignette darkening the corners like a scroll */
+    radial-gradient(
+      ellipse at center,
+      transparent 0%,
+      rgba(122, 79, 44, 0.06) 55%,
+      rgba(74, 51, 28, 0.18) 100%
+    ),
+    /* faint horizontal "grain of paper" */
+    repeating-linear-gradient(
+      90deg,
+      rgba(122, 79, 44, 0.012) 0 2px,
+      transparent 2px 5px
+    ),
+    var(--paper-grain);
+  background-attachment: fixed, fixed, fixed;
+  font-family: "Be Vietnam Pro", "Noto Serif", serif;
+  color: var(--ink);
+}
+
+/* ============================================================
+ * Type — ink on parchment
+ * ============================================================ */
+h1, h2, h3, .headline-lg, .brand-title {
+  font-family: "Noto Serif", serif;
+  color: var(--cinnabar);
+  letter-spacing: 0.01em;
+}
+
+.headline-lg {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 0 rgba(255, 244, 214, 0.4);
+}
+
+.kicker {
+  color: var(--cinnabar-bright);
+  font-family: "Noto Serif", serif;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.lead {
+  color: var(--ink-soft);
+  font-family: "Be Vietnam Pro", serif;
+  line-height: 1.6;
+}
+
+small,
+.collection-body small {
+  color: var(--muted);
+}
+
+/* ============================================================
+ * Sidebar — scroll-edge with seal
+ * ============================================================ */
+.side-nav {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(214, 189, 134, 0.55) 0%,
+      rgba(239, 225, 189, 0.95) 18%,
+      rgba(239, 225, 189, 0.95) 82%,
+      rgba(214, 189, 134, 0.55) 100%
+    );
+  border-right: 1px solid var(--wood);
+  box-shadow: inset -4px 0 0 -2px var(--gold-soft);
+  padding-top: 96px;
+}
+
+.side-nav::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: 28px;
+  right: 28px;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--wood-light) 12%,
+    var(--wood) 50%,
+    var(--wood-light) 88%,
+    transparent
+  );
+}
+
+.brand {
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.brand-title {
+  font-family: "Noto Serif", serif;
+  font-weight: 700;
+  font-size: 32px;
+  color: var(--cinnabar-deep);
+  letter-spacing: 0.05em;
+  margin: 0;
+  position: relative;
+  display: inline-block;
+}
+
+.brand-title::after {
+  /* small red seal/stamp dot to the right of the wordmark */
+  content: "印";
+  position: absolute;
+  right: -28px;
+  top: 4px;
+  width: 22px;
+  height: 22px;
+  background: var(--cinnabar-bright);
+  color: var(--surface-lowest);
+  font-family: "Noto Serif", serif;
+  font-size: 13px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  border-radius: 3px;
+  transform: rotate(-4deg);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.brand-subtitle {
+  color: var(--wood);
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  margin: 6px 0 0;
+}
+
+.nav-link {
+  font-family: "Be Vietnam Pro", serif;
+  color: var(--ink-soft);
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 10px 14px;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.nav-link:hover {
+  background: rgba(122, 79, 44, 0.08);
+  color: var(--cinnabar);
+}
+
+.nav-link.active {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(166, 41, 41, 0.14),
+      rgba(166, 41, 41, 0.04) 80%
+    );
+  color: var(--cinnabar);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--cinnabar-bright);
+  border-radius: 4px 8px 8px 4px;
+}
+
+.nav-link .material-symbols-outlined {
+  color: var(--gold);
+}
+
+.nav-link.active .material-symbols-outlined {
+  color: var(--cinnabar-bright);
+}
+
+/* ============================================================
+ * Top bar — carved tablet
+ * ============================================================ */
+.topbar {
+  background:
+    linear-gradient(180deg, rgba(250, 240, 210, 0.88), rgba(231, 211, 164, 0.88));
+  border-bottom: 1px solid var(--wood-light);
+  box-shadow: 0 1px 0 var(--gold-soft), 0 4px 12px -8px rgba(58, 36, 18, 0.25);
+}
+
+.topbar-metrics .metric {
+  background: var(--surface-lowest);
+  border: 1px solid var(--wood-light);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-family: "Noto Serif", serif;
+  font-weight: 600;
+  color: var(--cinnabar);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 248, 220, 0.9),
+    0 2px 4px rgba(58, 36, 18, 0.12);
+}
+
+.topbar-metrics .metric .material-symbols-outlined {
+  color: var(--gold);
+  font-size: 20px;
+}
+
+/* ============================================================
+ * Cards — parchment scrolls with double-line wood frame
+ * ============================================================ */
+.card {
+  background:
+    linear-gradient(180deg, var(--surface-lowest), var(--paper));
+  background-blend-mode: multiply;
+  border: 1px solid var(--wood-light);
+  box-shadow:
+    inset 0 0 0 1px rgba(231, 211, 164, 0.7),
+    inset 0 0 0 5px var(--surface-lowest),
+    inset 0 0 0 6px var(--gold-soft),
+    var(--shadow);
+  border-radius: 8px;
+  position: relative;
+}
+
+.card::before,
+.card::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--cinnabar);
+  pointer-events: none;
+}
+
+.card::before {
+  top: 10px;
+  left: 10px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.card::after {
+  bottom: 10px;
+  right: 10px;
+  border-left: none;
+  border-top: none;
+}
+
+/* Discover card body — keep image hero, restyle text panel */
+.deck-card .deck-body {
+  background: transparent;
+  padding-top: 22px;
+}
+
+.deck-card .quote {
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  color: var(--cinnabar-deep);
+  border-left: 3px double var(--cinnabar);
+  padding-left: 16px;
+  background:
+    linear-gradient(90deg, rgba(166, 41, 41, 0.06), transparent 80%);
+}
+
+.deck-card .deck-bio {
+  color: var(--ink-soft);
+  font-family: "Be Vietnam Pro", serif;
+}
+
+.conflict-tile {
+  background:
+    linear-gradient(180deg, var(--surface-lowest), var(--surface-low));
+  border: 1px solid var(--wood-light);
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px var(--gold-soft);
+}
+
+.conflict-tile > span {
+  font-family: "Noto Serif", serif;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.conflict-tile strong {
+  color: var(--cinnabar);
+  font-family: "Noto Serif", serif;
+}
+
+.conflict-tile .material-symbols-outlined {
+  color: var(--cinnabar-bright);
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: "Material Symbols Outlined";
+}
+
+.trait-row span {
+  background: var(--surface-lowest);
+  border: 1px solid var(--wood-light);
+  color: var(--ink-soft);
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  padding: 4px 12px;
+  box-shadow: 0 1px 0 var(--gold-soft);
+}
+
+/* Image hero gets a subtle inset frame */
+.art.image-art img {
+  filter: sepia(0.18) saturate(1.05) contrast(1.04);
+}
+
+.art.image-art::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid var(--gold-soft);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.art .tag {
+  background: var(--cinnabar-bright);
+  color: var(--surface-lowest);
+  font-family: "Noto Serif", serif;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  border: 1px solid var(--surface-lowest);
+  box-shadow: 0 0 0 1px var(--cinnabar);
+}
+
+/* ============================================================
+ * Buttons — carved chops
+ * ============================================================ */
+.btn {
+  font-family: "Noto Serif", serif;
+  letter-spacing: 0.04em;
+  border-radius: 6px;
+  transition: transform 120ms ease, box-shadow 120ms ease,
+              background 160ms ease, color 160ms ease;
+}
+
+.btn.primary {
+  background:
+    linear-gradient(180deg, var(--cinnabar-bright), var(--cinnabar-deep));
+  color: var(--surface-lowest);
+  border: 1px solid var(--cinnabar-deep);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 180, 0.35),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.18),
+    0 2px 6px rgba(91, 0, 5, 0.35);
+  font-weight: 600;
+}
+
+.btn.primary:hover {
+  background:
+    linear-gradient(180deg, #c33333, var(--cinnabar));
+  transform: translateY(-1px);
+}
+
+.btn.secondary {
+  background:
+    linear-gradient(180deg, var(--surface-lowest), var(--surface-low));
+  color: var(--cinnabar);
+  border: 1px solid var(--wood-light);
+  box-shadow: inset 0 0 0 1px var(--gold-soft);
+}
+
+.btn.secondary:hover {
+  background:
+    linear-gradient(180deg, var(--surface-low), var(--surface-mid));
+}
+
+.btn.ghost {
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px dashed var(--wood-light);
+}
+
+.btn.ghost:hover {
+  background: rgba(122, 79, 44, 0.08);
+  color: var(--cinnabar);
+}
+
+.btn.circle {
+  border-radius: 999px;
+  width: 60px;
+  height: 60px;
+}
+
+.btn.circle.primary {
+  box-shadow:
+    inset 0 2px 0 rgba(255, 220, 180, 0.4),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.2),
+    0 4px 12px rgba(91, 0, 5, 0.4);
+}
+
+.btn.circle.ghost {
+  background: var(--surface-lowest);
+  border: 1px solid var(--wood-light);
+}
+
+/* ============================================================
+ * Stats, panels, side rails
+ * ============================================================ */
+.panel.stat {
+  background:
+    linear-gradient(180deg, var(--surface-lowest), var(--paper));
+  border: 1px solid var(--wood-light);
+  box-shadow: inset 0 0 0 1px var(--gold-soft);
+  border-radius: 6px;
+  text-align: center;
+}
+
+.panel.stat strong {
+  font-family: "Noto Serif", serif;
+  color: var(--cinnabar);
+  font-size: 28px;
+}
+
+.panel.stat span {
+  font-family: "Noto Serif", serif;
+  color: var(--muted);
+  font-style: italic;
+  letter-spacing: 0.06em;
+}
+
+.source-panel {
+  background:
+    linear-gradient(180deg, rgba(250, 240, 210, 0.95), rgba(231, 211, 164, 0.85));
+  border: 1px solid var(--wood-light);
+  box-shadow: inset 0 0 0 1px var(--gold-soft), var(--shadow);
+}
+
+.source-panel h2 {
+  color: var(--cinnabar);
+  font-family: "Noto Serif", serif;
+}
+
+.source-book {
+  background: var(--surface-lowest);
+  border: 1px solid var(--wood-light);
+  box-shadow: inset 0 0 0 1px var(--gold-soft);
+}
+
+.source-book strong {
+  color: var(--cinnabar);
+  font-family: "Noto Serif", serif;
+}
+
+.source-book .material-symbols-outlined {
+  color: var(--gold);
+}
+
+.source-list .source-item {
+  background:
+    linear-gradient(90deg, rgba(166, 41, 41, 0.05), transparent);
+  border-left: 2px solid var(--cinnabar);
+  color: var(--ink-soft);
+  font-family: "Be Vietnam Pro", serif;
+  font-size: 14px;
+  padding: 10px 12px;
+}
+
+/* ============================================================
+ * Collection cards — wood-frame portraits
+ * ============================================================ */
+.collection-card {
+  border-radius: 6px;
+}
+
+.collection-card .collection-image {
+  background: var(--wood-dark);
+  border-bottom: 1px solid var(--wood);
+}
+
+.collection-card .collection-image img {
+  filter: sepia(0.15) contrast(1.05);
+}
+
+.collection-status {
+  background: var(--surface-lowest);
+  border: 1px solid var(--wood-light);
+  color: var(--cinnabar);
+  font-family: "Noto Serif", serif;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+.collection-status .material-symbols-outlined {
+  color: var(--gold);
+}
+
+.collection-progress {
+  background: rgba(122, 79, 44, 0.18);
+  height: 6px;
+  border-radius: 3px;
+  border: 1px solid var(--wood-light);
+}
+
+.collection-progress span {
+  background:
+    linear-gradient(90deg, var(--gold), var(--cinnabar-bright));
+  border-radius: 3px;
+  height: 100%;
+  display: block;
+}
+
+.badge {
+  background: var(--surface-lowest);
+  border: 1px solid var(--wood-light);
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+
+.badge.done {
+  background:
+    linear-gradient(180deg, #f3d777, var(--gold));
+  border-color: var(--cinnabar);
+  color: var(--cinnabar-deep);
+  font-weight: 600;
+}
+
+.badge.pending {
+  background: var(--surface-lowest);
+  color: var(--muted);
+}
+
+/* ============================================================
+ * Chat — scroll thread
+ * ============================================================ */
+.chat-card {
+  background:
+    linear-gradient(180deg, var(--surface-lowest), var(--paper));
+  border: 1px solid var(--wood-light);
+  box-shadow: inset 0 0 0 1px var(--gold-soft), var(--shadow);
+}
+
+.chat-header {
+  border-bottom: 1px dashed var(--wood-light);
+}
+
+.chapter-pill {
+  background:
+    linear-gradient(180deg, var(--surface-lowest), var(--surface-low));
+  border: 1px solid var(--wood-light);
+  box-shadow: inset 0 0 0 1px var(--gold-soft);
+  color: var(--cinnabar);
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 11px;
+  padding: 6px 16px;
+  border-radius: 999px;
+}
+
+.message.user {
+  background:
+    linear-gradient(180deg, var(--cinnabar), var(--cinnabar-deep));
+  color: var(--surface-lowest);
+  border: 1px solid var(--cinnabar-deep);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 180, 0.25),
+    0 2px 4px rgba(91, 0, 5, 0.2);
+  font-family: "Noto Serif", serif;
+}
+
+.message.bot {
+  background: var(--surface-lowest);
+  border: 1px solid var(--wood-light);
+  box-shadow: inset 0 0 0 1px var(--gold-soft);
+  color: var(--ink);
+  font-family: "Noto Serif", serif;
+}
+
+.work-pill {
+  background: var(--surface-lowest);
+  border: 1px solid var(--wood-light);
+  color: var(--cinnabar);
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.work-pill .material-symbols-outlined {
+  color: var(--gold);
+}
+
+.chat-form {
+  background:
+    linear-gradient(180deg, transparent, rgba(231, 211, 164, 0.4));
+  border-top: 1px dashed var(--wood-light);
+}
+
+.chat-form input {
+  background: var(--surface-lowest);
+  border: 1px solid var(--wood-light);
+  box-shadow: inset 0 1px 2px rgba(58, 36, 18, 0.12);
+  font-family: "Noto Serif", serif;
+  color: var(--ink);
+}
+
+.chat-form input::placeholder {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.chip {
+  background:
+    linear-gradient(180deg, var(--surface-lowest), var(--surface-low));
+  border: 1px solid var(--wood-light);
+  color: var(--cinnabar);
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  letter-spacing: 0.04em;
+}
+
+.chip:hover,
+.chip.active {
+  background:
+    linear-gradient(180deg, var(--gold-bright), var(--gold));
+  border-color: var(--cinnabar);
+  color: var(--cinnabar-deep);
+}
+
+.online-dot {
+  background: var(--cinnabar-bright);
+  box-shadow: 0 0 0 3px rgba(165, 34, 34, 0.25);
+}
+
+.typing-line {
+  color: var(--muted);
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+}
+
+.understanding {
+  background:
+    linear-gradient(90deg, var(--surface-low), var(--surface-lowest));
+  border: 1px solid var(--wood-light);
+  color: var(--ink-soft);
+  font-family: "Noto Serif", serif;
+}
+
+.understanding strong {
+  color: var(--cinnabar);
+}
+
+.understanding i {
+  background:
+    linear-gradient(90deg, var(--gold), var(--cinnabar-bright));
+}
+
+/* ============================================================
+ * Challenge — exam scroll
+ * ============================================================ */
+.challenge-progress-top {
+  background: rgba(122, 79, 44, 0.18);
+  border: 1px solid var(--wood-light);
+}
+
+.challenge-progress-top span {
+  background:
+    linear-gradient(90deg, var(--gold), var(--cinnabar-bright));
+}
+
+.challenge-card .question {
+  font-family: "Noto Serif", serif;
+  color: var(--cinnabar-deep);
+  font-weight: 600;
+}
+
+.option {
+  background:
+    linear-gradient(180deg, var(--surface-lowest), var(--paper));
+  border: 1px solid var(--wood-light);
+  box-shadow: inset 0 0 0 1px var(--gold-soft);
+  color: var(--ink);
+  font-family: "Noto Serif", serif;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.option strong {
+  background:
+    linear-gradient(180deg, var(--gold), var(--gold-soft));
+  color: var(--cinnabar-deep);
+  border: 1px solid var(--cinnabar);
+  font-family: "Noto Serif", serif;
+}
+
+.option:hover {
+  transform: translateX(2px);
+  border-color: var(--cinnabar-bright);
+}
+
+.option.active {
+  background:
+    linear-gradient(180deg, #fce6b8, var(--gold-soft));
+  border-color: var(--cinnabar);
+  box-shadow:
+    inset 0 0 0 1px var(--cinnabar),
+    0 2px 6px rgba(91, 0, 5, 0.18);
+}
+
+.option.active strong {
+  background:
+    linear-gradient(180deg, var(--cinnabar-bright), var(--cinnabar-deep));
+  color: var(--surface-lowest);
+}
+
+.option .material-symbols-outlined {
+  color: var(--cinnabar-bright);
+}
+
+.info-block {
+  background:
+    linear-gradient(180deg, var(--surface-lowest), var(--paper));
+  border: 1px solid var(--wood-light);
+  box-shadow: inset 0 0 0 1px var(--gold-soft);
+  border-radius: 6px;
+}
+
+.info-block h3 {
+  color: var(--cinnabar);
+  font-family: "Noto Serif", serif;
+  letter-spacing: 0.06em;
+}
+
+.result-list .info-block p {
+  color: var(--ink-soft);
+}
+
+/* ============================================================
+ * Leaderboard — wood ranking tablet
+ * ============================================================ */
+.leader-tabs button {
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  color: var(--ink-soft);
+  background: transparent;
+  border: none;
+  padding: 8px 18px;
+  border-bottom: 2px solid transparent;
+  letter-spacing: 0.04em;
+}
+
+.leader-tabs button.active {
+  color: var(--cinnabar);
+  font-weight: 700;
+  border-bottom-color: var(--cinnabar-bright);
+}
+
+.leaderboard {
+  padding: 0;
+  overflow: hidden;
+}
+
+.leader-row {
+  border-bottom: 1px solid var(--wood-light);
+  font-family: "Noto Serif", serif;
+}
+
+.leader-row.header {
+  background:
+    linear-gradient(180deg, var(--wood-light), var(--wood));
+  color: var(--surface-lowest);
+  font-family: "Noto Serif", serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.leader-row.current {
+  background:
+    linear-gradient(90deg, rgba(198, 154, 62, 0.25), rgba(166, 41, 41, 0.08));
+  font-weight: 600;
+  color: var(--cinnabar-deep);
+}
+
+.leader-row .rank {
+  color: var(--cinnabar);
+  font-family: "Noto Serif", serif;
+  font-weight: 700;
+}
+
+.leader-avatar {
+  background:
+    linear-gradient(180deg, var(--gold), var(--gold-soft));
+  border: 1px solid var(--cinnabar);
+  color: var(--cinnabar-deep);
+  font-family: "Noto Serif", serif;
+  font-weight: 700;
+}
+
+/* ============================================================
+ * Onboarding — first scroll
+ * ============================================================ */
+.onboarding-screen {
+  background:
+    radial-gradient(
+      ellipse at center,
+      var(--surface) 0%,
+      rgba(184, 155, 101, 0.4) 100%
+    ),
+    var(--paper-grain);
+  background-attachment: fixed, fixed;
+}
+
+.onboarding-card {
+  background:
+    linear-gradient(180deg, var(--surface-lowest), var(--paper));
+  border: 1px solid var(--wood-light);
+  box-shadow:
+    inset 0 0 0 1px var(--gold-soft),
+    inset 0 0 0 6px var(--surface-lowest),
+    inset 0 0 0 7px var(--gold-soft),
+    var(--shadow-deep);
+  position: relative;
+}
+
+.onboarding-card::before,
+.onboarding-card::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--cinnabar);
+}
+
+.onboarding-card::before {
+  top: 12px;
+  left: 12px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.onboarding-card::after {
+  bottom: 12px;
+  right: 12px;
+  border-left: none;
+  border-top: none;
+}
+
+.onboarding-card .kicker {
+  display: block;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.onboarding-card .headline-lg {
+  text-align: center;
+  margin: 4px 0 12px;
+}
+
+.onboarding-card .lead {
+  text-align: center;
+}
+
+.onboarding-form input {
+  background: var(--surface-lowest);
+  border: 1px solid var(--wood-light);
+  box-shadow: inset 0 1px 2px rgba(58, 36, 18, 0.1);
+  font-family: "Noto Serif", serif;
+}
+
+.onboarding-form input:focus-visible {
+  outline: 2px solid var(--cinnabar-bright);
+  outline-offset: 2px;
+}
+
+.onboarding-form .field > span {
+  color: var(--cinnabar);
+  font-family: "Noto Serif", serif;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+/* ============================================================
+ * Sort dropdown — small lacquer card
+ * ============================================================ */
+.sort-control span {
+  color: var(--cinnabar);
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  letter-spacing: 0.06em;
+}
+
+.sort-options {
+  background: var(--surface-lowest);
+  border: 1px solid var(--wood-light);
+  box-shadow: inset 0 0 0 1px var(--gold-soft), var(--shadow);
+}
+
+.sort-options button {
+  font-family: "Noto Serif", serif;
+  color: var(--ink);
+}
+
+.sort-options button:hover {
+  background: rgba(166, 41, 41, 0.08);
+  color: var(--cinnabar);
+}
+
+.sort-options button.active {
+  background:
+    linear-gradient(90deg, rgba(198, 154, 62, 0.35), transparent);
+  color: var(--cinnabar-deep);
+}
+
+/* ============================================================
+ * Mobile bottom nav
+ * ============================================================ */
+.mobile-nav {
+  background:
+    linear-gradient(180deg, rgba(250, 240, 210, 0.95), rgba(231, 211, 164, 0.95));
+  border-top: 1px solid var(--wood-light);
+  box-shadow: 0 -1px 0 var(--gold-soft);
+}
+
+.mobile-nav .nav-link {
+  color: var(--ink-soft);
+}
+
+.mobile-nav .nav-link.active {
+  color: var(--cinnabar);
+  background: transparent;
+  box-shadow: inset 0 -3px 0 var(--cinnabar-bright);
+  border-radius: 0;
+}
+
+/* ============================================================
+ * Avatars
+ * ============================================================ */
+.avatar.image-avatar {
+  filter: sepia(0.15) contrast(1.04);
+  border: 1px solid var(--gold-soft);
+  box-shadow: 0 2px 4px rgba(58, 36, 18, 0.18);
+}
+
+.message-avatar.fallback {
+  background:
+    linear-gradient(180deg, var(--gold), var(--cinnabar-bright));
+  color: var(--surface-lowest);
+  font-family: "Noto Serif", serif;
+  font-weight: 700;
+  border: 1px solid var(--cinnabar-deep);
+}
+
+/* ============================================================
+ * Profile
+ * ============================================================ */
+.profile-card .headline-lg {
+  color: var(--cinnabar-deep);
+}
+
+/* ============================================================
+ * Errors
+ * ============================================================ */
+.chat-error {
+  background:
+    linear-gradient(180deg, #f7d7c8, #ecbcaa);
+  color: var(--cinnabar-deep);
+  border: 1px solid var(--cinnabar);
+  font-family: "Noto Serif", serif;
+}
+
+/* ============================================================
+ * Decorative ornament — reusable
+ * ============================================================ */
+.ornament-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--gold);
+  font-family: "Noto Serif", serif;
+  letter-spacing: 0.16em;
+  font-size: 11px;
+  text-transform: uppercase;
+  margin: 12px 0;
+}
+
+.ornament-divider::before,
+.ornament-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--gold-soft),
+    transparent
+  );
+}
+
+/* ============================================================
+ * Page vignette wrapper
+ * ============================================================ */
+.page {
+  position: relative;
+}

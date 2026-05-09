@@ -17,8 +17,7 @@ export const characters: Character[] = [
     artA: "#2c1f1b",
     artB: "#8a3d22",
     artTitle: "Làng Vũ Đại",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDwtes59noXJn0ueuoo3KTimSDM0Ny4Tu_sIMVMFYCpK4O0cMBTNzorNrvgztQ-ve8ROj0cSubCTzVoQ17f5jwSbT-ufDAxxC0gdq9VEAvTAdDs3cBGEeISo37PLpkwt3d-VMBEO7cmA5dKi8WF7kyWxFGJ5dlO1LqIiZeM14ouVYlR7roPwNE3cU3W662ngNF8JDhwhyFcZJrnMiRpkmP4_0Wo1Vw2I8mBvt79h06BvSy7HtstRP0DUUFxvS-3d5iSMLvV1N2uwkMf",
+    image: "/characters/chi-pheo.png",
     imageBrief:
       "Người đàn ông gầy gò, mặt đầy sẹo, áo nâu sờn rách, tay cầm chai rượu, lảo đảo giữa làng quê.",
     bio: "Trai làng Vũ Đại. Bề ngoài hổ báo nhưng bên trong đầy vết xước. Khao khát lớn nhất là được làm người lương thiện.",
@@ -103,6 +102,7 @@ export const characters: Character[] = [
     artA: "#1f2930",
     artB: "#6c7b58",
     artTitle: "Căn buồng Hồng Ngài",
+    image: "/characters/mi.png",
     imageBrief:
       "Thiếu nữ người Mông ngồi quay sợi bên cửa sổ nhỏ, ánh mắt hướng ra núi rừng Tây Bắc.",
     bio: "Từng thổi sáo rất hay, nay mắc kẹt trong kiếp con dâu gạt nợ. Bên trong vẻ lặng câm là sức sống đang hồi sinh.",
@@ -186,8 +186,7 @@ export const characters: Character[] = [
     artA: "#78341d",
     artB: "#0d2b45",
     artTitle: "Hà Nội Âu hóa",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCqK7d3Ww0zpC4mg8eZGJ5rmnd0s9gNWibZHNYDDHlHiI-J_mXeoPtJtYmKSBylq-LbLnlyVnKvin6R1i5NzNoHP5Kkm4zerB8P_EkpVdV7aBTIKWBAkhF9Vys3eiOx5SiCPC_GBF1Rwzs1uGCwpI4R-1_RyIlRJp0rX5gBOKCay-h8hr9uWp9LncnuoYJM8Sd9q6IQX_OH-ywZgTUNDRBfLBhrgfwTZuyF7FjAOIU_vVTpDBrGvCmLONNhdjEprKwdYraxdf9gLlxf",
+    image: "/characters/xuan-toc-do.png",
     imageBrief:
       "Thanh niên tóc đỏ, vest tây lố lăng, cầm vợt tennis trước phố Hà Nội thời Pháp thuộc.",
     bio: "Từ nhặt bóng quần vợt và bán thuốc lậu, Xuân leo lên thành đốc tờ, vĩ nhân, anh hùng nhờ xã hội thượng lưu kệch cỡm.",
@@ -271,6 +270,7 @@ export const characters: Character[] = [
     artA: "#183b32",
     artB: "#b78a3a",
     artTitle: "Chính khí Nam Bộ",
+    image: "/characters/luc-van-tien.png",
     imageBrief:
       "Nho sinh trẻ mặc áo dài, vung gậy đánh cướp Phong Lai, phía xa có kiệu Kiều Nguyệt Nga.",
     bio: "Nho sinh văn võ song toàn, trọng nghĩa khinh tài. Dù bị mù, bị phản bội, vẫn giữ vững khí tiết trung hiếu tiết nghĩa.",
@@ -354,12 +354,7 @@ export const characters: Character[] = [
     artA: "#0d2b45",
     artB: "#6c2d35",
     artTitle: "Lầu Ngưng Bích",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDIqfrmZRgVoag61VAEyP6Q-Mb-yG8Euwt6DfrmCT9itzl363JyePkjYmThUq25l7XM85yR9_bd_HDkPZmKJZEu7RiOwHKm-bpVpM8iEESgAWOzUlgmF7ma6p3H8vVg3IY8knRyKBrXxnHducwh7A6PgE2n05ZpO-Q3nWcmV5DVvHSrsvAOxhiS7TH0bZMEZlPxoDbo-2-As2mCIiS_Bkx1wK-ZmBIEUy7mFe9UZtKrFCCAzo6vh6pGNgV47VLhAt88OK1oS97RPrIQ",
-    portrait:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBPbJy1LhWB1iD9GidcpCRpCqCWW9uxSBQK45dxugW8r9heFyMyYGSnS5uFWc0AoNRnkkaTtNpLA6zzke4baa1Ye7IrH4h82HxvtlYa7T5gq082q8SM_NJYlici3sRbNNuiwCQkJlNJ_ymbGGVOmNSLAtW_xFoL_Hg9tVpwllf26eXTGpkuoyr3SaijAENF7_6nzPsP0ZczLaJCagw0-qDmrgkUgLvkMh7uEgkjlbbZIkt012Gu8wMiMNbSqIMytAfSzs4u2Uk38yU7",
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuB4kct87omL-rYA-idsraW4imGjPB-D90yruxgX-caQX3Zo78y8taEWM_GWnBGxMnLcynvLtRM5YDBRc6Ey7F5UrWviyS1kuMwR1mOnLZjtMw5sf4RG5Dax2yfBW4HHoPTJDVVJrsaLa4eVyoKQQf8BTnsPvtPFlWYREMf_-q_PPqGLmwyf4_lHoVb-ZrZCFQmrasbNB39ZpBeikG2oQiAvO8kOtpK6c4HRMyFvAw33swjkVNY-cS312HuXcIjUNq6p__UxviQIZ9xW",
+    image: "/characters/thuy-kieu.png",
     imageBrief:
       "Thiếu nữ tài sắc gảy đàn nguyệt, ánh mắt u buồn, khung cảnh lầu Ngưng Bích và sông Tiền Đường.",
     bio: "Tiểu thư họ Vương tài sắc vẹn toàn, bán mình chuộc cha rồi lưu lạc mười lăm năm giữa chữ hiếu, chữ tình và số phận.",
