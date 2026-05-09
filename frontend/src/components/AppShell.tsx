@@ -30,8 +30,11 @@ export default function AppShell() {
       <BackgroundMusic />
       <aside className="side-nav">
         <div className="brand">
-          <h1 className="brand-title">LitMatch</h1>
-          <p className="brand-subtitle">Văn học Việt Nam</p>
+          <img src="/logo-192.png" alt="LitMatch" style={{ width: 40, height: 40 }} />
+          <div>
+            <h1 className="brand-title">LitMatch</h1>
+            <p className="brand-subtitle">Văn học Việt Nam</p>
+          </div>
         </div>
         <nav className="nav-links">
           {items.map((item) => (
@@ -49,7 +52,8 @@ export default function AppShell() {
         </nav>
       </aside>
       <header className="topbar">
-        <div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <img src="/logo-192.png" alt="" style={{ width: 28, height: 28 }} />
           <strong
             style={{
               color: "var(--cinnabar)",
