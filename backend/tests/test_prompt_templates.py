@@ -31,7 +31,9 @@ class PromptTemplateTests(unittest.TestCase):
 
         self.assertIn("[MODE]\nroleplay", prompt)
         self.assertIn("[CHARACTER CARD]", prompt)
-        self.assertIn("current_timeline_stage: before_spring_night", prompt)
+        # Mị's default stage is the spring-night awakening — the most
+        # conversationally rich moment for student questions.
+        self.assertIn("current_timeline_stage: spring_night_awakening", prompt)
         self.assertIn("what_character_does_not_know", prompt)
         self.assertIn("[TIMELINE STAGE]", prompt)
         self.assertIn("[RETRIEVED CONTEXT - SILENT USE ONLY]", prompt)
