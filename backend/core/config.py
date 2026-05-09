@@ -30,10 +30,9 @@ class Settings(BaseSettings):
 
     # --- OpenAI ---
     OPENAI_API_KEY: str = ""
-    CODEX_MODEL: str = "codex-mini"
     CHAT_MODEL: str = "gpt-5-mini"
-    EMBEDDING_MODEL: str = "text-embedding-3-large"
-    EMBEDDING_DIMENSIONS: int = 3072
+    EMBEDDING_MODEL: str = "text-embedding-3-small"
+    EMBEDDING_DIMENSIONS: int = 1536
 
     # --- Codex Knowledge Base ---
     KNOWLEDGE_BASE_DIR: str = "./knowledge_base"

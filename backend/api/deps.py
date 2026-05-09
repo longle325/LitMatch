@@ -10,7 +10,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import async_session_factory
 from services.chat_service import ChatService, get_chat_service
-from services.codex_agent import CodexKnowledgeAgent, get_codex_agent
 from services.knowledge_retriever import KnowledgeRetriever, get_knowledge_retriever
 
 
@@ -23,19 +22,12 @@ async def get_db() -> AsyncIterator[AsyncSession]:
         yield session
 
 
-# ── Codex agent ───────────────────────────────────────────────────────────
-
-
-def get_codex() -> CodexKnowledgeAgent:
-    return get_codex_agent()
-
-
 # ── Chat service ──────────────────────────────────────────────────────────
 
 
 def get_chat() -> ChatService:
     return get_chat_service(
-        codex_agent=get_codex(),
+        codex_agent=None,
         knowledge_retriever=get_retriever(),
     )
 
