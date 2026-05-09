@@ -80,6 +80,14 @@ export interface ChallengeResult {
   perfect: boolean;
   awarded: number;
   answers: number[];
+  /**
+   * Per-question correct answer indices, populated post-submission.
+   * Real mode receives them in the backend response; mock mode sources
+   * them from the seed `character.challenge[i].answer`. The FE uses
+   * `correctAnswers ?? question.answer` so both modes light up the
+   * "Đáp án đúng" indicator on the result page.
+   */
+  correctAnswers?: number[];
 }
 
 export interface LeaderboardEntry {

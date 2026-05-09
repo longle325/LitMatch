@@ -143,9 +143,11 @@ export async function apiFetch<T = unknown>(
 
 // ─── Slug ↔ UUID map ──────────────────────────────────────────────────────
 
+// Matches the backend `CharacterCard` shape — only the fields we need to
+// build the slug↔UUID map. Backend names the UUID field `id`.
 interface CharacterIdRecord {
   slug: string;
-  uuid: string;
+  id: string;
 }
 
 const slugToUuid = new Map<string, string>();
@@ -178,7 +180,10 @@ export async function ensureSlugMap(): Promise<void> {
     mapPromise = apiFetch<CharacterIdRecord[]>("/characters")
       .then((rows) => {
         for (const row of rows) {
-          if (row?.slug && row?.uuid) rememberCharacterId(row.slug, row.uuid);
+          if (!row?.slug || !row?.id) continue;
+          const normalized = row.slug.replace(/_/g, "-");
+          rememberCharacterId(normalized, row.id);
+          if (normalized !== row.slug) rememberCharacterId(row.slug, row.id);
         }
       })
       .catch((err) => {
@@ -224,11 +229,24 @@ export interface BackendCharacterCard {
   voice_instructions?: string | null;
 }
 
+/**
+ * Backend stores slugs with underscores (`chi_pheo`) while the FE seed and
+ * URL convention use hyphens (`chi-pheo`). Normalize to the FE form at the
+ * boundary so the rest of the codebase only ever sees kebab-case.
+ */
+function normalizeSlug(slug: string): string {
+  return slug.replace(/_/g, "-");
+}
+
 export function mergeBackendCharacter(
   card: BackendCharacterCard,
 ): Character | undefined {
-  rememberCharacterId(card.slug, card.id);
-  const seed = getSeedCharacter(card.slug);
+  const slug = normalizeSlug(card.slug);
+  rememberCharacterId(slug, card.id);
+  // Also remember the raw backend slug so a server that sometimes returns
+  // either form still resolves to the same UUID.
+  if (slug !== card.slug) rememberCharacterId(card.slug, card.id);
+  const seed = getSeedCharacter(slug);
   if (!seed) {
     // No matching seed — caller should treat this as an unknown character.
     // (E.g. the backend introduced a new character before the FE seed

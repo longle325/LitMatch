@@ -74,6 +74,7 @@ interface BackendChallengeResult {
   passed: boolean;
   points_earned: number;
   explanations: string[];
+  correct_answers: number[];
 }
 
 interface BackendSwipeResponse {
@@ -187,6 +188,7 @@ export const realClient: ApiClient = {
       perfect: res.score === res.total,
       awarded: res.points_earned,
       answers: [...answers],
+      correctAnswers: res.correct_answers,
     };
   },
 

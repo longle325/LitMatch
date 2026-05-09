@@ -50,6 +50,19 @@ export function useMatchMutation() {
   });
 }
 
+export function useSkipMutation() {
+  const skipCharacter = useAppStore((state) => state.skipCharacter);
+  return useMutation({
+    mutationFn: async (id: string) => {
+      // Optimistic local update first so the deck advances even if the
+      // backend call fails (e.g. mock mode is a no-op anyway).
+      skipCharacter(id);
+      await api.recordSkip(id);
+      return id;
+    },
+  });
+}
+
 export function useSubmitChallengeMutation() {
   const saveChallenge = useAppStore((state) => state.saveChallenge);
   return useMutation({
