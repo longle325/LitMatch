@@ -1466,13 +1466,14 @@ small,
 .reference-character-profile {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
 }
 
 .reference-character-profile .back-link {
   align-self: flex-start;
-  font-family: "Noto Serif", serif;
-  letter-spacing: 0.06em;
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 .reference-character-profile .back-link .material-symbols-outlined {
@@ -1481,36 +1482,39 @@ small,
 }
 
 .character-profile {
-  padding: 28px 32px 32px;
+  padding: clamp(28px, 5vw, 48px);
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 34px;
 }
 
 .character-profile-hero {
   display: grid;
-  grid-template-columns: 200px 1fr;
-  gap: 24px;
+  grid-template-columns: minmax(190px, 240px) minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 54px);
   align-items: center;
 }
 
 .character-profile-portrait {
-  border: 2px solid var(--wood);
+  border: 1px solid var(--wood-light);
   border-radius: 4px;
   overflow: hidden;
   background: var(--wood-dark);
   aspect-ratio: 3 / 4;
   position: relative;
-  box-shadow: var(--shadow);
+  box-shadow:
+    0 18px 34px -18px rgba(58, 36, 18, 0.58),
+    0 0 0 8px rgba(250, 240, 210, 0.52);
 }
 
 .character-profile-portrait::after {
   content: "";
   position: absolute;
-  inset: 4px;
+  inset: 7px;
   border: 1px solid var(--gold-soft);
   pointer-events: none;
   border-radius: 2px;
+  opacity: 0.7;
 }
 
 .character-profile-portrait img {
@@ -1522,66 +1526,165 @@ small,
 
 .character-profile-heading .kicker {
   color: var(--muted);
+  font-family: "Be Vietnam Pro", sans-serif;
   font-size: 12px;
-  letter-spacing: 0.14em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  margin: 0 0 10px;
 }
 
 .character-profile-heading .headline-lg {
-  margin: 4px 0 6px;
+  margin: 0;
   color: var(--cinnabar);
+  font-size: clamp(46px, 8vw, 78px);
+  line-height: 0.98;
+  letter-spacing: 0.01em;
 }
 
-.character-profile-heading .lead {
-  color: var(--ink-soft);
-  font-style: italic;
-  font-size: 15px;
-}
-
-.character-profile-status {
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+.profile-location {
+  display: inline-flex;
   align-items: center;
+  gap: 7px;
+  margin: 20px 0 0;
+  color: var(--ink-soft);
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
 }
 
-.character-profile-status small {
-  color: var(--muted);
-  font-size: 12px;
-  letter-spacing: 0.04em;
+.profile-location .material-symbols-outlined {
+  color: var(--cinnabar);
+  font-size: 18px;
+}
+
+.profile-summary {
+  max-width: 620px;
+  margin: 18px 0 0;
+  color: var(--ink-soft);
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-size: clamp(16px, 2vw, 19px);
+  line-height: 1.72;
+}
+
+.profile-quote-card {
+  max-width: 780px;
+  min-height: 0;
+  margin: 0;
+  padding: 22px 76px 22px 28px;
+  border-left: 4px solid var(--cinnabar);
+  border-radius: 6px;
+  background:
+    linear-gradient(90deg, rgba(166, 41, 41, 0.055), rgba(255, 248, 220, 0.42) 72%),
+    rgba(250, 240, 210, 0.42);
+  box-shadow: inset 0 0 0 1px rgba(184, 155, 101, 0.22);
 }
 
 .profile-quote {
   margin: 0;
-  font-size: 18px;
-  line-height: 1.5;
+  padding-right: 0;
+  color: var(--cinnabar-deep);
+  font-family: "Noto Serif", serif;
+  font-size: clamp(19px, 2.2vw, 25px);
+  font-weight: 600;
+  line-height: 1.55;
+  letter-spacing: 0;
 }
 
 .character-profile-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px 28px;
+  grid-template-columns: minmax(0, 1.25fr) minmax(220px, 0.75fr);
+  gap: 34px 46px;
 }
 
-.character-profile-grid .profile-section:nth-child(1),
-.character-profile-grid .profile-section:nth-child(4) {
+.character-profile-grid .profile-section:first-child,
+.profile-section-featured {
   grid-column: 1 / -1;
 }
 
 .profile-section h2 {
-  font-family: "Noto Serif", serif;
-  font-size: 14px;
-  letter-spacing: 0.18em;
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
   color: var(--cinnabar);
-  margin: 0 0 8px;
-  border-bottom: 1px solid var(--gold-soft);
-  padding-bottom: 4px;
+  margin: 0 0 10px;
 }
 
-.profile-section .deck-bio {
+.profile-section p {
   margin: 0;
+  color: var(--ink-soft);
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-size: 16px;
+  line-height: 1.78;
+}
+
+.profile-traits {
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.profile-traits span,
+.profile-analysis-tags span {
+  min-height: 34px;
+  padding: 7px 14px;
+  background: rgba(250, 240, 210, 0.54);
+  border: 1px solid rgba(122, 79, 44, 0.34);
+  box-shadow: none;
+  color: var(--ink-soft);
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.profile-analysis {
+  border-top: 1px solid rgba(184, 155, 101, 0.48);
+  border-bottom: 1px solid rgba(184, 155, 101, 0.34);
+  padding: 4px 0;
+}
+
+.profile-analysis summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  color: var(--cinnabar);
+  cursor: pointer;
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  list-style: none;
+  text-transform: uppercase;
+}
+
+.profile-analysis summary::-webkit-details-marker {
+  display: none;
+}
+
+.profile-analysis summary .material-symbols-outlined {
+  color: var(--gold);
+  font-size: 22px;
+  transition: transform 160ms ease;
+}
+
+.profile-analysis[open] summary .material-symbols-outlined {
+  transform: rotate(180deg);
+}
+
+.profile-analysis-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px 42px;
+  padding: 10px 0 22px;
+}
+
+.profile-analysis-grid .profile-section:first-child,
+.profile-analysis-grid .profile-section:nth-child(3) {
+  grid-column: 1 / -1;
 }
 
 .profile-sources {
@@ -1589,10 +1692,11 @@ small,
   padding-left: 18px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 9px;
   color: var(--ink-soft);
+  font-family: "Be Vietnam Pro", sans-serif;
   font-size: 14px;
-  line-height: 1.55;
+  line-height: 1.7;
 }
 
 .profile-sources li::marker {
@@ -1600,11 +1704,31 @@ small,
 }
 
 .character-profile-actions {
-  border-top: 1px solid var(--gold-soft);
-  padding-top: 18px;
+  border-top: 0;
+  padding-top: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  align-items: center;
+}
+
+.character-profile-actions .btn {
+  font-family: "Be Vietnam Pro", sans-serif;
+  min-height: 48px;
+  letter-spacing: 0;
+}
+
+.character-profile-actions .btn.primary {
+  padding-inline: 22px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 180, 0.34),
+    0 10px 18px -12px rgba(91, 0, 5, 0.72);
+}
+
+.character-profile-actions .btn.secondary {
+  background: rgba(250, 240, 210, 0.32);
+  box-shadow: none;
+  color: var(--cinnabar);
 }
 
 .character-profile-actions .material-symbols-outlined {
@@ -1612,21 +1736,62 @@ small,
   font-size: 18px;
 }
 
+.profile-progress-note {
+  flex-basis: 100%;
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-size: 12px;
+}
+
 @media (max-width: 720px) {
   .character-profile {
-    padding: 20px 18px;
+    padding: 28px 20px;
+    gap: 28px;
   }
+
   .character-profile-hero {
     grid-template-columns: 1fr;
+    gap: 24px;
   }
+
   .character-profile-portrait {
-    width: 60%;
+    width: min(72%, 260px);
     margin: 0 auto;
   }
+
+  .character-profile-heading {
+    text-align: left;
+  }
+
+  .character-profile-heading .headline-lg {
+    font-size: clamp(40px, 14vw, 56px);
+  }
+
+  .profile-quote-card {
+    padding: 20px 66px 20px 20px;
+  }
+
   .character-profile-grid {
     grid-template-columns: 1fr;
+    gap: 28px;
   }
-  .character-profile-grid .profile-section:nth-child(n) {
+
+  .character-profile-grid .profile-section:nth-child(n),
+  .profile-analysis-grid .profile-section:nth-child(n) {
     grid-column: 1 / -1;
+  }
+
+  .profile-analysis-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .character-profile-actions {
+    align-items: stretch;
+  }
+
+  .character-profile-actions .btn {
+    width: 100%;
   }
 }
