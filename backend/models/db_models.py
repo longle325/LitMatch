@@ -40,6 +40,11 @@ class MatchStatus(str, enum.Enum):
     CHALLENGE_PASSED = "CHALLENGE_PASSED"
 
 
+class ChatRole(str, enum.Enum):
+    USER = "user"
+    ASSISTANT = "assistant"
+
+
 # ---------------------------------------------------------------------------
 # Users
 # ---------------------------------------------------------------------------
@@ -58,6 +63,7 @@ class User(Base):
 
     # relationships
     matches = relationship("Match", back_populates="user", lazy="selectin")
+    chat_messages = relationship("ChatMessage", back_populates="user", lazy="selectin")
 
 
 # ---------------------------------------------------------------------------
@@ -83,6 +89,11 @@ class Character(Base):
     # relationships
     challenges = relationship("Challenge", back_populates="character", lazy="selectin")
     matches = relationship("Match", back_populates="character", lazy="selectin")
+    chat_messages = relationship(
+        "ChatMessage",
+        back_populates="character",
+        lazy="selectin",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -148,3 +159,36 @@ class Challenge(Base):
 
     # relationships
     character = relationship("Character", back_populates="challenges")
+
+
+# ---------------------------------------------------------------------------
+# Chat messages
+# ---------------------------------------------------------------------------
+class ChatMessage(Base):
+    __tablename__ = "chat_messages"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    character_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("characters.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    role = Column(Enum(ChatRole), nullable=False)
+    content = Column(Text, nullable=False)
+    created_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+        index=True,
+    )
+
+    # relationships
+    user = relationship("User", back_populates="chat_messages")
+    character = relationship("Character", back_populates="chat_messages")

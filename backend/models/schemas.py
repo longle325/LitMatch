@@ -27,6 +27,11 @@ class SwipeDirection(str, Enum):
     RIGHT = "right"
 
 
+class ChatRole(str, Enum):
+    USER = "user"
+    ASSISTANT = "assistant"
+
+
 # ── User ──────────────────────────────────────────────────────────────────
 
 
@@ -113,6 +118,21 @@ class ChatRequest(BaseModel):
     user_id: UUID
     character_id: UUID
     message: str = Field(..., min_length=1, max_length=2000)
+
+
+class ChatMessageResponse(BaseModel):
+    id: UUID
+    user_id: UUID
+    character_id: UUID
+    role: ChatRole
+    content: str
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class ChatHistoryResponse(BaseModel):
+    messages: List[ChatMessageResponse]
 
 
 # ── Challenge ─────────────────────────────────────────────────────────────
