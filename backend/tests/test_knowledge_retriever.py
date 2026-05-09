@@ -128,6 +128,37 @@ class KnowledgeRetrieverTests(unittest.TestCase):
         self.assertEqual(result["sources"][0]["chunk_id"], "chi.chunk_1")
         self.assertEqual(result["sources"][0]["source_path"], "Chi_Pheo/analysis.txt")
 
+    def test_diagnostics_reports_lexical_fallback_availability(self):
+        class NoDatabaseRetriever(KnowledgeRetriever):
+            async def diagnostics(self):
+                result = await super().diagnostics()
+                result["last_error"] = "database unavailable"
+                return result
+
+        async def run_diagnostics():
+            with tempfile.TemporaryDirectory() as temp_dir:
+                index_path = Path(temp_dir) / "chunks.jsonl"
+                write_jsonl(
+                    index_path,
+                    [
+                        {
+                            "chunk_id": "chi.chunk_1",
+                            "document_id": "chi.doc",
+                            "character_slug": "chi_pheo",
+                            "source_path": "source.txt",
+                            "doc_type": "analysis",
+                            "text": "context",
+                        }
+                    ],
+                )
+                return await NoDatabaseRetriever(index_path=index_path).diagnostics()
+
+        result = __import__("asyncio").run(run_diagnostics())
+
+        self.assertEqual(result["lexical_chunk_count"], 1)
+        self.assertTrue(result["fallback_available"])
+        self.assertEqual(result["embedding_model"], "text-embedding-3-large")
+
 
 if __name__ == "__main__":
     unittest.main()

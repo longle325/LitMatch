@@ -18,6 +18,7 @@ from core.database import Base, engine, ensure_vector_extension
 
 # Route modules
 from api.routes import (
+    admin,
     challenges,
     characters,
     chat,
@@ -76,6 +77,7 @@ app.include_router(chat.router, prefix=API_PREFIX)
 app.include_router(challenges.router, prefix=API_PREFIX)
 app.include_router(leaderboard.router, prefix=API_PREFIX)
 app.include_router(characters.router, prefix=API_PREFIX)
+app.include_router(admin.router, prefix=API_PREFIX)
 
 
 @app.get("/health")

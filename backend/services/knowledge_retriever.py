@@ -201,6 +201,62 @@ class KnowledgeRetriever:
             )
             return [dict(row._mapping) for row in result.all()]
 
+    async def diagnostics(self) -> dict[str, Any]:
+        lexical_chunks = self._load_chunks()
+        diagnostics: dict[str, Any] = {
+            "vector_extension_enabled": False,
+            "embedding_model": settings.EMBEDDING_MODEL,
+            "embedding_dimensions": settings.EMBEDDING_DIMENSIONS,
+            "rag_top_k": settings.RAG_TOP_K,
+            "rag_min_similarity": settings.RAG_MIN_SIMILARITY,
+            "vector_chunk_count": 0,
+            "vector_chunks_by_character": {},
+            "lexical_index_path": str(self.index_path),
+            "lexical_chunk_count": len(lexical_chunks),
+            "fallback_available": bool(lexical_chunks),
+            "last_error": None,
+        }
+        try:
+            async with async_session_factory() as session:
+                extension_result = await session.execute(
+                    text("SELECT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'vector')")
+                )
+                diagnostics["vector_extension_enabled"] = bool(
+                    extension_result.scalar_one()
+                )
+
+                count_result = await session.execute(
+                    text(
+                        """
+                        SELECT COUNT(*)
+                        FROM knowledge_chunks
+                        WHERE embedding_model = :embedding_model
+                        """
+                    ),
+                    {"embedding_model": settings.EMBEDDING_MODEL},
+                )
+                diagnostics["vector_chunk_count"] = int(count_result.scalar_one())
+
+                by_character_result = await session.execute(
+                    text(
+                        """
+                        SELECT character_slug, COUNT(*) AS chunk_count
+                        FROM knowledge_chunks
+                        WHERE embedding_model = :embedding_model
+                        GROUP BY character_slug
+                        ORDER BY character_slug
+                        """
+                    ),
+                    {"embedding_model": settings.EMBEDDING_MODEL},
+                )
+                diagnostics["vector_chunks_by_character"] = {
+                    row.character_slug: int(row.chunk_count)
+                    for row in by_character_result.all()
+                }
+        except Exception as exc:
+            diagnostics["last_error"] = str(exc)
+        return diagnostics
+
     async def _embed_query(self, user_query: str) -> list[float]:
         response = await self.client.embeddings.create(
             model=settings.EMBEDDING_MODEL,
