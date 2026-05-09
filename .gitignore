@@ -1,5 +1,9 @@
 node_modules/
 dist/
 .DS_Store
-
-Techstack.md
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+__pycache__/
+.ruff_cache/
