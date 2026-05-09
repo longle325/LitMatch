@@ -70,6 +70,10 @@ export const mockClient: ApiClient = {
     await delay(0);
     return characters;
   },
+  async getAllCharacters(): Promise<Character[]> {
+    await delay(0);
+    return characters;
+  },
   async getCharacter(id: string): Promise<Character> {
     await delay(0);
     const character = getCharacter(id);
