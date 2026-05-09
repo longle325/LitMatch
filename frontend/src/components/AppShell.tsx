@@ -1,18 +1,20 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAppStore } from "@/stores/useAppStore";
+import { Compass, BookOpen, Trophy, User, Flame, Medal } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 interface NavItem {
   key: string;
   to: string;
   label: string;
-  icon: string;
+  icon: LucideIcon;
 }
 
 const items: NavItem[] = [
-  { key: "discover", to: "/discover", label: "Khám phá", icon: "explore" },
-  { key: "collection", to: "/collection", label: "Nhân vật đã chọn", icon: "book_2" },
-  { key: "leaderboard", to: "/leaderboard", label: "Bảng xếp hạng", icon: "emoji_events" },
-  { key: "profile", to: "/profile", label: "Hồ sơ", icon: "account_circle" },
+  { key: "discover", to: "/discover", label: "Khám phá", icon: Compass },
+  { key: "collection", to: "/collection", label: "Nhân vật đã chọn", icon: BookOpen },
+  { key: "leaderboard", to: "/leaderboard", label: "Bảng xếp hạng", icon: Trophy },
+  { key: "profile", to: "/profile", label: "Hồ sơ", icon: User },
 ];
 
 export default function AppShell() {
@@ -38,7 +40,7 @@ export default function AppShell() {
                 `nav-link${isActive ? " active" : ""}`
               }
             >
-              <span className="material-symbols-outlined">{item.icon}</span>
+              <item.icon size={22} />
               <span>{item.label}</span>
             </NavLink>
           ))}
@@ -50,25 +52,25 @@ export default function AppShell() {
             style={{
               color: "var(--cinnabar)",
               fontFamily: "'Noto Serif', serif",
-              fontSize: 24,
+              fontSize: 20,
             }}
           >
             LitMatch
           </strong>
           {profile && (
-            <span style={{ marginLeft: 10, color: "var(--muted)", fontSize: 13 }}>
+            <span style={{ marginLeft: 8, color: "var(--muted)", fontSize: 12 }}>
               Lớp {profile.grade}
             </span>
           )}
         </div>
         <div className="topbar-metrics">
           <span className="metric">
-            <span className="material-symbols-outlined">local_fire_department</span>
+            <Flame size={16} />
             {isLeaderboard ? "Thành tích: " : ""}
             {streak} Ngày
           </span>
           <span className="metric">
-            <span className="material-symbols-outlined">military_tech</span>
+            <Medal size={16} />
             {isLeaderboard ? "Điểm: " : ""}
             {points.toLocaleString("vi-VN")} Điểm
           </span>
@@ -89,7 +91,7 @@ export default function AppShell() {
                   `nav-link${isActive ? " active" : ""}`
                 }
               >
-                <span className="material-symbols-outlined">{item.icon}</span>
+                <item.icon size={20} />
                 <span>{item.label}</span>
               </NavLink>
             ))}

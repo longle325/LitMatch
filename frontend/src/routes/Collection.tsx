@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { ShieldCheck, LockOpen, ChevronDown } from "lucide-react";
 import { useDeck } from "@/api/queries";
 import { useAppStore } from "@/stores/useAppStore";
 import CharacterArt from "@/components/CharacterArt";
@@ -39,9 +40,7 @@ function CollectionCard({
           <CharacterArt character={character} />
         )}
         <span className="collection-status">
-          <span className="material-symbols-outlined">
-            {result?.passed ? "verified" : "lock_open"}
-          </span>
+          {result?.passed ? <ShieldCheck size={14} /> : <LockOpen size={14} />}
           {result?.passed ? "Đã mở khóa" : "Chờ thử thách"}
         </span>
       </div>
@@ -112,10 +111,7 @@ export default function Collection() {
               aria-expanded={open}
               onClick={() => setOpen((v) => !v)}
             >
-              {SORT_LABEL[sort]}{" "}
-              <span className="material-symbols-outlined">
-                keyboard_arrow_down
-              </span>
+              {SORT_LABEL[sort]} <ChevronDown size={16} />
             </button>
             {open && (
               <ul role="listbox" className="sort-options">

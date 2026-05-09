@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { CheckCircle, BookOpen } from "lucide-react";
 import { useCharacter, useSubmitChallengeMutation } from "@/api/queries";
 import { useAppStore } from "@/stores/useAppStore";
 import type { Character, ChallengeResult } from "@/types";
@@ -88,7 +89,6 @@ export default function Challenge() {
   const [activeQuestion, setActiveQuestion] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
 
-  // Reset local form state whenever the character changes.
   useEffect(() => {
     setActiveQuestion(0);
     setAnswers([]);
@@ -174,11 +174,7 @@ export default function Challenge() {
               >
                 <strong>{String.fromCharCode(65 + index)}</strong>
                 <span>{option}</span>
-                {active && (
-                  <span className="material-symbols-outlined">
-                    check_circle
-                  </span>
-                )}
+                {active && <CheckCircle size={18} />}
               </button>
             );
           })}
@@ -191,7 +187,7 @@ export default function Challenge() {
           disabled={activeQuestion === 0}
           type="button"
         >
-          <span className="material-symbols-outlined">menu_book</span>
+          <BookOpen size={16} />
           Cần gợi ý? Xem lại văn bản
         </button>
         <button
