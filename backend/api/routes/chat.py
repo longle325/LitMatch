@@ -82,6 +82,16 @@ async def chat_stream(
         body.user_id,
         body.character_id,
     )
+    recent_messages = await db.list_recent_chat_messages(
+        session,
+        user_id=body.user_id,
+        character_id=body.character_id,
+        limit=8,
+    )
+    chat_history = [
+        {"role": message.role.value, "content": message.content}
+        for message in recent_messages
+    ]
     await db.create_chat_message(
         session,
         user_id=body.user_id,
@@ -97,6 +107,7 @@ async def chat_stream(
             character_name=character.name,
             user_message=body.message,
             voice_instructions=character.voice_instructions,
+            chat_history=chat_history,
         ):
             assistant_chunks.append(chunk)
             yield {"data": chunk}

@@ -52,6 +52,7 @@ class ChatService:
         character_name: str,
         user_message: str,
         voice_instructions: Optional[str] = None,
+        chat_history: Optional[list[dict[str, str]]] = None,
     ) -> AsyncIterator[str]:
         """
         Yield streamed text chunks for a character chat turn.
@@ -95,6 +96,7 @@ class ChatService:
             character_name=character_name,
             retrieved_context=retrieved_context,
             voice_instructions=voice_instructions,
+            conversation_context=self._format_chat_history(chat_history or []),
         )
 
         # Step 3 — stream the LLM response
@@ -128,6 +130,18 @@ class ChatService:
             kwargs["max_tokens"] = 1024
 
         return kwargs
+
+    @staticmethod
+    def _format_chat_history(chat_history: list[dict[str, str]]) -> str:
+        lines: list[str] = []
+        for message in chat_history:
+            content = message.get("content", "").strip()
+            if not content:
+                continue
+            role = message.get("role")
+            label = "Nhân vật" if role == "assistant" else "Người học"
+            lines.append(f"{label}: {content}")
+        return "\n".join(lines)
 
 
 # ---------------------------------------------------------------------------

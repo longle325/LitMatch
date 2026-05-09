@@ -92,6 +92,58 @@ class ChatServiceCompletionOptionsTests(unittest.TestCase):
         self.assertIn("VECTOR_CONTEXT_FROM_PGVECTOR", system_prompt)
         self.assertEqual(chunks, ["xin chào"])
 
+    def test_stream_response_includes_recent_chat_history_in_prompt(self):
+        class FakeCompletions:
+            def __init__(self):
+                self.kwargs = None
+
+            async def create(self, **kwargs):
+                self.kwargs = kwargs
+
+                async def stream():
+                    yield SimpleNamespace(
+                        choices=[
+                            SimpleNamespace(
+                                delta=SimpleNamespace(content="tôi nhớ")
+                            )
+                        ]
+                    )
+
+                return stream()
+
+        class FakeOpenAI:
+            def __init__(self):
+                self.chat = SimpleNamespace(completions=FakeCompletions())
+
+        async def collect_prompt():
+            client = FakeOpenAI()
+            service = ChatService(
+                codex_agent=None,
+                knowledge_retriever=None,
+                openai_client=client,
+                chat_model="gpt-4o",
+            )
+            chunks = [
+                chunk
+                async for chunk in service.stream_response(
+                    character_slug="mi",
+                    character_name="Mị",
+                    user_message="Còn sau đó thì sao?",
+                    chat_history=[
+                        {"role": "user", "content": "Trước đó em hỏi về tiếng sáo."},
+                        {"role": "assistant", "content": "Ta đã nghe tiếng sáo gọi về tuổi trẻ."},
+                    ],
+                )
+            ]
+            return client.chat.completions.kwargs["messages"][0]["content"], chunks
+
+        system_prompt, chunks = __import__("asyncio").run(collect_prompt())
+
+        self.assertIn("[LỊCH SỬ HỘI THOẠI GẦN ĐÂY]", system_prompt)
+        self.assertIn("Người học: Trước đó em hỏi về tiếng sáo.", system_prompt)
+        self.assertIn("Nhân vật: Ta đã nghe tiếng sáo gọi về tuổi trẻ.", system_prompt)
+        self.assertEqual(chunks, ["tôi nhớ"])
+
 
 if __name__ == "__main__":
     unittest.main()
