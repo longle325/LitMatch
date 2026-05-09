@@ -44,9 +44,9 @@ export interface ApiClient {
   getLeaderboard: () => Promise<LeaderboardEntry[]>;
   getChatHistory: (characterId: string) => Promise<ChatMessage[]>;
   /**
-   * Streams a character reply. Yields plain string chunks for backwards
-   * compatibility with the existing chat UI; structured events are exposed
-   * via `streamChatEvents` (TODO Phase 4) when source citations land.
+   * Streams a character reply as structured events. Mock yields a sequence
+   * of `token` events and ends; real backend additionally emits `source`
+   * events with retrieval citations once at the start of the stream.
    */
-  streamChat: (input: ChatRequest) => AsyncIterable<string>;
+  streamChat: (input: ChatRequest) => AsyncIterable<ChatStreamEvent>;
 }
