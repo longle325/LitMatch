@@ -1,6 +1,6 @@
 # LitMatch Task Tracker
 
-Last updated: 2026-05-08 (backend wire-up Phase 1 scaffold)
+Last updated: 2026-05-08 (backend wire-up Phase 2 — auth + leaderboard flipped)
 
 ## Completed
 
@@ -96,8 +96,10 @@ Foundation laid for swapping mock endpoints to the FastAPI backend on `origin/ba
 
 ### Backend wire-up — remaining phases
 
-- [ ] **Phase 2A — flip `auth`** — verify onboarding→`POST /users` end-to-end with backend running. Add bootstrap path: if `profile` exists but `userId` is missing on app boot AND `auth` is real, transparently call `createUser` to back-fill (or redirect to `/onboarding` on 409).
-- [ ] **Phase 2B — flip `leaderboard`** — read-only, lowest risk. Verify entries match shape, current-user merge still works.
+- [x] **Phase 2A — flipped `auth`** — Onboarding submit calls `POST /api/v1/users`, persists UUID into Zustand `profile.userId`. Verified end-to-end: new user "PhatTest" created in postgres, UUID `35f649d0-…` stored. 409 surfaces "Tên này đã được dùng" inline.
+- [x] **Phase 2B — flipped `leaderboard`** — Returns 4 seed users + the current user (server-included). FE dedupes by `userId` so "Bạn" no longer appears twice. Mock mode behavior preserved (legacy `name === currentName` path).
+- [x] **Backend CORS** — added `http://127.0.0.1:5173` to `backend/core/config.py:CORS_ORIGINS` since the FE dev server binds to 127.0.0.1, which browsers treat as a separate origin from `localhost`.
+- [ ] **Bootstrap (deferred to Phase 3)** — when `profile.username` exists but `profile.userId` is missing on app boot AND `auth` is real, transparently call `createUser` to back-fill (or redirect to `/onboarding` on 409). Not blocking until Phase 3 endpoints (which actually need `userId`) flip.
 - [ ] **Phase 3A — flip `characters` + `deck`** — depends on slug-map cold-load via `GET /characters`. Verify deck filters out already-swiped cards correctly.
 - [ ] **Phase 3B — flip `match`** — `POST /interactions/swipe` for both `right` (match) and `left` (skip) directions. FE currently doesn't call backend on skip; mock parity needs `recordSkip` wiring in `Discover.tsx`.
 - [ ] **Phase 3C — flip `challenge`** — needs backend to echo `correct_answers: int[]` in `ChallengeResult` so the FE result page can keep showing "Đáp án đúng: X". Also remove `POINTS_PERFECT_SCORE_BONUS=25` from `backend/core/config.py` (drift from PRD §6.5).

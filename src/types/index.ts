@@ -86,4 +86,10 @@ export interface LeaderboardEntry {
   name: string;
   points: number;
   unlocked: number;
+  /**
+   * Backend-issued UUID. Present on real responses, undefined for the mock
+   * `demoLeaders` seed. Used by the leaderboard view to detect whether the
+   * current user is already in the response and avoid double-listing.
+   */
+  userId?: string;
 }
