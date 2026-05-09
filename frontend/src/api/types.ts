@@ -40,6 +40,9 @@ export interface ApiClient {
   getCharacter: (id: string) => Promise<Character>;
   recordMatch: (id: string) => Promise<{ ok: true }>;
   recordSkip: (id: string) => Promise<{ ok: true }>;
+  /** Authoritative list of slugs the user has right-swiped on. Real
+   *  backend reads `GET /users/{id}/matches`; mock returns []. */
+  getMatchedSlugs: () => Promise<string[]>;
   getChallenge: (id: string) => Promise<ChallengeQuestion[]>;
   submitChallenge: (
     id: string,
