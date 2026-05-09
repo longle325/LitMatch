@@ -202,9 +202,10 @@ function ChatInput({
       <Link
         className="btn secondary deeper-button"
         to={`/characters/${characterId}/challenge`}
+        aria-label="Mở trang thử thách 5 câu"
       >
         <Sparkles size={19} strokeWidth={1.8} />
-        Hỏi sâu hơn
+        Làm thử thách
       </Link>
       <button
         className="btn ghost send-button"
