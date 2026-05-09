@@ -34,6 +34,7 @@ from core.database import Base
 # Enums
 # ---------------------------------------------------------------------------
 class MatchStatus(str, enum.Enum):
+    SWIPED_LEFT = "SWIPED_LEFT"
     SWIPED_RIGHT = "SWIPED_RIGHT"
     CHAT_UNLOCKED = "CHAT_UNLOCKED"
     CHALLENGE_PASSED = "CHALLENGE_PASSED"
