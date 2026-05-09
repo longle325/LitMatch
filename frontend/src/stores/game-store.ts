@@ -6,7 +6,8 @@
  */
 
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { persist } from "zustand/middleware";
+import { appStorage } from "@/lib/storage";
 import type { ChatMessage, ChallengeResult, UserProfile } from "@/types";
 import { STORAGE_KEY, POINTS } from "@/lib/constants";
 import { calculateChallengePoints } from "@/lib/utils";
@@ -144,7 +145,7 @@ export const useGameStore = create<GameState & GameActions>()(
     }),
     {
       name: STORAGE_KEY,
-      storage: createJSONStorage(() => localStorage),
+      storage: appStorage,
     }
   )
 );

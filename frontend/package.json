@@ -10,9 +10,22 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "cap:sync": "vite build && cap sync",
+    "cap:ios": "vite build && cap sync ios && cap open ios",
+    "cap:android": "vite build && cap sync android && cap open android",
+    "cap:live": "cap run ios --livereload --external"
   },
   "dependencies": {
+    "@capacitor/android": "^8.3.2",
+    "@capacitor/cli": "^8.3.2",
+    "@capacitor/core": "^8.3.2",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/ios": "^8.3.2",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/splash-screen": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.2",
+    "@react-spring/web": "^9.7.5",
     "@tanstack/react-query": "^5.56.2",
     "clsx": "^2.1.1",
     "framer-motion": "^11.5.6",
@@ -23,8 +36,7 @@
     "react-router-dom": "^6.26.2",
     "react-tinder-card": "^1.6.4",
     "tailwind-merge": "^2.5.2",
-    "zustand": "^4.5.5",
-    "@react-spring/web": "^9.7.5"
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.5.0",
