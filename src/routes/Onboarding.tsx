@@ -16,6 +16,7 @@ export default function Onboarding() {
   const setProfile = useAppStore((s) => s.setProfile);
   const navigate = useNavigate();
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [composing, setComposing] = useState(false);
   const {
     register,
     handleSubmit,
@@ -64,6 +65,8 @@ export default function Onboarding() {
             <input
               autoComplete="off"
               placeholder="Ví dụ: Lan Anh"
+              onCompositionStart={() => setComposing(true)}
+              onCompositionEnd={() => setComposing(false)}
               {...register("username", {
                 required: "Vui lòng nhập tên hiển thị",
                 minLength: { value: 1, message: "Tên không được để trống" },
@@ -99,7 +102,7 @@ export default function Onboarding() {
           <button
             className="btn primary"
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || composing}
           >
             {isSubmitting ? "Đang tạo tài khoản..." : "Vào khám phá"}
           </button>

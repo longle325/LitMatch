@@ -26,6 +26,7 @@ import {
   ApiError,
   API_BASE_URL,
   apiFetch,
+  handleSessionExpired,
   mergeBackendCharacter,
   rememberCharacterId,
   requireCurrentUserId,
@@ -305,6 +306,7 @@ async function* streamChatReal(
     } catch {
       // ignore
     }
+    handleSessionExpired(response.status, detail);
     throw new ApiError(detail, response.status);
   }
 

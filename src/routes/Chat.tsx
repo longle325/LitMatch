@@ -167,10 +167,22 @@ function ChatInput({
   onSubmit: (event: React.FormEvent) => void;
 }) {
   const handleTextAreaKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      onSubmit(event);
+    // Guard against the dupe-message bug with Vietnamese IME (macOS, Telex,
+    // Bộ gõ tiếng Việt, etc.): when the user finalises a tone-marked word
+    // and presses Enter, the browser fires *two* keydown events — one from
+    // compositionend (which has `isComposing = true` or `keyCode === 229`)
+    // and a real one. Without this guard, the first call submits the full
+    // draft and the second submits the trailing word residue.
+    if (
+      event.key !== "Enter" ||
+      event.shiftKey ||
+      event.nativeEvent.isComposing ||
+      event.keyCode === 229
+    ) {
+      return;
     }
+    event.preventDefault();
+    onSubmit(event);
   };
 
   return (

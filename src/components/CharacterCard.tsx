@@ -6,9 +6,17 @@ interface Props {
   character: Character;
   onSkip: () => void;
   onMatch: () => void;
+  /** When true (mutation in flight) the action buttons are disabled to
+   *  prevent fast double-taps on trackpads from firing the swipe twice. */
+  busy?: boolean;
 }
 
-export default function CharacterCard({ character, onSkip, onMatch }: Props) {
+export default function CharacterCard({
+  character,
+  onSkip,
+  onMatch,
+  busy = false,
+}: Props) {
   const traits = character.personality
     .split(",")
     .slice(0, 3)
@@ -48,6 +56,7 @@ export default function CharacterCard({ character, onSkip, onMatch }: Props) {
           className="btn circle ghost"
           aria-label="Bỏ qua"
           onClick={onSkip}
+          disabled={busy}
         >
           <span className="material-symbols-outlined">close</span>
         </button>
@@ -55,6 +64,7 @@ export default function CharacterCard({ character, onSkip, onMatch }: Props) {
           className="btn circle primary"
           aria-label="Chọn nhân vật"
           onClick={onMatch}
+          disabled={busy}
         >
           <span className="material-symbols-outlined">favorite</span>
         </button>
