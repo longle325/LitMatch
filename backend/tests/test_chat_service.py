@@ -1,4 +1,5 @@
 import unittest
+from types import SimpleNamespace
 
 from services.chat_service import ChatService
 
@@ -29,6 +30,67 @@ class ChatServiceCompletionOptionsTests(unittest.TestCase):
         self.assertEqual(kwargs["max_tokens"], 1024)
         self.assertEqual(kwargs["temperature"], 0.7)
         self.assertNotIn("max_completion_tokens", kwargs)
+
+    def test_stream_response_uses_async_hybrid_retriever_context(self):
+        class FakeRetriever:
+            def __init__(self):
+                self.called = False
+
+            async def search_context_async(self, character_slug, user_query):
+                self.called = True
+                self.character_slug = character_slug
+                self.user_query = user_query
+                return "VECTOR_CONTEXT_FROM_PGVECTOR"
+
+        class FakeCompletions:
+            def __init__(self):
+                self.kwargs = None
+
+            async def create(self, **kwargs):
+                self.kwargs = kwargs
+
+                async def stream():
+                    yield SimpleNamespace(
+                        choices=[
+                            SimpleNamespace(
+                                delta=SimpleNamespace(content="xin chào")
+                            )
+                        ]
+                    )
+
+                return stream()
+
+        class FakeOpenAI:
+            def __init__(self):
+                self.chat = SimpleNamespace(completions=FakeCompletions())
+
+        async def collect_response():
+            retriever = FakeRetriever()
+            client = FakeOpenAI()
+            service = ChatService(
+                codex_agent=None,
+                knowledge_retriever=retriever,
+                openai_client=client,
+                chat_model="gpt-4o",
+            )
+
+            chunks = [
+                chunk
+                async for chunk in service.stream_response(
+                    character_slug="chi_pheo",
+                    character_name="Chí Phèo",
+                    user_message="bát cháo hành là gì?",
+                )
+            ]
+            return retriever, client, chunks
+
+        retriever, client, chunks = __import__("asyncio").run(collect_response())
+        system_prompt = client.chat.completions.kwargs["messages"][0]["content"]
+
+        self.assertTrue(retriever.called)
+        self.assertEqual(retriever.character_slug, "chi_pheo")
+        self.assertIn("VECTOR_CONTEXT_FROM_PGVECTOR", system_prompt)
+        self.assertEqual(chunks, ["xin chào"])
 
 
 if __name__ == "__main__":
