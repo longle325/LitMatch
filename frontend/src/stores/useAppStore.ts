@@ -31,6 +31,8 @@ interface AppState {
   setProfile: (username: string, grade: Grade, userId?: string) => void;
   setUserId: (userId: string) => void;
   matchCharacter: (id: string) => void;
+  setMatches: (ids: string[]) => void;
+  removeMatch: (id: string) => void;
   skipCharacter: (id: string) => void;
   resetSkipped: () => void;
   appendChat: (id: string, message: ChatMessage) => void;
@@ -88,6 +90,21 @@ export const useAppStore = create<AppState>()(
                 points: state.points + POINTS_PER_MATCH,
               },
         ),
+
+      // Replace local matches wholesale with the authoritative list from
+      // the backend. Used by RequireProfile to reconcile after auth so
+      // zombie entries from the mock-mode era can never linger.
+      setMatches: (ids) =>
+        set(() => ({ matches: Array.from(new Set(ids)) })),
+
+      // Drop a single match — used by Chat when a stream returns 403,
+      // which means the FE thought the user had matched but the backend
+      // doesn't agree. Healing locally lets the route's match guard
+      // render the LockedView on the next render.
+      removeMatch: (id) =>
+        set((state) => ({
+          matches: state.matches.filter((m) => m !== id),
+        })),
 
       skipCharacter: (id) =>
         set((state) =>

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { BookOpen, Send, Sparkles, Pencil, AlertCircle } from "lucide-react";
 import { useCharacter } from "@/api/queries";
-import { api } from "@/api/client";
+import { api, ApiError } from "@/api/client";
 import { useAppStore } from "@/stores/useAppStore";
 import type { Character, ChatMessage, ChatSource } from "@/types";
 
@@ -337,6 +337,7 @@ export default function Chat() {
   const chats = useAppStore((s) => s.chats);
   const appendChat = useAppStore((s) => s.appendChat);
   const setChat = useAppStore((s) => s.setChat);
+  const removeMatch = useAppStore((s) => s.removeMatch);
   const { data: character, isLoading } = useCharacter(id);
 
   // Rehydrate chat history from the backend on mount. Mock returns [] so
@@ -357,14 +358,22 @@ export default function Chat() {
         if (localCount > 0) return;
         setChat(id, history);
       },
-      () => {
-        // Backend down or chat flag off — fall back to whatever Zustand has.
+      (err) => {
+        if (cancelled) return;
+        if (err instanceof ApiError && err.status === 403) {
+          // Stale local match — heal immediately so LockedView renders
+          // instead of letting the user type a question that's about to
+          // 403 the stream call.
+          removeMatch(id);
+          return;
+        }
+        // Other errors (backend down, chat flag off): fall back to local.
       },
     );
     return () => {
       cancelled = true;
     };
-  }, [id, setChat]);
+  }, [id, setChat, removeMatch]);
 
   const [draft, setDraft] = useState("");
   const [streaming, setStreaming] = useState("");
@@ -449,6 +458,13 @@ export default function Chat() {
       });
     } catch (err) {
       console.error("chat stream failed", err);
+      if (err instanceof ApiError && err.status === 403) {
+        // Backend says the user hasn't actually matched this character.
+        // Local matches are stale — drop the entry and let the route's
+        // match guard render the LockedView on the next render.
+        removeMatch(id);
+        return;
+      }
       if (buffer) {
         appendChat(id, {
           from: "bot",
