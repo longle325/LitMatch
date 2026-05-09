@@ -43,7 +43,7 @@ CHARACTER_FOLDER_MAP: dict[str, str] = {
     "thuy_kieu": "Thuy_Kieu",
 }
 
-MAX_CONTEXT_CHARS = 12_000  # Stay within token limits
+MAX_CONTEXT_CHARS = 2_000  # gpt-5 reasoning models burn tokens on thinking
 
 
 class CodexKnowledgeAgent:
@@ -62,7 +62,7 @@ class CodexKnowledgeAgent:
     ):
         self.client = AsyncOpenAI(api_key=api_key or settings.OPENAI_API_KEY)
         self.knowledge_dir = Path(knowledge_dir or settings.KNOWLEDGE_BASE_DIR)
-        self.model = model or settings.CHAT_MODEL  # gpt-5-mini
+        self.model = model or "gpt-5-nano"  # fast + cheap for search extraction
 
     # ------------------------------------------------------------------
     # Public API
@@ -109,7 +109,7 @@ class CodexKnowledgeAgent:
                         ),
                     },
                 ],
-                max_completion_tokens=1024,
+                max_completion_tokens=4096,
             )
             return response.choices[0].message.content or ""
 
