@@ -1,0 +1,60 @@
+import type { Character } from "@/types";
+import CharacterArt from "./CharacterArt";
+
+interface Props {
+  character: Character;
+  onSkip: () => void;
+  onMatch: () => void;
+}
+
+export default function CharacterCard({ character, onSkip, onMatch }: Props) {
+  const traits = character.personality
+    .split(",")
+    .slice(0, 3)
+    .map((trait) => trait.trim());
+  return (
+    <article className="card deck-card">
+      <div className="swipe-stamp swipe-stamp-left">Bỏ qua</div>
+      <div className="swipe-stamp swipe-stamp-right">Chọn</div>
+      <CharacterArt character={character} />
+      <div className="deck-body">
+        <div className="deck-title">
+          <h1 className="headline-lg">{character.name}</h1>
+          <p>
+            {character.work} · {character.author}
+          </p>
+        </div>
+        <blockquote className="quote">"{character.quote}"</blockquote>
+        <p className="deck-bio">{character.bio}</p>
+        <div className="conflict-tile">
+          <span>Xung đột</span>
+          <strong>
+            <span className="material-symbols-outlined">balance</span>
+            {character.conflict.split(";")[0]}
+          </strong>
+        </div>
+        <div className="trait-row">
+          {traits.map((trait) => (
+            <span key={trait}>{trait}</span>
+          ))}
+        </div>
+      </div>
+      <div className="swipe-actions">
+        <button
+          className="btn circle ghost"
+          aria-label="Bỏ qua"
+          onClick={onSkip}
+        >
+          <span className="material-symbols-outlined">close</span>
+        </button>
+        <button
+          className="btn circle primary"
+          aria-label="Chọn nhân vật"
+          onClick={onMatch}
+        >
+          <span className="material-symbols-outlined">favorite</span>
+        </button>
+      </div>
+    </article>
+  );
+}
