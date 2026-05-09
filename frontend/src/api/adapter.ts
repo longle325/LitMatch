@@ -32,11 +32,20 @@ export type EndpointKey =
   | "leaderboard"
   | "chat";
 
-const realEndpoints = new Set(
-  (import.meta.env.VITE_REAL_ENDPOINTS ?? "")
-    .split(",")
-    .map((entry: string) => entry.trim())
-    .filter(Boolean) as EndpointKey[],
+const ALL_ENDPOINTS: EndpointKey[] = [
+  "auth", "deck", "characters", "match", "challenge", "leaderboard", "chat",
+];
+
+const realFlag = (import.meta.env.VITE_REAL_ENDPOINTS ?? "").trim();
+
+const realEndpoints = new Set<EndpointKey>(
+  // "all" or empty-when-backend-URL-is-set → every endpoint hits real backend
+  realFlag === "all" || (realFlag === "" && import.meta.env.VITE_API_BASE_URL)
+    ? ALL_ENDPOINTS
+    : (realFlag
+        .split(",")
+        .map((entry: string) => entry.trim())
+        .filter(Boolean) as EndpointKey[]),
 );
 
 export function useReal(endpoint: EndpointKey): boolean {
@@ -94,8 +103,8 @@ export function handleSessionExpired(status: number, detail: string): void {
   } catch {
     // even if Zustand fails, the redirect below still recovers.
   }
-  if (window.location.pathname !== "/onboarding") {
-    window.location.replace("/onboarding");
+  if (!window.location.hash.includes("/onboarding")) {
+    window.location.replace("/#/onboarding");
   }
 }
 
