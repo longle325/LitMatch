@@ -98,6 +98,30 @@ function CharacterMessage({
   );
 }
 
+function ThinkingBubble({ character }: { character: Character }) {
+  const avatarImage = getCharacterImage(character);
+  const avatar = avatarImage ? (
+    <img className="message-avatar" src={avatarImage} alt={character.name} />
+  ) : (
+    <span className="message-avatar fallback">{character.initial}</span>
+  );
+  return (
+    <div
+      className="message-row bot"
+      role="status"
+      aria-live="polite"
+      aria-label={`${character.name} đang soạn câu trả lời`}
+    >
+      {avatar}
+      <div className="message bot typing-bubble">
+        <span className="typing-bubble-dot" />
+        <span className="typing-bubble-dot" />
+        <span className="typing-bubble-dot" />
+      </div>
+    </div>
+  );
+}
+
 function ChatSourceChips({ sources }: { sources: ChatSource[] }) {
   // De-duplicate by title so the same work doesn't render twice when the
   // retriever surfaces multiple chunks from one document.
@@ -152,6 +176,7 @@ function ChatInput({
   character,
   draft,
   streaming,
+  awaiting,
   suggestedQuestions,
   onDraftChange,
   onPromptSelect,
@@ -161,6 +186,7 @@ function ChatInput({
   character: Character;
   draft: string;
   streaming: string;
+  awaiting: boolean;
   suggestedQuestions: string[];
   onDraftChange: (draft: string) => void;
   onPromptSelect: (prompt: string) => void;
@@ -210,7 +236,7 @@ function ChatInput({
       <button
         className="btn ghost send-button"
         type="submit"
-        disabled={!!streaming || !draft.trim()}
+        disabled={!!streaming || awaiting || !draft.trim()}
       >
         <Send size={17} strokeWidth={1.8} />
         Gửi
@@ -342,6 +368,7 @@ export default function Chat() {
 
   const [draft, setDraft] = useState("");
   const [streaming, setStreaming] = useState("");
+  const [awaiting, setAwaiting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const threadRef = useRef<HTMLDivElement | null>(null);
 
@@ -370,7 +397,7 @@ export default function Chat() {
       top: threadRef.current.scrollHeight,
       behavior: "smooth",
     });
-  }, [messages.length, streaming]);
+  }, [messages.length, streaming, awaiting]);
 
   if (!id) return <Navigate to="/discover" replace />;
   if (isLoading) return null;
@@ -394,7 +421,7 @@ export default function Chat() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const text = draft.trim();
-    if (!text || streaming) return;
+    if (!text || streaming || awaiting) return;
     setDraft("");
     setError(null);
     appendChat(id, { from: "user", text });
@@ -402,6 +429,7 @@ export default function Chat() {
     let buffer = "";
     const sources: ChatSource[] = [];
     setStreaming("");
+    setAwaiting(true);
     try {
       for await (const event of api.streamChat({
         characterId: id,
@@ -433,6 +461,7 @@ export default function Chat() {
       );
     } finally {
       setStreaming("");
+      setAwaiting(false);
     }
   };
 
@@ -457,13 +486,16 @@ export default function Chat() {
               character={character}
             />
           )}
-          {streaming && (
+          {awaiting && !streaming && (
+            <ThinkingBubble character={character} />
+          )}
+          {(streaming || awaiting) && (
             <div className="typing-line">
               <Pencil size={14} />
               {character.name} đang suy ngẫm...
             </div>
           )}
-          {error && !streaming && (
+          {error && !streaming && !awaiting && (
             <div className="chat-error" role="alert">
               <AlertCircle size={16} />
               <span>{error}</span>
@@ -475,6 +507,7 @@ export default function Chat() {
           character={character}
           draft={draft}
           streaming={streaming}
+          awaiting={awaiting}
           suggestedQuestions={suggestedQuestions}
           onDraftChange={setDraft}
           onPromptSelect={setDraft}
