@@ -8,6 +8,7 @@ import Chat from "@/routes/Chat";
 import Challenge from "@/routes/Challenge";
 import Leaderboard from "@/routes/Leaderboard";
 import Profile from "@/routes/Profile";
+import CharacterProfile from "@/routes/CharacterProfile";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
       >
         <Route path="/discover" element={<Discover />} />
         <Route path="/collection" element={<Collection />} />
+        <Route path="/characters/:id" element={<CharacterProfile />} />
         <Route path="/characters/:id/chat" element={<Chat />} />
         <Route path="/characters/:id/challenge" element={<Challenge />} />
         <Route path="/leaderboard" element={<Leaderboard />} />

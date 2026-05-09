@@ -1,6 +1,6 @@
 # LitMatch Task Tracker
 
-Last updated: 2026-05-08
+Last updated: 2026-05-08 (character profile route)
 
 ## Completed
 
@@ -54,6 +54,12 @@ Last updated: 2026-05-08
 - [x] `docs/API.md` §3.4: documented MVP-1 scope — multiple-choice only, short-answer / quote-ID out of scope, question count and option count are array-length-authoritative.
 - [x] `docs/API.md` §3.5 / §5.3: relaxed hard-coded length 4 / length 5; pass threshold is `4` for MVP-1 only and product owns the rule per PRD §7 if a future character has ≠5 questions.
 - [x] `docs/API.md` §3.7: added "Backend internals (RAG inputs)" subsection enumerating the five LLM-call inputs from PRD §9 RAG Direction.
+
+## Character profile route (2026-05-08)
+
+- [x] Added `/characters/:id` route rendering full hồ sơ — portrait, kicker, status, quote, sections for tiểu sử / xung đột / tính cách / bối cảnh / chủ đề / biểu tượng / chất giọng / chi tiết then chốt — plus chat + challenge entry points.
+- [x] Wired Collection portraits and names as links into the new profile route; added third "Hồ sơ" action button so it's discoverable.
+- [x] Added themed styles in `src/styles/theme.css` (wood-frame portrait, two-column section grid, parchment dividers, mobile collapse).
 
 ## Next (post-migration polish + backend)
 

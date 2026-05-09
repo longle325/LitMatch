@@ -32,7 +32,11 @@ function CollectionCard({
 
   return (
     <article className="card collection-card">
-      <div className="collection-image">
+      <Link
+        to={`/characters/${character.id}`}
+        className="collection-image collection-image-link"
+        aria-label={`Xem hồ sơ ${character.name}`}
+      >
         {image ? (
           <img src={image} alt={character.name} />
         ) : (
@@ -44,9 +48,13 @@ function CollectionCard({
           </span>
           {result?.passed ? "Đã mở khóa" : "Chờ thử thách"}
         </span>
-      </div>
+      </Link>
       <div className="collection-body">
-        <h2>{character.name}</h2>
+        <h2>
+          <Link to={`/characters/${character.id}`} className="collection-name-link">
+            {character.name}
+          </Link>
+        </h2>
         <p>{character.work}</p>
         <div className="collection-progress">
           <span style={{ width: `${progress}%` }} />
@@ -67,6 +75,12 @@ function CollectionCard({
             to={`/characters/${character.id}/challenge`}
           >
             Làm thử thách
+          </Link>
+          <Link
+            className="btn ghost"
+            to={`/characters/${character.id}`}
+          >
+            Hồ sơ
           </Link>
         </div>
       </div>
