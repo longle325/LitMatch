@@ -43,7 +43,12 @@ function ResultView({
         <div className="result-list">
           {character.challenge.map((question, index) => {
             const picked = result.answers[index];
-            const isCorrect = picked === question.answer;
+            // In real mode `question.answer` is a -1 stub (server hides it
+            // pre-submission); the authoritative correct index comes back in
+            // `result.correctAnswers`. Fall back to the seed value for mock.
+            const correctIndex =
+              result.correctAnswers?.[index] ?? question.answer;
+            const isCorrect = picked === correctIndex;
             return (
               <div key={index} className="info-block">
                 <h3>
@@ -52,7 +57,7 @@ function ResultView({
                 <p>
                   <strong>{question.text}</strong>
                 </p>
-                <p>Đáp án đúng: {question.options[question.answer]}</p>
+                <p>Đáp án đúng: {question.options[correctIndex]}</p>
                 <p>{question.explanation}</p>
               </div>
             );

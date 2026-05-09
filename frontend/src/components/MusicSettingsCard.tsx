@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { Volume2, VolumeX, Volume1, Volume, PlayCircle, StopCircle } from "lucide-react";
 import { useAppStore } from "@/stores/useAppStore";
 import { MUSIC_TRACKS, type MusicTrack } from "@/data/music";
 
 function VolumeIcon({ volume, muted }: { volume: number; muted: boolean }) {
-  let name = "volume_up";
-  if (muted || volume === 0) name = "volume_off";
-  else if (volume < 0.34) name = "volume_mute";
-  else if (volume < 0.67) name = "volume_down";
-  return <span className="material-symbols-outlined">{name}</span>;
+  if (muted || volume === 0) return <VolumeX size={20} />;
+  if (volume < 0.34) return <Volume size={20} />;
+  if (volume < 0.67) return <Volume1 size={20} />;
+  return <Volume2 size={20} />;
 }
 
 function TrackPreviewButton({ track }: { track: MusicTrack }) {
@@ -64,9 +64,7 @@ function TrackPreviewButton({ track }: { track: MusicTrack }) {
         aria-label={playing ? "Tạm dừng nghe thử" : `Nghe thử ${track.title}`}
         title={playing ? "Tạm dừng" : "Nghe thử"}
       >
-        <span className="material-symbols-outlined">
-          {playing ? "stop_circle" : "play_circle"}
-        </span>
+        {playing ? <StopCircle size={18} /> : <PlayCircle size={18} />}
       </button>
       <audio ref={audioRef} src={track.src} preload="none" />
     </>

@@ -10,3 +10,9 @@ __pycache__/
 .env.local
 .env.*.local
 .ruff_cache/
+
+# Knowledge-base SQL dumps — ship via team Drive
+backend/data/*.sql.gz
+
+# Source content reference — not for git
+Content for Hackathon game *.pdf
