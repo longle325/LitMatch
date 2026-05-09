@@ -1,6 +1,6 @@
 # LitMatch Task Tracker
 
-Last updated: 2026-05-08 (character voice playback)
+Last updated: 2026-05-08 (background music settings)
 
 ## Completed
 
@@ -67,6 +67,15 @@ Last updated: 2026-05-08 (character voice playback)
 - [x] New `src/components/VoicePlayButton.tsx` — round play/stop button with cinnabar pulse while playing; hides itself on 404 / autoplay block.
 - [x] Wired into `CharacterCard` (Discover quote) and `CharacterProfile` (profile quote); button anchored inside the quote box's right edge.
 - [x] Note: out of PRD scope — kept as a small delight feature; no backend dependency.
+
+## Background music + Profile settings panel (2026-05-08)
+
+- [x] Two ambient tracks dropped into `public/audio/{duoi-anh-den-dau,vet-muc-tren-giay}.mp3` (id-based, ASCII filenames). Default track is "Dưới ánh đèn dầu".
+- [x] New `src/data/music.ts` registry + Zustand `music: { enabled, trackId, volume }` slice (persisted, defaults: off, 20% volume).
+- [x] New `src/components/BackgroundMusic.tsx` — single global `<audio loop>` driven by store; on autoplay-blocked refresh, retries on the next user gesture (pointerdown / keydown).
+- [x] New `src/components/MusicSettingsCard.tsx` — collapsed-by-default dropdown panel on `/profile` with brass-pull lamp toggle, two scroll-panel track cards (with per-track preview play), themed volume groove + cartouche.
+- [x] Mounted `BackgroundMusic` in `AppShell` so playback survives navigation.
+- [x] Note: out of PRD scope — delight feature, no backend dependency.
 
 ## Next (post-migration polish + backend)
 

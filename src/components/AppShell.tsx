@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAppStore } from "@/stores/useAppStore";
+import BackgroundMusic from "@/components/BackgroundMusic";
 
 interface NavItem {
   key: string;
@@ -24,6 +25,7 @@ export default function AppShell() {
 
   return (
     <div className="app-shell">
+      <BackgroundMusic />
       <aside className="side-nav">
         <div className="brand">
           <h1 className="brand-title">LitMatch</h1>
