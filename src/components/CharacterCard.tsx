@@ -1,5 +1,6 @@
 import type { Character } from "@/types";
 import CharacterArt from "./CharacterArt";
+import VoicePlayButton from "./VoicePlayButton";
 
 interface Props {
   character: Character;
@@ -24,7 +25,10 @@ export default function CharacterCard({ character, onSkip, onMatch }: Props) {
             {character.work} · {character.author}
           </p>
         </div>
-        <blockquote className="quote">"{character.quote}"</blockquote>
+        <div className="quote-row">
+          <blockquote className="quote">"{character.quote}"</blockquote>
+          <VoicePlayButton characterId={character.id} size="sm" />
+        </div>
         <p className="deck-bio">{character.bio}</p>
         <div className="conflict-tile">
           <span>Xung đột</span>
