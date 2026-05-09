@@ -1,11 +1,18 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from pathlib import Path
 from typing import Any, Optional
 
+from openai import AsyncOpenAI
+from sqlalchemy import text
+
 from core.config import settings
+from core.database import async_session_factory
+
+logger = logging.getLogger(__name__)
 
 
 TOKEN_RE = re.compile(r"\w+", re.UNICODE)
@@ -14,12 +21,30 @@ TOKEN_RE = re.compile(r"\w+", re.UNICODE)
 class KnowledgeRetriever:
     """Local character-scoped retriever over the generated JSONL chunk index."""
 
-    def __init__(self, index_path: Optional[Path] = None, top_k: int = 5):
+    def __init__(
+        self,
+        index_path: Optional[Path] = None,
+        top_k: Optional[int] = None,
+        openai_client: Optional[AsyncOpenAI] = None,
+    ):
         self.index_path = index_path or (
             Path(settings.KNOWLEDGE_BASE_DIR) / "index" / "chunks.jsonl"
         )
-        self.top_k = top_k
+        self.top_k = top_k or settings.RAG_TOP_K
+        self.client = openai_client or AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
         self._chunks: Optional[list[dict[str, Any]]] = None
+
+    async def search_context_async(self, character_slug: str, user_query: str) -> str:
+        try:
+            vector_chunks = await self._search_vector_chunks(
+                character_slug,
+                user_query,
+            )
+            if vector_chunks:
+                return self._format_context(vector_chunks)
+        except Exception as exc:
+            logger.info("Vector retrieval failed; falling back to lexical search: %s", exc)
+        return self.search_context(character_slug, user_query)
 
     def search_context(self, character_slug: str, user_query: str) -> str:
         terms = self._tokenize(user_query)
@@ -93,6 +118,59 @@ class KnowledgeRetriever:
                 )
             )
         return "\n\n---\n\n".join(sections)
+
+    async def _search_vector_chunks(
+        self,
+        character_slug: str,
+        user_query: str,
+    ) -> list[dict[str, Any]]:
+        query_embedding = await self._embed_query(user_query)
+        query_vector = self._vector_literal(query_embedding)
+        stmt = text(
+            """
+            SELECT
+                chunk_id,
+                document_id,
+                character_slug,
+                character_name,
+                work_title,
+                author,
+                doc_type,
+                source_path,
+                text,
+                1 - (embedding <=> CAST(:query_embedding AS vector)) AS similarity
+            FROM knowledge_chunks
+            WHERE character_slug = :character_slug
+              AND embedding_model = :embedding_model
+              AND 1 - (embedding <=> CAST(:query_embedding AS vector)) >= :min_similarity
+            ORDER BY embedding <=> CAST(:query_embedding AS vector)
+            LIMIT :limit
+            """
+        )
+
+        async with async_session_factory() as session:
+            result = await session.execute(
+                stmt,
+                {
+                    "query_embedding": query_vector,
+                    "character_slug": character_slug,
+                    "embedding_model": settings.EMBEDDING_MODEL,
+                    "min_similarity": settings.RAG_MIN_SIMILARITY,
+                    "limit": self.top_k,
+                },
+            )
+            return [dict(row._mapping) for row in result.all()]
+
+    async def _embed_query(self, user_query: str) -> list[float]:
+        response = await self.client.embeddings.create(
+            model=settings.EMBEDDING_MODEL,
+            input=user_query,
+        )
+        return response.data[0].embedding
+
+    @staticmethod
+    def _vector_literal(values: list[float]) -> str:
+        return "[" + ",".join(str(float(value)) for value in values) + "]"
 
 
 _retriever: Optional[KnowledgeRetriever] = None
