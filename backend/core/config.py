@@ -1,17 +1,27 @@
 """
 Application settings loaded from environment variables.
 
-Single-source-of-truth for secrets is the repository-root `.env` file
-(also used by Vite for the `VITE_*` flags). Resolved relative to this
-file so the backend can be launched from any working directory.
+Resolution order (pydantic-settings default behaviour):
+  1. OS / container environment variables  (Cloud Run, Docker, shell export)
+  2. .env file (local development convenience)
+
+In production (Cloud Run / Docker) there is no .env file — settings come
+entirely from env vars injected by the platform.  Locally, developers can
+use either `backend/.env` or the repo-root `.env` (shared with Vite).
 """
 
 from pathlib import Path
 from pydantic_settings import BaseSettings
 from typing import List
 
-# backend/core/config.py  →  parents[2] is the repo root.
-ROOT_ENV_FILE = Path(__file__).resolve().parents[2] / ".env"
+
+def _find_env_files() -> list[str]:
+    """Return .env paths that actually exist, closest first."""
+    candidates = [
+        Path(__file__).resolve().parents[1] / ".env",  # backend/.env
+        Path(__file__).resolve().parents[2] / ".env",  # repo-root .env
+    ]
+    return [str(p) for p in candidates if p.is_file()]
 
 
 class Settings(BaseSettings):
@@ -45,18 +55,15 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     # --- Points ---
-    # Mirrors PRD §6.5 (and FE `src/lib/scoring.ts`): match awards, completion
-    # bonus, pass bonus only. No perfect-score bonus — the FE explicitly
-    # removed it for parity with the PRD; keep the backend in lockstep.
     POINTS_MATCH: int = 10
     POINTS_CHALLENGE_COMPLETE: int = 50
     POINTS_CHALLENGE_PASS_BONUS: int = 40  # >= 4/5
     CHALLENGE_PASS_THRESHOLD: int = 4  # out of 5
 
-    # Root `.env` is canonical. Vite-only `VITE_*` keys in the same file are
-    # ignored by pydantic-settings (no matching field), so co-living is safe.
     model_config = {
-        "env_file": str(ROOT_ENV_FILE),
+        # Tuple of .env paths — pydantic reads the first one found.
+        # Empty tuple is fine (no .env in production containers).
+        "env_file": tuple(_find_env_files()) or (".env",),
         "env_file_encoding": "utf-8",
         "extra": "ignore",
     }
