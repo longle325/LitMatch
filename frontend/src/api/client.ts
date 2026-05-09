@@ -1,13 +1,5 @@
-/**
- * Mock API client — ported from main branch.
- *
- * Implements the ApiClient interface using local seed data.
- * When the backend is live, swap for a real HTTP implementation
- * using the helpers in api-client.ts.
- */
-
-import { characters, findCharacter } from "@/data/seed";
-import { demoLeaders } from "@/data/seed";
+import { characters, getCharacter } from "@/data/characters";
+import { demoLeaders } from "@/data/leaderboard";
 import { scoreChallenge } from "@/lib/scoring";
 import type {
   Character,
@@ -34,13 +26,12 @@ export interface ChatRequest {
   signal?: AbortSignal;
 }
 
-/** Simulates word-by-word streaming like the real SSE backend. */
 async function* mockStreamChat({
   characterId,
   message,
   signal,
 }: ChatRequest): AsyncIterable<string> {
-  const character = findCharacter(characterId);
+  const character = getCharacter(characterId);
   if (!character) throw new Error(`Unknown character: ${characterId}`);
 
   const reply = composeReply(character, message);
@@ -68,7 +59,9 @@ function composeReply(character: Character, text: string): string {
     character.sources.find((item) =>
       lower
         .split(/\s+/)
-        .some((word) => word.length > 3 && item.toLowerCase().includes(word))
+        .some(
+          (word) => word.length > 3 && item.toLowerCase().includes(word),
+        ),
     ) ?? character.sources[0];
   return `Theo giọng của ${character.name}, câu trả lời nên xuất phát từ mâu thuẫn cốt lõi: ${character.conflict} Ghi chú nguồn liên quan: ${source} Đây là diễn giải học tập, không phải trích dẫn nguyên văn toàn bộ tác phẩm.`;
 }
@@ -80,23 +73,23 @@ export const mockClient: ApiClient = {
   },
   async getCharacter(id) {
     await delay(0);
-    const character = findCharacter(id);
+    const character = getCharacter(id);
     if (!character) throw new Error(`Unknown character: ${id}`);
     return character;
   },
   async recordMatch(_id) {
     await delay(0);
-    return { ok: true as const };
+    return { ok: true };
   },
   async getChallenge(id) {
     await delay(0);
-    const character = findCharacter(id);
+    const character = getCharacter(id);
     if (!character) throw new Error(`Unknown character: ${id}`);
     return character.challenge;
   },
   async submitChallenge(id, answers) {
     await delay(0);
-    const character = findCharacter(id);
+    const character = getCharacter(id);
     if (!character) throw new Error(`Unknown character: ${id}`);
     return scoreChallenge(character, answers);
   },
@@ -109,5 +102,4 @@ export const mockClient: ApiClient = {
   },
 };
 
-/** Active API client. Swap mockClient for httpClient when backend is live. */
 export const api: ApiClient = mockClient;

@@ -9,13 +9,16 @@ import type { Character, ChallengeQuestion, LeaderboardEntry } from "@/types";
 
 /* ── Helper ──────────────────────────────────────────────────── */
 
+let _qCounter = 0;
+
 function q(
   text: string,
   options: string[],
   answer: number,
   explanation: string
 ): ChallengeQuestion {
-  return { text, options, answer, explanation };
+  _qCounter++;
+  return { id: `seed-q${_qCounter}`, text, options, answer, explanation };
 }
 
 /* ── Characters ──────────────────────────────────────────────── */
