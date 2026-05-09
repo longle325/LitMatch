@@ -1,6 +1,12 @@
 import unittest
 
-from scripts.seed_database import CHARACTER_SEEDS, DEMO_USER_SEEDS, challenge_payload
+from scripts.seed_database import (
+    CHARACTER_EVENT_SEEDS,
+    CHARACTER_RELATIONSHIP_SEEDS,
+    CHARACTER_SEEDS,
+    DEMO_USER_SEEDS,
+    challenge_payload,
+)
 
 
 class SeedDatabaseTests(unittest.TestCase):
@@ -27,6 +33,16 @@ class SeedDatabaseTests(unittest.TestCase):
 
         self.assertEqual(len(usernames), len(set(usernames)))
         self.assertTrue(all(user["total_score"] > 0 for user in DEMO_USER_SEEDS))
+
+    def test_relationship_and_event_seeds_cover_each_character(self):
+        character_slugs = {character["slug"] for character in CHARACTER_SEEDS}
+
+        self.assertEqual(set(CHARACTER_RELATIONSHIP_SEEDS), character_slugs)
+        self.assertEqual(set(CHARACTER_EVENT_SEEDS), character_slugs)
+        self.assertTrue(
+            all(CHARACTER_RELATIONSHIP_SEEDS[slug] for slug in character_slugs)
+        )
+        self.assertTrue(all(CHARACTER_EVENT_SEEDS[slug] for slug in character_slugs))
 
 
 if __name__ == "__main__":

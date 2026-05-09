@@ -17,6 +17,8 @@ from models.db_models import (
     Challenge,
     ChallengeAttempt,
     Character,
+    CharacterEvent,
+    CharacterRelationship,
     ChatMessage,
     ChatRole,
     Match,
@@ -82,6 +84,30 @@ async def get_unswiped_characters(
 
 async def list_characters(db: AsyncSession) -> List[Character]:
     result = await db.execute(select(Character))
+    return list(result.scalars().all())
+
+
+async def list_character_relationships(
+    db: AsyncSession,
+    character_id: UUID,
+) -> List[CharacterRelationship]:
+    result = await db.execute(
+        select(CharacterRelationship).where(
+            CharacterRelationship.character_id == character_id
+        )
+    )
+    return list(result.scalars().all())
+
+
+async def list_character_events(
+    db: AsyncSession,
+    character_id: UUID,
+) -> List[CharacterEvent]:
+    result = await db.execute(
+        select(CharacterEvent)
+        .where(CharacterEvent.character_id == character_id)
+        .order_by(CharacterEvent.sequence_number.asc())
+    )
     return list(result.scalars().all())
 
 
