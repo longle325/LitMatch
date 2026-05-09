@@ -114,7 +114,7 @@ h1, h2, h3, .headline-lg, .brand-title {
 
 .lead {
   color: var(--ink-soft);
-  font-family: "Be Vietnam Pro", serif;
+  font-family: "Be Vietnam Pro", sans-serif;
   line-height: 1.6;
 }
 
@@ -197,12 +197,13 @@ small,
   color: var(--wood);
   font-family: "Noto Serif", serif;
   font-style: italic;
+  font-weight: 500;
   letter-spacing: 0.04em;
   margin: 6px 0 0;
 }
 
 .nav-link {
-  font-family: "Be Vietnam Pro", serif;
+  font-family: "Be Vietnam Pro", sans-serif;
   color: var(--ink-soft);
   font-weight: 500;
   border-radius: 8px;
@@ -323,7 +324,7 @@ small,
 
 .deck-card .deck-bio {
   color: var(--ink-soft);
-  font-family: "Be Vietnam Pro", serif;
+  font-family: "Be Vietnam Pro", sans-serif;
 }
 
 .conflict-tile {
@@ -557,7 +558,7 @@ small,
     linear-gradient(90deg, rgba(166, 41, 41, 0.05), transparent);
   border-left: 2px solid var(--cinnabar);
   color: var(--ink-soft);
-  font-family: "Be Vietnam Pro", serif;
+  font-family: "Be Vietnam Pro", sans-serif;
   font-size: 14px;
   padding: 10px 12px;
 }
@@ -668,7 +669,7 @@ small,
   align-items: center;
   margin: 6px 0 0;
   color: var(--muted);
-  font-family: "Be Vietnam Pro", serif;
+  font-family: "Be Vietnam Pro", sans-serif;
   font-weight: 600;
 }
 
@@ -911,7 +912,7 @@ small,
   min-height: 42px;
   padding: 9px 12px;
   border-radius: 6px;
-  font-family: "Be Vietnam Pro", serif;
+  font-family: "Be Vietnam Pro", sans-serif;
   text-align: left;
 }
 

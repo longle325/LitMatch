@@ -22,7 +22,7 @@ A gamified Vietnamese literature learning app. Swipe to discover characters, cha
 cp .env.example .env   # then add OPENAI_API_KEY
 
 # 2. Frontend
-npm install
+cd frontend && npm install && cd ..
 
 # 3. Backend
 cd backend
@@ -43,9 +43,9 @@ bash scripts/restore-knowledge-chunks.sh
 ## Run locally
 
 ```sh
-docker compose up -d postgres                                       # one-time
-cd backend && ./.venv/bin/python -m uvicorn main:app --reload --port 8081   # T1
-npm run dev                                                          # T2
+docker compose up -d postgres                                              # one-time
+cd backend && ./.venv/bin/python -m uvicorn main:app --reload --port 8081  # T1
+cd frontend && npm run dev                                                 # T2
 ```
 
 Open <http://127.0.0.1:5173/>.
