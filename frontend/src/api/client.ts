@@ -43,6 +43,11 @@ export const api: ApiClient = {
   recordSkip: (id) =>
     useReal("match") ? realClient.recordSkip(id) : mockClient.recordSkip(id),
 
+  getMatchedSlugs: () =>
+    useReal("match")
+      ? realClient.getMatchedSlugs()
+      : mockClient.getMatchedSlugs(),
+
   getChallenge: (id) =>
     useReal("challenge")
       ? realClient.getChallenge(id)

@@ -30,7 +30,8 @@ class Settings(BaseSettings):
 
     # --- OpenAI ---
     OPENAI_API_KEY: str = ""
-    CHAT_MODEL: str = "gpt-5-mini"
+    CODEX_MODEL: str = "codex-mini"
+    CHAT_MODEL: str = "gpt-4o"
     EMBEDDING_MODEL: str = "text-embedding-3-large"
     EMBEDDING_DIMENSIONS: int = 3072
 

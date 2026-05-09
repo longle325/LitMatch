@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { BookOpen, Send, Sparkles, Pencil, AlertCircle } from "lucide-react";
 import { useCharacter } from "@/api/queries";
-import { api } from "@/api/client";
+import { api, ApiError } from "@/api/client";
 import { useAppStore } from "@/stores/useAppStore";
 import type { Character, ChatMessage, ChatSource } from "@/types";
 
@@ -98,6 +98,30 @@ function CharacterMessage({
   );
 }
 
+function ThinkingBubble({ character }: { character: Character }) {
+  const avatarImage = getCharacterImage(character);
+  const avatar = avatarImage ? (
+    <img className="message-avatar" src={avatarImage} alt={character.name} />
+  ) : (
+    <span className="message-avatar fallback">{character.initial}</span>
+  );
+  return (
+    <div
+      className="message-row bot"
+      role="status"
+      aria-live="polite"
+      aria-label={`${character.name} đang soạn câu trả lời`}
+    >
+      {avatar}
+      <div className="message bot typing-bubble">
+        <span className="typing-bubble-dot" />
+        <span className="typing-bubble-dot" />
+        <span className="typing-bubble-dot" />
+      </div>
+    </div>
+  );
+}
+
 function ChatSourceChips({ sources }: { sources: ChatSource[] }) {
   // De-duplicate by title so the same work doesn't render twice when the
   // retriever surfaces multiple chunks from one document.
@@ -152,6 +176,7 @@ function ChatInput({
   character,
   draft,
   streaming,
+  awaiting,
   suggestedQuestions,
   onDraftChange,
   onPromptSelect,
@@ -161,6 +186,7 @@ function ChatInput({
   character: Character;
   draft: string;
   streaming: string;
+  awaiting: boolean;
   suggestedQuestions: string[];
   onDraftChange: (draft: string) => void;
   onPromptSelect: (prompt: string) => void;
@@ -210,7 +236,7 @@ function ChatInput({
       <button
         className="btn ghost send-button"
         type="submit"
-        disabled={!!streaming || !draft.trim()}
+        disabled={!!streaming || awaiting || !draft.trim()}
       >
         <Send size={17} strokeWidth={1.8} />
         Gửi
@@ -311,6 +337,7 @@ export default function Chat() {
   const chats = useAppStore((s) => s.chats);
   const appendChat = useAppStore((s) => s.appendChat);
   const setChat = useAppStore((s) => s.setChat);
+  const removeMatch = useAppStore((s) => s.removeMatch);
   const { data: character, isLoading } = useCharacter(id);
 
   // Rehydrate chat history from the backend on mount. Mock returns [] so
@@ -331,17 +358,26 @@ export default function Chat() {
         if (localCount > 0) return;
         setChat(id, history);
       },
-      () => {
-        // Backend down or chat flag off — fall back to whatever Zustand has.
+      (err) => {
+        if (cancelled) return;
+        if (err instanceof ApiError && err.status === 403) {
+          // Stale local match — heal immediately so LockedView renders
+          // instead of letting the user type a question that's about to
+          // 403 the stream call.
+          removeMatch(id);
+          return;
+        }
+        // Other errors (backend down, chat flag off): fall back to local.
       },
     );
     return () => {
       cancelled = true;
     };
-  }, [id, setChat]);
+  }, [id, setChat, removeMatch]);
 
   const [draft, setDraft] = useState("");
   const [streaming, setStreaming] = useState("");
+  const [awaiting, setAwaiting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const threadRef = useRef<HTMLDivElement | null>(null);
 
@@ -370,7 +406,7 @@ export default function Chat() {
       top: threadRef.current.scrollHeight,
       behavior: "smooth",
     });
-  }, [messages.length, streaming]);
+  }, [messages.length, streaming, awaiting]);
 
   if (!id) return <Navigate to="/discover" replace />;
   if (isLoading) return null;
@@ -394,7 +430,7 @@ export default function Chat() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const text = draft.trim();
-    if (!text || streaming) return;
+    if (!text || streaming || awaiting) return;
     setDraft("");
     setError(null);
     appendChat(id, { from: "user", text });
@@ -402,6 +438,7 @@ export default function Chat() {
     let buffer = "";
     const sources: ChatSource[] = [];
     setStreaming("");
+    setAwaiting(true);
     try {
       for await (const event of api.streamChat({
         characterId: id,
@@ -421,6 +458,13 @@ export default function Chat() {
       });
     } catch (err) {
       console.error("chat stream failed", err);
+      if (err instanceof ApiError && err.status === 403) {
+        // Backend says the user hasn't actually matched this character.
+        // Local matches are stale — drop the entry and let the route's
+        // match guard render the LockedView on the next render.
+        removeMatch(id);
+        return;
+      }
       if (buffer) {
         appendChat(id, {
           from: "bot",
@@ -433,6 +477,7 @@ export default function Chat() {
       );
     } finally {
       setStreaming("");
+      setAwaiting(false);
     }
   };
 
@@ -457,13 +502,16 @@ export default function Chat() {
               character={character}
             />
           )}
-          {streaming && (
+          {awaiting && !streaming && (
+            <ThinkingBubble character={character} />
+          )}
+          {(streaming || awaiting) && (
             <div className="typing-line">
               <Pencil size={14} />
               {character.name} đang suy ngẫm...
             </div>
           )}
-          {error && !streaming && (
+          {error && !streaming && !awaiting && (
             <div className="chat-error" role="alert">
               <AlertCircle size={16} />
               <span>{error}</span>
@@ -475,6 +523,7 @@ export default function Chat() {
           character={character}
           draft={draft}
           streaming={streaming}
+          awaiting={awaiting}
           suggestedQuestions={suggestedQuestions}
           onDraftChange={setDraft}
           onPromptSelect={setDraft}
