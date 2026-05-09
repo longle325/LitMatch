@@ -63,7 +63,7 @@ jobs:
             --cpu 1 \
             --min-instances 0 \
             --max-instances 5 \
-            --set-env-vars "^||^DATABASE_URL=${{ secrets.DATABASE_URL }}||OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}||CHAT_MODEL=gpt-5-mini||EMBEDDING_MODEL=text-embedding-3-small||EMBEDDING_DIMENSIONS=1536" \
+            --set-env-vars "^||^DATABASE_URL=${{ secrets.DATABASE_URL }}||OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}||CHAT_MODEL=gpt-5-mini||EMBEDDING_MODEL=text-embedding-3-large||EMBEDDING_DIMENSIONS=3072" \
             --quiet
 
       - name: Get backend URL
