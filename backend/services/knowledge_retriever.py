@@ -182,7 +182,10 @@ class KnowledgeRetriever:
             FROM knowledge_chunks
             WHERE character_slug = :character_slug
               AND embedding_model = :embedding_model
-              AND 1 - (embedding <=> CAST(:query_embedding AS vector)) >= :min_similarity
+              AND (
+                  :min_similarity <= 0
+                  OR 1 - (embedding <=> CAST(:query_embedding AS vector)) >= :min_similarity
+              )
             ORDER BY embedding <=> CAST(:query_embedding AS vector)
             LIMIT :limit
             """
