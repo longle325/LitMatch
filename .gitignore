@@ -1,9 +1,12 @@
 node_modules/
 dist/
 .DS_Store
+.venv/
+.venv-*/
+__pycache__/
+*.py[cod]
 *.tsbuildinfo
 .env
 .env.local
 .env.*.local
-__pycache__/
 .ruff_cache/

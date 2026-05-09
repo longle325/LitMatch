@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/stores/useAppStore";
+import MusicSettingsCard from "@/components/MusicSettingsCard";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -44,6 +45,7 @@ export default function Profile() {
           </button>
         </div>
       </div>
+      <MusicSettingsCard />
     </section>
   );
 }

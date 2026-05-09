@@ -10,6 +10,13 @@ import type {
 import {
   POINTS_PER_MATCH,
 } from "@/lib/scoring";
+import { DEFAULT_TRACK_ID, type MusicTrack } from "@/data/music";
+
+export interface MusicSettings {
+  enabled: boolean;
+  trackId: MusicTrack["id"];
+  volume: number;
+}
 
 interface AppState {
   profile: UserProfile | null;
@@ -19,6 +26,7 @@ interface AppState {
   skipped: string[];
   completed: Record<string, ChallengeResult>;
   chats: Record<string, ChatMessage[]>;
+  music: MusicSettings;
 
   setProfile: (username: string, grade: Grade) => void;
   matchCharacter: (id: string) => void;
@@ -27,6 +35,9 @@ interface AppState {
   appendChat: (id: string, message: ChatMessage) => void;
   saveChallenge: (id: string, result: ChallengeResult) => void;
   retryChallenge: (id: string) => void;
+  setMusicEnabled: (enabled: boolean) => void;
+  setMusicTrack: (trackId: MusicTrack["id"]) => void;
+  setMusicVolume: (volume: number) => void;
   resetAll: () => void;
 }
 
@@ -38,6 +49,11 @@ const initial = {
   skipped: [] as string[],
   completed: {} as Record<string, ChallengeResult>,
   chats: {} as Record<string, ChatMessage[]>,
+  music: {
+    enabled: false,
+    trackId: DEFAULT_TRACK_ID,
+    volume: 0.2,
+  } as MusicSettings,
 };
 
 export const useAppStore = create<AppState>()(
@@ -92,6 +108,20 @@ export const useAppStore = create<AppState>()(
             points: Math.max(0, state.points - previous.awarded),
           };
         }),
+
+      setMusicEnabled: (enabled) =>
+        set((state) => ({ music: { ...state.music, enabled } })),
+
+      setMusicTrack: (trackId) =>
+        set((state) => ({ music: { ...state.music, trackId } })),
+
+      setMusicVolume: (volume) =>
+        set((state) => ({
+          music: {
+            ...state.music,
+            volume: Math.max(0, Math.min(1, volume)),
+          },
+        })),
 
       resetAll: () => set({ ...initial }),
     }),

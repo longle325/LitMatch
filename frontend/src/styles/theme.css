@@ -1795,3 +1795,857 @@ small,
     width: 100%;
   }
 }
+
+/* ============================================================
+ * Music settings card — scholar's wooden music box
+ *
+ * Aesthetic: a lacquered folk-print panel with three carved
+ * sections — a brass-pull lamp switch, sealed scroll panels for
+ * each track, and a carved bamboo groove for the volume.
+ * ============================================================ */
+.music-settings {
+  margin-top: 22px;
+  padding: 18px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: padding 220ms ease;
+}
+
+.music-settings.is-expanded {
+  padding: 26px 32px 30px;
+}
+
+.music-settings::before,
+.music-settings::after {
+  border-color: var(--cinnabar-bright);
+}
+
+.music-settings-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 28px;
+  align-items: center;
+}
+
+/* Summary button — clickable header strip that expands the panel */
+.music-settings-summary {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  background: none;
+  border: 0;
+  padding: 6px 16px 6px 4px;
+  margin: 0;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  border-radius: 4px;
+  transition: background 180ms ease;
+  min-width: 0;
+}
+
+.music-settings-summary:hover {
+  background: rgba(166, 41, 41, 0.05);
+}
+
+.music-settings-summary:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+}
+
+.music-settings-intro {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.music-settings-intro .kicker {
+  margin: 0;
+  display: block;
+}
+
+.music-settings-title {
+  font-family: "Noto Serif", serif;
+  color: var(--cinnabar-deep);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin: 0;
+  position: relative;
+  display: inline-block;
+  padding-right: 18px;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.music-settings.is-expanded .music-settings-title {
+  font-size: 26px;
+}
+
+.music-settings-title::after {
+  /* small gilded serif flourish */
+  content: "♪";
+  position: absolute;
+  right: -2px;
+  top: -4px;
+  font-size: 13px;
+  color: var(--gold);
+  letter-spacing: 0;
+  transform: rotate(8deg);
+}
+
+.music-settings-status {
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+
+.music-settings.is-expanded .music-settings-status {
+  display: none;
+}
+
+.music-settings-chevron {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-lowest);
+  border: 1px solid var(--wood-light);
+  box-shadow: inset 0 0 0 1px var(--gold-soft);
+  color: var(--cinnabar);
+  transition: transform 220ms cubic-bezier(0.4, 0.2, 0.2, 1.2),
+              background 180ms ease;
+}
+
+.music-settings-summary:hover .music-settings-chevron {
+  background: var(--surface);
+}
+
+.music-settings.is-expanded .music-settings-chevron {
+  transform: rotate(180deg);
+}
+
+.music-settings-lead {
+  margin: 0 0 4px;
+  font-size: 14px;
+  max-width: 56ch;
+}
+
+/* Body — only rendered when expanded; reveal animation */
+.music-settings-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  animation: music-body-reveal 280ms cubic-bezier(0.32, 0.04, 0.32, 1.02);
+}
+
+@keyframes music-body-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+ * Lamp-pull switch — a brass knob in a parchment groove
+ * ============================================================ */
+.music-lamp-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: 0;
+  padding: 0;
+  font-family: "Noto Serif", serif;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.music-lamp-switch:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 6px;
+  border-radius: 6px;
+}
+
+.music-lamp-track {
+  position: relative;
+  width: 78px;
+  height: 34px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, var(--surface-mid), var(--surface-low) 60%, var(--surface-lowest));
+  border: 1px solid var(--wood);
+  box-shadow:
+    inset 0 1px 2px rgba(58, 36, 18, 0.42),
+    inset 0 0 0 1px rgba(231, 211, 164, 0.55),
+    0 1px 0 rgba(255, 248, 220, 0.7);
+  transition: background 220ms ease, box-shadow 220ms ease;
+  flex-shrink: 0;
+}
+
+.music-lamp-glyph {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: opacity 220ms ease, color 220ms ease;
+}
+
+.music-lamp-glyph--off {
+  left: 11px;
+  color: var(--wood-light);
+  opacity: 0.85;
+}
+
+.music-lamp-glyph--on {
+  right: 11px;
+  color: var(--cinnabar-bright);
+  opacity: 0.45;
+}
+
+.music-lamp-knob {
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  transform: translateY(-50%);
+  background:
+    radial-gradient(circle at 32% 30%, var(--gold-bright), var(--gold) 55%, var(--wood-light) 102%);
+  border: 1px solid var(--wood);
+  box-shadow:
+    0 2px 4px rgba(58, 36, 18, 0.42),
+    inset 0 1px 0 rgba(255, 244, 214, 0.78),
+    inset 0 -2px 2px rgba(58, 36, 18, 0.32);
+  transition: left 240ms cubic-bezier(0.55, 0.04, 0.32, 1.16),
+              box-shadow 220ms ease, transform 220ms ease, background 220ms ease;
+}
+
+.music-lamp-knob-inset {
+  position: absolute;
+  inset: 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(58, 36, 18, 0.32);
+  background:
+    radial-gradient(circle at 50% 38%, rgba(255, 244, 214, 0.5), transparent 70%);
+}
+
+.music-lamp-switch.is-on .music-lamp-track {
+  background:
+    linear-gradient(180deg, #f4d6a6, #ecc683 55%, #d8a55b);
+  border-color: var(--cinnabar-deep);
+  box-shadow:
+    inset 0 1px 2px rgba(91, 0, 5, 0.32),
+    inset 0 0 0 1px rgba(255, 244, 214, 0.78),
+    0 0 0 3px rgba(198, 154, 62, 0.15);
+}
+
+.music-lamp-switch.is-on .music-lamp-knob {
+  left: calc(100% - 31px);
+  background:
+    radial-gradient(circle at 30% 32%, #ffeac6, #e6c87c 55%, var(--cinnabar-bright) 102%);
+  box-shadow:
+    0 2px 6px rgba(91, 0, 5, 0.5),
+    inset 0 1px 0 rgba(255, 244, 214, 0.85),
+    inset 0 -2px 2px rgba(91, 0, 5, 0.32),
+    0 0 0 3px rgba(166, 41, 41, 0.18);
+}
+
+.music-lamp-switch.is-on .music-lamp-glyph--off {
+  opacity: 0.25;
+}
+
+.music-lamp-switch.is-on .music-lamp-glyph--on {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px rgba(166, 41, 41, 0.55));
+  animation: lamp-flicker 2.4s ease-in-out infinite;
+}
+
+@keyframes lamp-flicker {
+  0%, 100% { transform: translateY(-50%) scale(1); opacity: 1; }
+  44% { transform: translateY(-52%) scale(1.05); opacity: 0.92; }
+  64% { transform: translateY(-48%) scale(0.97); opacity: 0.86; }
+}
+
+.music-lamp-switch:hover .music-lamp-knob {
+  transform: translateY(-50%) scale(1.04);
+}
+
+.music-lamp-switch:active .music-lamp-knob {
+  transform: translateY(-50%) scale(0.96);
+}
+
+.music-lamp-label {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  line-height: 1.15;
+  min-width: 92px;
+}
+
+.music-lamp-label strong {
+  font-family: "Noto Serif", serif;
+  color: var(--cinnabar-deep);
+  font-size: 15px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.music-lamp-label small {
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  margin-top: 3px;
+}
+
+.music-lamp-switch.is-off .music-lamp-label strong {
+  color: var(--muted);
+}
+
+/* ============================================================
+ * Section divider — gold filaments framing a serif label
+ * ============================================================ */
+.music-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 22px 0 14px;
+}
+
+.music-divider::before,
+.music-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background:
+    linear-gradient(to right, transparent, var(--gold-soft), transparent);
+}
+
+.music-divider-mark {
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  color: var(--cinnabar);
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border: 1px solid var(--gold-soft);
+  border-radius: 2px;
+  background: var(--surface-lowest);
+  box-shadow: inset 0 0 0 2px var(--surface-lowest), 0 1px 0 rgba(255, 244, 214, 0.6);
+  position: relative;
+}
+
+.music-divider-mark::before,
+.music-divider-mark::after {
+  content: "❖";
+  color: var(--gold);
+  font-size: 9px;
+  margin: 0 6px;
+  vertical-align: 2px;
+}
+
+/* ============================================================
+ * Track cards — sealed scroll panels with chosen "印" stamp
+ * ============================================================ */
+.music-track-group {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.music-track-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 22px 16px 18px;
+  background:
+    linear-gradient(180deg, var(--surface-lowest), var(--paper));
+  border: 1px solid var(--wood-light);
+  border-radius: 6px;
+  box-shadow:
+    inset 0 0 0 1px var(--surface-lowest),
+    inset 0 0 0 2px var(--gold-soft),
+    0 2px 6px rgba(74, 51, 28, 0.12);
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 220ms ease,
+              border-color 220ms ease, background 220ms ease;
+  overflow: hidden;
+}
+
+.music-track-card input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.music-track-card::before {
+  /* faint diagonal scroll-paper streaks */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      18deg,
+      rgba(122, 79, 44, 0.04) 0 1px,
+      transparent 1px 14px
+    );
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.music-track-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--gold);
+  box-shadow:
+    inset 0 0 0 1px var(--surface-lowest),
+    inset 0 0 0 2px var(--gold),
+    0 4px 10px rgba(74, 51, 28, 0.18);
+}
+
+.music-track-card.selected {
+  border-color: var(--cinnabar);
+  background:
+    linear-gradient(180deg, #faecc8, #efd8a8);
+  box-shadow:
+    inset 0 0 0 1px var(--surface-lowest),
+    inset 0 0 0 2px var(--cinnabar-bright),
+    0 6px 14px rgba(91, 0, 5, 0.18);
+}
+
+.music-track-card.selected::after {
+  /* tiny serif corner ornament when selected — top-left */
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 12px;
+  height: 12px;
+  border-top: 2px solid var(--cinnabar);
+  border-left: 2px solid var(--cinnabar);
+  pointer-events: none;
+}
+
+.music-track-card input[type="radio"]:focus-visible ~ .music-track-numeral {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+}
+
+.music-track-numeral {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 30%, var(--surface-lowest), var(--surface-low) 75%);
+  border: 1px solid var(--wood-light);
+  box-shadow:
+    inset 0 0 0 1px var(--gold-soft),
+    inset 0 -2px 0 rgba(58, 36, 18, 0.12);
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  color: var(--cinnabar);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  position: relative;
+  z-index: 1;
+}
+
+.music-track-card.selected .music-track-numeral {
+  background:
+    radial-gradient(circle at 32% 30%, var(--gold-bright), var(--gold) 80%);
+  color: var(--cinnabar-deep);
+  border-color: var(--cinnabar);
+  box-shadow:
+    inset 0 0 0 1px var(--surface-lowest),
+    inset 0 -2px 0 rgba(91, 0, 5, 0.22);
+}
+
+.music-track-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.music-track-title {
+  font-family: "Noto Serif", serif;
+  color: var(--cinnabar-deep);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.music-track-mood {
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+.music-track-card.selected .music-track-mood {
+  color: var(--ink);
+}
+
+.music-track-stamp {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  background: var(--cinnabar-bright);
+  color: var(--surface-lowest);
+  font-family: "Noto Serif", serif;
+  font-weight: 700;
+  font-size: 13px;
+  border: 1px solid var(--surface-lowest);
+  box-shadow:
+    0 0 0 1px var(--cinnabar-deep),
+    0 1px 2px rgba(0, 0, 0, 0.25);
+  border-radius: 3px;
+  transform: rotate(-7deg) scale(0.6);
+  opacity: 0;
+  transition: opacity 220ms ease, transform 240ms cubic-bezier(0.4, 0.2, 0.2, 1.4);
+  pointer-events: none;
+}
+
+.music-track-card.selected .music-track-stamp {
+  opacity: 1;
+  transform: rotate(-7deg) scale(1);
+}
+
+.music-track-preview {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--surface-lowest);
+  border: 1.5px solid var(--cinnabar);
+  color: var(--cinnabar);
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  z-index: 2;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease,
+              box-shadow 0.18s ease;
+  box-shadow: 0 2px 6px rgba(74, 51, 28, 0.18);
+}
+
+.music-track-preview .material-symbols-outlined {
+  font-size: 26px;
+  font-variation-settings: "FILL" 0, "wght" 400;
+}
+
+.music-track-preview:hover {
+  background: var(--cinnabar);
+  color: var(--surface-lowest);
+  transform: scale(1.05);
+}
+
+.music-track-preview.playing {
+  background: var(--cinnabar);
+  color: var(--surface-lowest);
+  animation: voice-pulse 1.6s ease-in-out infinite;
+}
+
+.music-track-preview:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Disabled track group — keep selection visible but mute everything */
+.music-track-group.is-disabled .music-track-card {
+  cursor: not-allowed;
+  filter: saturate(0.55);
+  opacity: 0.6;
+}
+
+.music-track-group.is-disabled .music-track-card:hover {
+  transform: none;
+  border-color: var(--wood-light);
+  box-shadow:
+    inset 0 0 0 1px var(--surface-lowest),
+    inset 0 0 0 2px var(--gold-soft),
+    0 2px 6px rgba(74, 51, 28, 0.12);
+}
+
+.music-track-group.is-disabled .music-track-preview {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.music-track-group.is-disabled .music-track-preview:hover {
+  background: var(--surface-lowest);
+  color: var(--cinnabar);
+  transform: none;
+}
+
+/* ============================================================
+ * Volume row — bamboo groove with gold-fill and brass thumb
+ * ============================================================ */
+.music-volume {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 4px 4px;
+}
+
+.music-volume-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--surface-lowest);
+  border: 1px solid var(--wood-light);
+  box-shadow: inset 0 0 0 1px var(--gold-soft);
+  color: var(--cinnabar);
+}
+
+.music-volume-icon .material-symbols-outlined {
+  font-size: 22px;
+}
+
+.music-volume-track {
+  position: relative;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  --music-volume-fill: 20%;
+}
+
+.music-volume-track::before {
+  content: "";
+  position: absolute;
+  inset: 8px 0;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(58, 36, 18, 0.18), rgba(122, 79, 44, 0.06));
+  border: 1px solid var(--wood-light);
+  box-shadow: inset 0 1px 2px rgba(58, 36, 18, 0.32);
+  pointer-events: none;
+}
+
+.music-volume-track::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: var(--music-volume-fill);
+  background:
+    linear-gradient(180deg, var(--gold-bright), var(--gold));
+  border-radius: 999px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 244, 214, 0.85),
+    inset 0 -1px 0 rgba(91, 0, 5, 0.16);
+  pointer-events: none;
+  transition: width 80ms ease-out;
+}
+
+.music-volume-ticks {
+  position: absolute;
+  inset: 8px 14px;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.music-volume-ticks span {
+  width: 1px;
+  height: 8px;
+  background: rgba(58, 36, 18, 0.32);
+}
+
+.music-volume-slider {
+  position: relative;
+  width: 100%;
+  height: 22px;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.music-volume-slider:focus {
+  outline: none;
+}
+
+/* WebKit thumb — brass coin with cinnabar core */
+.music-volume-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 30%, #ffeac6, var(--gold) 50%, var(--cinnabar-bright) 95%);
+  border: 1.5px solid var(--cinnabar-deep);
+  box-shadow:
+    0 2px 5px rgba(91, 0, 5, 0.45),
+    inset 0 1px 0 rgba(255, 244, 214, 0.78),
+    inset 0 -1px 1px rgba(91, 0, 5, 0.32);
+  cursor: grab;
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.music-volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+.music-volume-slider:active::-webkit-slider-thumb {
+  cursor: grabbing;
+  transform: scale(1.06);
+  box-shadow:
+    0 2px 8px rgba(91, 0, 5, 0.55),
+    inset 0 1px 0 rgba(255, 244, 214, 0.78);
+}
+
+.music-volume-slider:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* WebKit track — invisible, the visual track is on the wrapper */
+.music-volume-slider::-webkit-slider-runnable-track {
+  height: 22px;
+  background: transparent;
+}
+
+/* Firefox */
+.music-volume-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 30%, #ffeac6, var(--gold) 50%, var(--cinnabar-bright) 95%);
+  border: 1.5px solid var(--cinnabar-deep);
+  box-shadow:
+    0 2px 5px rgba(91, 0, 5, 0.45),
+    inset 0 1px 0 rgba(255, 244, 214, 0.78);
+  cursor: grab;
+}
+
+.music-volume-slider::-moz-range-track {
+  height: 22px;
+  background: transparent;
+  border: 0;
+}
+
+.music-volume-cartouche {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  background:
+    linear-gradient(180deg, var(--surface-lowest), var(--paper));
+  border: 1px solid var(--wood-light);
+  box-shadow:
+    inset 0 0 0 1px var(--gold-soft),
+    0 1px 2px rgba(74, 51, 28, 0.18);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-family: "Noto Serif", serif;
+  color: var(--cinnabar);
+  min-width: 64px;
+  justify-content: center;
+}
+
+.music-volume-cartouche strong {
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+}
+
+.music-volume-cartouche small {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: italic;
+}
+
+.music-volume.is-disabled {
+  opacity: 0.5;
+  filter: saturate(0.55);
+  pointer-events: none;
+}
+
+/* ============================================================
+ * Music card — responsive collapse
+ * ============================================================ */
+@media (max-width: 720px) {
+  .music-settings {
+    padding: 22px 18px 20px;
+  }
+
+  .music-settings-head {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .music-lamp-switch {
+    align-self: flex-start;
+  }
+
+  .music-track-card {
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .music-track-numeral {
+    width: 44px;
+    height: 44px;
+    font-size: 15px;
+  }
+
+  .music-track-title {
+    font-size: 15px;
+  }
+
+  .music-track-mood {
+    font-size: 12px;
+  }
+
+  .music-volume {
+    gap: 12px;
+  }
+}

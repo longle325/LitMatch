@@ -2,6 +2,7 @@ import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAppStore } from "@/stores/useAppStore";
 import { Compass, BookOpen, Trophy, User, Flame, Medal } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import BackgroundMusic from "@/components/BackgroundMusic";
 
 interface NavItem {
   key: string;
@@ -26,6 +27,7 @@ export default function AppShell() {
 
   return (
     <div className="app-shell">
+      <BackgroundMusic />
       <aside className="side-nav">
         <div className="brand">
           <h1 className="brand-title">LitMatch</h1>

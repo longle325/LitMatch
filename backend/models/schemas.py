@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 
 
 class MatchStatus(str, Enum):
+    SWIPED_LEFT = "SWIPED_LEFT"
     SWIPED_RIGHT = "SWIPED_RIGHT"
     CHAT_UNLOCKED = "CHAT_UNLOCKED"
     CHALLENGE_PASSED = "CHALLENGE_PASSED"
@@ -24,6 +25,11 @@ class MatchStatus(str, Enum):
 class SwipeDirection(str, Enum):
     LEFT = "left"
     RIGHT = "right"
+
+
+class ChatRole(str, Enum):
+    USER = "user"
+    ASSISTANT = "assistant"
 
 
 # ── User ──────────────────────────────────────────────────────────────────
@@ -72,11 +78,68 @@ class CharacterDetail(CharacterCard):
     voice_instructions: Optional[str] = None
 
 
+class MatchedCharacter(CharacterCard):
+    """Character card with the current user's match state."""
+
+    match_status: MatchStatus
+    matched_at: datetime
+
+
+class CharacterRelationshipResponse(BaseModel):
+    id: UUID
+    character_id: UUID
+    related_character_id: Optional[UUID] = None
+    related_name: str
+    relationship_type: str
+    description: str
+    evidence: Optional[str] = None
+    source_path: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+class CharacterRelationshipsResponse(BaseModel):
+    relationships: List[CharacterRelationshipResponse]
+
+
+class CharacterEventResponse(BaseModel):
+    id: UUID
+    character_id: UUID
+    sequence_number: int
+    title: str
+    description: str
+    source_path: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+class CharacterEventsResponse(BaseModel):
+    events: List[CharacterEventResponse]
+
+
+class RagDiagnosticsResponse(BaseModel):
+    vector_extension_enabled: bool
+    embedding_model: str
+    embedding_dimensions: int
+    rag_top_k: int
+    rag_min_similarity: float
+    vector_chunk_count: int
+    vector_chunks_by_character: dict[str, int]
+    lexical_index_path: str
+    lexical_chunk_count: int
+    fallback_available: bool
+    last_error: Optional[str] = None
+
+
 # ── Deck ──────────────────────────────────────────────────────────────────
 
 
 class DeckResponse(BaseModel):
     characters: List[CharacterCard]
+
+
+class MatchedCharactersResponse(BaseModel):
+    characters: List[MatchedCharacter]
 
 
 # ── Swipe / Match ─────────────────────────────────────────────────────────
@@ -101,6 +164,21 @@ class ChatRequest(BaseModel):
     user_id: UUID
     character_id: UUID
     message: str = Field(..., min_length=1, max_length=2000)
+
+
+class ChatMessageResponse(BaseModel):
+    id: UUID
+    user_id: UUID
+    character_id: UUID
+    role: ChatRole
+    content: str
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class ChatHistoryResponse(BaseModel):
+    messages: List[ChatMessageResponse]
 
 
 # ── Challenge ─────────────────────────────────────────────────────────────
@@ -135,6 +213,16 @@ class ChallengeResult(BaseModel):
     passed: bool
     points_earned: int
     explanations: List[str]
+
+
+class ChallengeAttemptResponse(ChallengeResult):
+    id: UUID
+    user_id: UUID
+    character_id: UUID
+    answers: List[int]
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
 
 
 # ── Leaderboard ───────────────────────────────────────────────────────────
