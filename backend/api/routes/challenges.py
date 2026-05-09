@@ -81,11 +81,16 @@ async def submit_challenge(
             detail="You must match with this character first.",
         )
 
-    # Prevent re-submission after passing
-    if match.status == MatchStatus.CHALLENGE_PASSED:
+    # Prevent duplicate point awards. Retry rules are not defined for MVP.
+    existing_attempt = await db.get_challenge_attempt(
+        session,
+        body.user_id,
+        body.character_id,
+    )
+    if existing_attempt:
         raise HTTPException(
             status_code=409,
-            detail="Challenge already passed for this character.",
+            detail="Challenge already submitted for this character.",
         )
 
     # Load challenge
@@ -128,6 +133,17 @@ async def submit_challenge(
         points += settings.POINTS_PERFECT_SCORE_BONUS
 
     await db.add_points(session, body.user_id, points)
+    await db.create_challenge_attempt(
+        session,
+        user_id=body.user_id,
+        character_id=body.character_id,
+        answers=body.answers,
+        score=score,
+        total=total,
+        passed=passed,
+        points_earned=points,
+        explanations=explanations,
+    )
 
     return ChallengeResult(
         score=score,

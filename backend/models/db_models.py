@@ -6,6 +6,7 @@ Tables:
   characters  - literary character profiles
   matches     - user <-> character swipe state
   challenges  - per-character quiz questions (JSONB)
+  challenge_attempts - one graded submission per user/character
 """
 
 from __future__ import annotations
@@ -15,6 +16,7 @@ import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy import (
+    Boolean,
     Column,
     DateTime,
     Enum,
@@ -64,6 +66,11 @@ class User(Base):
     # relationships
     matches = relationship("Match", back_populates="user", lazy="selectin")
     chat_messages = relationship("ChatMessage", back_populates="user", lazy="selectin")
+    challenge_attempts = relationship(
+        "ChallengeAttempt",
+        back_populates="user",
+        lazy="selectin",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -91,6 +98,11 @@ class Character(Base):
     matches = relationship("Match", back_populates="character", lazy="selectin")
     chat_messages = relationship(
         "ChatMessage",
+        back_populates="character",
+        lazy="selectin",
+    )
+    challenge_attempts = relationship(
+        "ChallengeAttempt",
         back_populates="character",
         lazy="selectin",
     )
@@ -159,6 +171,46 @@ class Challenge(Base):
 
     # relationships
     character = relationship("Character", back_populates="challenges")
+
+
+# ---------------------------------------------------------------------------
+# Challenge attempts
+# ---------------------------------------------------------------------------
+class ChallengeAttempt(Base):
+    __tablename__ = "challenge_attempts"
+    __table_args__ = (
+        UniqueConstraint("user_id", "character_id", name="uq_user_character_attempt"),
+    )
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    character_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("characters.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    answers = Column(JSON, nullable=False)
+    score = Column(Integer, nullable=False)
+    total = Column(Integer, nullable=False)
+    passed = Column(Boolean, nullable=False)
+    points_earned = Column(Integer, nullable=False)
+    explanations = Column(JSON, nullable=False)
+    created_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+        index=True,
+    )
+
+    # relationships
+    user = relationship("User", back_populates="challenge_attempts")
+    character = relationship("Character", back_populates="challenge_attempts")
 
 
 # ---------------------------------------------------------------------------
