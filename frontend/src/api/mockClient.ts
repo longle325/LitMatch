@@ -88,6 +88,13 @@ export const mockClient: ApiClient = {
     await delay(0);
     return { ok: true };
   },
+  async getMatchedSlugs(): Promise<string[]> {
+    // Mock has no backend; the local Zustand `matches` array IS the
+    // truth in this mode. Returning [] would falsely wipe it on sync,
+    // so callers that respect the real/mock split must skip the
+    // reconciliation entirely when in mock mode.
+    return [];
+  },
   async getChallenge(id: string): Promise<ChallengeQuestion[]> {
     await delay(0);
     const character = getCharacter(id);

@@ -195,6 +195,16 @@ export const realClient: ApiClient = {
     return { ok: true };
   },
 
+  async getMatchedSlugs(): Promise<string[]> {
+    const userId = requireCurrentUserId();
+    const res = await apiFetch<{ characters: BackendCharacterCard[] }>(
+      `/users/${userId}/matches`,
+    );
+    return res.characters
+      .map((card) => mergeBackendCharacter(card)?.id)
+      .filter((s): s is string => typeof s === "string");
+  },
+
   async recordSkip(slug: string): Promise<{ ok: true }> {
     const uuid = await resolveSlugToUuid(slug);
     const userId = requireCurrentUserId();
