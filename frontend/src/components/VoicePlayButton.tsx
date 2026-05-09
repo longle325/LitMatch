@@ -7,6 +7,21 @@ interface Props {
   size?: "sm" | "md";
 }
 
+// New characters share voice files with one of the original five whose
+// timbre and register fits best. Drop the entry once that character
+// gets its own /voices/<slug>.wav recording.
+const VOICE_ALIAS: Record<string, string> = {
+  "lao-hac": "chi-pheo",        // older male peasant, weary
+  "ong-hai": "chi-pheo",        // older male villager
+  "ong-sau": "luc-van-tien",    // older formal southern father
+  "chi-dau": "mi",              // female peasant
+  "vu-nuong": "thuy-kieu",      // refined classical female register
+};
+
+function resolveVoiceId(characterId: string): string {
+  return VOICE_ALIAS[characterId] ?? characterId;
+}
+
 export default function VoicePlayButton({
   characterId,
   label = "Nghe nhân vật",
@@ -67,7 +82,7 @@ export default function VoicePlayButton({
       </button>
       <audio
         ref={audioRef}
-        src={`/voices/${characterId}.wav`}
+        src={`/voices/${resolveVoiceId(characterId)}.wav`}
         preload="none"
       />
     </>
