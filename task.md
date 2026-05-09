@@ -1,6 +1,6 @@
 # LitMatch Task Tracker
 
-Last updated: 2026-05-08 (background music settings)
+Last updated: 2026-05-08 (backend wire-up Phase 1 scaffold)
 
 ## Completed
 
@@ -77,10 +77,36 @@ Last updated: 2026-05-08 (background music settings)
 - [x] Mounted `BackgroundMusic` in `AppShell` so playback survives navigation.
 - [x] Note: out of PRD scope — delight feature, no backend dependency.
 
+## Backend wire-up — Phase 1 scaffold (2026-05-08)
+
+Foundation laid for swapping mock endpoints to the FastAPI backend on `origin/backend-scaffolding`. No endpoints flipped yet — defaults to all-mock, identical behavior.
+
+- [x] `src/api/types.ts` — extracted `ApiClient` interface; added `createUser`, `recordSkip`, `getChatHistory` to the surface (mock + real both implement).
+- [x] `src/api/mockClient.ts` — moved existing in-memory mock here; nothing else changed.
+- [x] `src/api/realClient.ts` — full real-backend implementation for `auth`, `deck`, `characters`, `match`, `challenge`, `leaderboard`. `chat` (SSE) is stubbed, throws on flip until Phase 4.
+- [x] `src/api/adapter.ts` — boundary helpers: `apiFetch`, slug↔UUID map (`resolveSlugToUuid`, `ensureSlugMap`), `getCurrentUserId` / `requireCurrentUserId` (single seam for future session/auth swap), `mergeBackendCharacter` (backend dynamic fields + FE seed lore by slug).
+- [x] `src/api/client.ts` refactored into per-method router that picks mock vs real based on `VITE_REAL_ENDPOINTS`.
+- [x] `UserProfile.userId?: string` added to type + Zustand store; `setProfile(username, grade, userId?)` and `setUserId` setters.
+- [x] `Onboarding.tsx` calls `api.createUser` (real or mock); handles 409 (username taken) with localized error; submit button shows loading state.
+- [x] `.env.example` documents `VITE_API_BASE_URL` (default `http://localhost:8081`) and `VITE_REAL_ENDPOINTS` (comma-separated whitelist).
+- [x] `src/vite-env.d.ts` declares typed `import.meta.env`.
+- [x] `ChatMessage.sources?: ChatSource[]` field reserved for Phase 4 retrieval citations.
+
 ## Next (post-migration polish + backend)
 
+### Backend wire-up — remaining phases
+
+- [ ] **Phase 2A — flip `auth`** — verify onboarding→`POST /users` end-to-end with backend running. Add bootstrap path: if `profile` exists but `userId` is missing on app boot AND `auth` is real, transparently call `createUser` to back-fill (or redirect to `/onboarding` on 409).
+- [ ] **Phase 2B — flip `leaderboard`** — read-only, lowest risk. Verify entries match shape, current-user merge still works.
+- [ ] **Phase 3A — flip `characters` + `deck`** — depends on slug-map cold-load via `GET /characters`. Verify deck filters out already-swiped cards correctly.
+- [ ] **Phase 3B — flip `match`** — `POST /interactions/swipe` for both `right` (match) and `left` (skip) directions. FE currently doesn't call backend on skip; mock parity needs `recordSkip` wiring in `Discover.tsx`.
+- [ ] **Phase 3C — flip `challenge`** — needs backend to echo `correct_answers: int[]` in `ChallengeResult` so the FE result page can keep showing "Đáp án đúng: X". Also remove `POINTS_PERFECT_SCORE_BONUS=25` from `backend/core/config.py` (drift from PRD §6.5).
+- [ ] **Phase 3D — backend tweaks** — allow challenge retake (replace 409 with upsert/append latest attempt). Surface `ChallengeQuestion.id` in JSON.
+- [ ] **Phase 4 — flip `chat`** — implement SSE parser in `realClient.streamChat`, render `source` events as parchment chips below bot bubbles, fetch `GET /chat/history` on Chat mount.
+
+### UI polish + ops
+
 - [ ] Migrate components from legacy CSS to Tailwind utility classes during polish pass.
-- [ ] Replace mock API client with real backend (`/deck`, `/characters/:id`, `/match`, `/chat` SSE, `/challenge/submit`, `/leaderboard`).
 - [ ] Add Framer Motion animations for swipe, chat streaming, score reveal.
 - [ ] Persist in-progress challenge answers across reloads.
 - [ ] Add keyboard controls for discovery cards.
