@@ -52,6 +52,7 @@ jobs:
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy ${{ env.SERVICE }} \
+            --project ${{ env.PROJECT_ID }} \
             --image ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/litmatch/${{ env.SERVICE }}:${{ github.sha }} \
             --region ${{ env.REGION }} \
             --platform managed \
@@ -65,6 +66,6 @@ jobs:
 
       - name: Show deployed URL
         run: |
-          URL=$(gcloud run services describe ${{ env.SERVICE }} --region ${{ env.REGION }} --format 'value(status.url)')
+          URL=$(gcloud run services describe ${{ env.SERVICE }} --project ${{ env.PROJECT_ID }} --region ${{ env.REGION }} --format 'value(status.url)')
           echo "## Deployed to Cloud Run" >> $GITHUB_STEP_SUMMARY
           echo "URL: $URL" >> $GITHUB_STEP_SUMMARY
