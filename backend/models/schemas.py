@@ -1,0 +1,154 @@
+"""
+Pydantic schemas for request / response validation.
+"""
+
+from __future__ import annotations
+
+from datetime import datetime
+from enum import Enum
+from typing import List, Optional
+from uuid import UUID
+
+from pydantic import BaseModel, Field
+
+
+# ── Enums ─────────────────────────────────────────────────────────────────
+
+
+class MatchStatus(str, Enum):
+    SWIPED_RIGHT = "SWIPED_RIGHT"
+    CHAT_UNLOCKED = "CHAT_UNLOCKED"
+    CHALLENGE_PASSED = "CHALLENGE_PASSED"
+
+
+class SwipeDirection(str, Enum):
+    LEFT = "left"
+    RIGHT = "right"
+
+
+# ── User ──────────────────────────────────────────────────────────────────
+
+
+class UserCreate(BaseModel):
+    username: str = Field(..., min_length=1, max_length=50)
+    grade_level: int = Field(..., ge=10, le=12)
+
+
+class UserResponse(BaseModel):
+    id: UUID
+    username: str
+    grade_level: int
+    total_score: int
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# ── Character ─────────────────────────────────────────────────────────────
+
+
+class CharacterCard(BaseModel):
+    """Lightweight card returned for the swipe deck."""
+
+    id: UUID
+    slug: str
+    name: str
+    author: str
+    work_title: str
+    short_bio: Optional[str] = None
+    avatar_url: Optional[str] = None
+    difficulty_level: int
+    personality_traits: Optional[List[str]] = None
+    emotional_conflicts: Optional[str] = None
+    social_context: Optional[str] = None
+    famous_quote: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+class CharacterDetail(CharacterCard):
+    """Full detail including voice instructions."""
+
+    voice_instructions: Optional[str] = None
+
+
+# ── Deck ──────────────────────────────────────────────────────────────────
+
+
+class DeckResponse(BaseModel):
+    characters: List[CharacterCard]
+
+
+# ── Swipe / Match ─────────────────────────────────────────────────────────
+
+
+class SwipeRequest(BaseModel):
+    user_id: UUID
+    character_id: UUID
+    direction: SwipeDirection
+
+
+class SwipeResponse(BaseModel):
+    matched: bool
+    points_earned: int
+    match_status: Optional[MatchStatus] = None
+
+
+# ── Chat ──────────────────────────────────────────────────────────────────
+
+
+class ChatRequest(BaseModel):
+    user_id: UUID
+    character_id: UUID
+    message: str = Field(..., min_length=1, max_length=2000)
+
+
+# ── Challenge ─────────────────────────────────────────────────────────────
+
+
+class ChallengeQuestion(BaseModel):
+    id: int
+    question: str
+    options: List[str]
+    # NOTE: correct_answer_index is intentionally omitted from response
+    # to prevent cheating.  It is only used server-side for grading.
+    explanation: Optional[str] = None
+
+
+class ChallengeQuestionsResponse(BaseModel):
+    character_id: UUID
+    questions: List[ChallengeQuestion]
+
+
+class ChallengeSubmission(BaseModel):
+    user_id: UUID
+    character_id: UUID
+    answers: List[int] = Field(
+        ...,
+        description="List of selected option indices, one per question.",
+    )
+
+
+class ChallengeResult(BaseModel):
+    score: int
+    total: int
+    passed: bool
+    points_earned: int
+    explanations: List[str]
+
+
+# ── Leaderboard ───────────────────────────────────────────────────────────
+
+
+class LeaderboardEntry(BaseModel):
+    rank: int
+    user_id: UUID
+    username: str
+    total_score: int
+    characters_unlocked: int
+
+    model_config = {"from_attributes": True}
+
+
+class LeaderboardResponse(BaseModel):
+    entries: List[LeaderboardEntry]
