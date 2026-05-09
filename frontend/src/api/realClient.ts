@@ -331,6 +331,15 @@ async function* streamChatReal(
       }
       continue;
     }
+    if (event.event === "error") {
+      let detail = event.data;
+      try {
+        const parsed = JSON.parse(event.data);
+        detail = parsed.error ?? event.data;
+      } catch { /* use raw */ }
+      console.error("SSE error event from backend:", detail);
+      throw new ApiError(detail, 500);
+    }
     if (event.event === "message" && event.data) {
       yield { kind: "token", text: event.data };
     }
