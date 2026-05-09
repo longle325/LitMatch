@@ -14,9 +14,13 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
     CODEX_MODEL: str = "codex-mini"
     CHAT_MODEL: str = "gpt-4o"
+    EMBEDDING_MODEL: str = "text-embedding-3-large"
+    EMBEDDING_DIMENSIONS: int = 3072
 
     # --- Codex Knowledge Base ---
     KNOWLEDGE_BASE_DIR: str = "./knowledge_base"
+    RAG_TOP_K: int = 5
+    RAG_MIN_SIMILARITY: float = 0.0
 
     # --- CORS ---
     CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:3000"]
