@@ -96,6 +96,38 @@ class KnowledgeRetrieverTests(unittest.TestCase):
 
         self.assertIn("Bát cháo hành", context)
 
+    def test_search_with_sources_returns_structured_lexical_citations(self):
+        class FailingVectorRetriever(KnowledgeRetriever):
+            async def _search_vector_chunks(self, character_slug, user_query):
+                raise RuntimeError("vector unavailable")
+
+        async def run_search():
+            with tempfile.TemporaryDirectory() as temp_dir:
+                index_path = Path(temp_dir) / "chunks.jsonl"
+                write_jsonl(
+                    index_path,
+                    [
+                        {
+                            "chunk_id": "chi.chunk_1",
+                            "document_id": "chi.doc",
+                            "character_slug": "chi_pheo",
+                            "character_name": "Chí Phèo",
+                            "doc_type": "analysis",
+                            "source_path": "Chi_Pheo/analysis.txt",
+                            "text": "Bát cháo hành đánh thức phần người.",
+                        }
+                    ],
+                )
+                retriever = FailingVectorRetriever(index_path=index_path)
+                return await retriever.search_with_sources_async("chi_pheo", "bát cháo")
+
+        result = __import__("asyncio").run(run_search())
+
+        self.assertEqual(result["retrieval_mode"], "lexical")
+        self.assertIn("Bát cháo hành", result["context"])
+        self.assertEqual(result["sources"][0]["chunk_id"], "chi.chunk_1")
+        self.assertEqual(result["sources"][0]["source_path"], "Chi_Pheo/analysis.txt")
+
 
 if __name__ == "__main__":
     unittest.main()
