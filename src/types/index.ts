@@ -6,6 +6,12 @@ export interface UserProfile {
 }
 
 export interface ChallengeQuestion {
+  /**
+   * Stable identifier of the form `${characterId}-q${1-based index}`.
+   * Auto-generated in `src/data/characters.ts` for the mock layer; the
+   * backend is expected to assign and persist these per docs/API.md §5.2.
+   */
+  id: string;
   text: string;
   options: string[];
   answer: number;
