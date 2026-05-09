@@ -41,9 +41,12 @@ class Settings(BaseSettings):
     RAG_MIN_SIMILARITY: float = 0.0
 
     # --- CORS ---
+    # Vite may pick any free port (5173, 5169, etc.) so allow a range.
     CORS_ORIGINS: List[str] = [
         "http://localhost:5173",
+        "http://localhost:5169",
         "http://127.0.0.1:5173",
+        "http://127.0.0.1:5169",
         "http://localhost:3000",
         "capacitor://localhost",  # iOS Capacitor
         "https://localhost",  # Android Capacitor
