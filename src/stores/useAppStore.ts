@@ -27,11 +27,13 @@ interface AppState {
   chats: Record<string, ChatMessage[]>;
   music: MusicSettings;
 
-  setProfile: (username: string, grade: Grade) => void;
+  setProfile: (username: string, grade: Grade, userId?: string) => void;
+  setUserId: (userId: string) => void;
   matchCharacter: (id: string) => void;
   skipCharacter: (id: string) => void;
   resetSkipped: () => void;
   appendChat: (id: string, message: ChatMessage) => void;
+  setChat: (id: string, messages: ChatMessage[]) => void;
   saveChallenge: (id: string, result: ChallengeResult) => void;
   retryChallenge: (id: string) => void;
   setMusicEnabled: (enabled: boolean) => void;
@@ -60,8 +62,21 @@ export const useAppStore = create<AppState>()(
     (set) => ({
       ...initial,
 
-      setProfile: (username, grade) =>
-        set({ profile: { username, grade } }),
+      setProfile: (username, grade, userId) =>
+        set((state) => ({
+          profile: {
+            username,
+            grade,
+            userId: userId ?? state.profile?.userId,
+          },
+        })),
+
+      setUserId: (userId) =>
+        set((state) =>
+          state.profile
+            ? { profile: { ...state.profile, userId } }
+            : state,
+        ),
 
       matchCharacter: (id) =>
         set((state) =>
@@ -88,6 +103,11 @@ export const useAppStore = create<AppState>()(
             ...state.chats,
             [id]: [...(state.chats[id] || []), message],
           },
+        })),
+
+      setChat: (id, messages) =>
+        set((state) => ({
+          chats: { ...state.chats, [id]: messages },
         })),
 
       saveChallenge: (id, result) =>
