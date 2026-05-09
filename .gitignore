@@ -11,3 +11,6 @@ Techstack.md
 .env
 .env.local
 .env.*.local
+
+# Knowledge-base SQL dumps — ship via team Drive (see scripts/restore-knowledge-chunks.sh)
+backend/data/*.sql.gz

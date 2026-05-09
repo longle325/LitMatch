@@ -111,6 +111,7 @@ Foundation laid for swapping mock endpoints to the FastAPI backend on `origin/ba
 - [x] **Source citation chips** — small parchment chips render below bot bubbles (deduped by title); freshly-streamed replies only, since the backend doesn't persist source metadata with messages.
 - [x] **Env consolidation** — single root `.env` is now canonical for both Vite and the backend; `backend/core/config.py` reads `parents[2]/.env` with `extra: ignore` so Vite-only `VITE_*` keys are silently filtered.
 - [x] **Knowledge base embeddings seeded** — 542 chunks in pgvector via `text-embedding-3-large` (`scripts/embed_knowledge_base.py --batch-size 24`). Idempotent — re-runs skip unchanged chunks via stable `chunk_id` hash.
+- [x] **KB dump/restore tooling** — `scripts/dump-knowledge-chunks.sh` produces `backend/data/knowledge_chunks.sql.gz` (~7.4 MB compressed, 542 rows); `scripts/restore-knowledge-chunks.sh` truncates and reloads in ~1s, supports `DUMP_URL=…` for fetching from team Drive. Dump artifact gitignored — workflow is upload-to-Drive, share URL with team. Saves ~$0.02 OpenAI cost + ~5 min per fresh-clone setup.
 
 ### UI polish + ops
 
