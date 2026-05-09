@@ -1,6 +1,6 @@
 # LitMatch Task Tracker
 
-Last updated: 2026-05-08
+Last updated: 2026-05-08 (character voice playback)
 
 ## Completed
 
@@ -54,6 +54,19 @@ Last updated: 2026-05-08
 - [x] `docs/API.md` §3.4: documented MVP-1 scope — multiple-choice only, short-answer / quote-ID out of scope, question count and option count are array-length-authoritative.
 - [x] `docs/API.md` §3.5 / §5.3: relaxed hard-coded length 4 / length 5; pass threshold is `4` for MVP-1 only and product owns the rule per PRD §7 if a future character has ≠5 questions.
 - [x] `docs/API.md` §3.7: added "Backend internals (RAG inputs)" subsection enumerating the five LLM-call inputs from PRD §9 RAG Direction.
+
+## Character profile route (2026-05-08)
+
+- [x] Added `/characters/:id` route rendering full hồ sơ — portrait, kicker, status, quote, sections for tiểu sử / xung đột / tính cách / bối cảnh / chủ đề / biểu tượng / chất giọng / chi tiết then chốt — plus chat + challenge entry points.
+- [x] Wired Collection portraits and names as links into the new profile route; added third "Hồ sơ" action button so it's discoverable.
+- [x] Added themed styles in `src/styles/theme.css` (wood-frame portrait, two-column section grid, parchment dividers, mobile collapse).
+
+## Character voice slogan playback (2026-05-08)
+
+- [x] Dropped 5 character slogan WAVs into `public/voices/{chi-pheo,mi,xuan-toc-do,luc-van-tien,thuy-kieu}.wav` (id-based naming, served statically by Vite).
+- [x] New `src/components/VoicePlayButton.tsx` — round play/stop button with cinnabar pulse while playing; hides itself on 404 / autoplay block.
+- [x] Wired into `CharacterCard` (Discover quote) and `CharacterProfile` (profile quote); button anchored inside the quote box's right edge.
+- [x] Note: out of PRD scope — kept as a small delight feature; no backend dependency.
 
 ## Next (post-migration polish + backend)
 

@@ -28,6 +28,8 @@ export interface Character {
   artB: string;
   artTitle: string;
   image?: string;
+  images?: string[];
+  genre?: string;
   portrait?: string;
   avatar?: string;
   imageBrief: string;
@@ -38,6 +40,10 @@ export interface Character {
   context: string;
   sources: string[];
   voice: string;
+  chatOpening?: string;
+  suggestedQuestions?: string[];
+  interpretationThemes?: string[];
+  symbols?: string[];
   challenge: ChallengeQuestion[];
 }
 

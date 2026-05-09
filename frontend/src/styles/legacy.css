@@ -25,7 +25,7 @@
 
 body {
   margin: 0;
-  min-height: 100dvh;
+  min-height: 100vh;
   color: var(--text);
   background-color: var(--surface);
   background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
@@ -60,7 +60,7 @@ button {
 }
 
 .app-shell {
-  min-height: 100dvh;
+  min-height: 100vh;
 }
 
 .side-nav {
@@ -115,21 +115,18 @@ button {
 }
 
 .main {
-  min-height: 100dvh;
-  padding: 76px 16px 90px;
-  padding-top: calc(76px + env(safe-area-inset-top, 0px));
-  padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  min-height: 100vh;
+  padding: 86px 18px 112px;
 }
 
 .topbar {
   position: fixed;
   inset: 0 0 auto;
-  min-height: 56px;
+  min-height: 80px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 16px;
-  padding-top: calc(8px + env(safe-area-inset-top, 0px));
+  justify-content: flex-end;
+  padding: 12px 18px;
   background: rgba(251, 249, 248, 0.92);
   border-bottom: 1px solid var(--outline);
   backdrop-filter: blur(14px);
@@ -143,9 +140,7 @@ button {
 }
 
 .topbar > div:first-child {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: none;
 }
 
 .metric {
@@ -306,7 +301,6 @@ h3 {
 .deck-card {
   position: relative;
   width: min(840px, 100%);
-  max-width: 100%;
   max-height: none;
   margin: 0 auto;
   overflow: hidden;
@@ -315,7 +309,6 @@ h3 {
   transition: transform 180ms ease, opacity 180ms ease;
   will-change: transform;
   user-select: none;
-  box-sizing: border-box;
 }
 
 .deck-card.is-dragging {
@@ -409,6 +402,90 @@ h3 {
   display: block;
   object-fit: cover;
   object-position: center 35%;
+}
+
+.gallery-track {
+  --active-image: 0;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 430px;
+  transform: translateX(calc(var(--active-image) * -100%));
+  transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.gallery-track img {
+  flex: 0 0 100%;
+}
+
+.profile-gallery .gallery-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 4;
+  width: 34%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.gallery-zone-left {
+  left: 0;
+}
+
+.gallery-zone-right {
+  right: 0;
+}
+
+.gallery-controls {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  pointer-events: none;
+}
+
+.gallery-arrow {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255,255,255,0.7);
+  border-radius: 50%;
+  background: rgba(0,0,0,0.32);
+  color: white;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.24);
+  pointer-events: auto;
+}
+
+.gallery-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 7px;
+  pointer-events: auto;
+}
+
+.gallery-dots button {
+  width: 38px;
+  height: 5px;
+  min-height: 5px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.52);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.22);
+}
+
+.gallery-dots button.active {
+  background: white;
 }
 
 .image-art::before {
@@ -761,7 +838,7 @@ h3 {
 }
 
 .chat-card {
-  min-height: calc(100dvh - 128px);
+  min-height: calc(100vh - 128px);
   display: grid;
   grid-template-rows: auto 1fr auto;
   overflow: hidden;
@@ -774,18 +851,9 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 14px 16px;
+  gap: 14px;
+  padding: 28px 32px;
   border-bottom: 1px solid var(--outline);
-}
-
-@media (min-width: 860px) {
-  .chat-header {
-    padding: 28px 32px;
-    gap: 14px;
-    flex-wrap: nowrap;
-  }
 }
 
 .avatar {
@@ -913,28 +981,12 @@ h3 {
 }
 
 .chat-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  padding: 28px 32px;
   border-top: 1px solid var(--outline);
   background: var(--surface-low);
-}
-
-.chat-form input {
-  flex: 1 1 100%;
-}
-
-@media (min-width: 860px) {
-  .chat-form {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    gap: 12px;
-    padding: 28px 32px;
-  }
-  .chat-form input {
-    flex: initial;
-  }
 }
 
 .quick-row {
@@ -943,11 +995,12 @@ h3 {
   gap: 10px;
 }
 
-.chat-form input {
+.chat-form input,
+.chat-form textarea {
   flex: 1;
   min-width: 0;
-  height: 48px;
-  padding: 0 14px;
+  min-height: 48px;
+  padding: 12px 14px;
   border: 1px solid var(--outline);
   border-radius: 6px;
   background: white;
@@ -1148,27 +1201,11 @@ h3 {
 
 .leader-row {
   display: grid;
-  grid-template-columns: 36px 1fr auto;
-  gap: 8px;
+  grid-template-columns: 80px minmax(220px, 1fr) 1fr 120px;
+  gap: 12px;
   align-items: center;
-  padding: 12px 14px;
+  padding: 24px 30px;
   border-bottom: 1px solid var(--surface-high);
-}
-
-/* Hide the "unlocked" column on mobile */
-.leader-row span:nth-child(3) {
-  display: none;
-}
-
-@media (min-width: 860px) {
-  .leader-row {
-    grid-template-columns: 80px minmax(220px, 1fr) 1fr 120px;
-    gap: 12px;
-    padding: 24px 30px;
-  }
-  .leader-row span:nth-child(3) {
-    display: block;
-  }
 }
 
 .leader-row.header {
@@ -1253,8 +1290,7 @@ h3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 4px;
-  padding: 6px 8px;
-  padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+  padding: 9px 10px 12px;
   background: rgba(251, 249, 248, 0.94);
   border-top: 1px solid var(--outline);
   backdrop-filter: blur(14px);
@@ -1264,12 +1300,12 @@ h3 {
 .mobile-nav a {
   display: grid;
   place-items: center;
-  gap: 2px;
-  min-height: 48px;
+  gap: 3px;
+  min-height: 54px;
   color: var(--muted);
   text-decoration: none;
   border-radius: 8px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -1286,19 +1322,11 @@ h3 {
   .main {
     margin-left: 320px;
     padding: 104px 30px 48px;
-    padding-top: 104px;
-    padding-bottom: 48px;
   }
 
   .topbar {
     left: 320px;
     padding: 12px 28px;
-    min-height: 80px;
-  }
-
-  /* Hide mobile brand on desktop (sidebar has it) */
-  .topbar > div:first-child {
-    display: none;
   }
 
   .mobile-nav {
@@ -1307,10 +1335,6 @@ h3 {
 
   .deck-layout {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .reference-discover .deck-side {
-    display: block;
   }
 
   .chat-layout {

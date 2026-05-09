@@ -1,14 +1,71 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
-import { BookOpen, Pencil, AlertCircle, Swords } from "lucide-react";
+import { BookOpen, Send, Sparkles, Pencil, AlertCircle } from "lucide-react";
 import { useCharacter } from "@/api/queries";
 import { api } from "@/api/client";
 import { useAppStore } from "@/stores/useAppStore";
 import type { Character, ChatMessage } from "@/types";
 
-const QUICK_PROMPTS = ["Hỏi về Thơ ca", "Hỏi về Gia đình"];
+const defaultOpening = (character: Character) =>
+  `Tôi là ${character.name}. Hãy hỏi tôi về một biểu tượng, xung đột hoặc lựa chọn khiến nhân vật trong ${character.work} trở nên đáng suy nghĩ.`;
 
-function MessageRow({
+const legacyOpening = (character: Character) =>
+  `Chào bạn. Tôi là ${character.name}. Bạn có thể hỏi về động cơ, mâu thuẫn, bối cảnh xã hội hoặc một chi tiết trong tác phẩm.`;
+
+const getCharacterImage = (character: Character) =>
+  character.avatar || character.images?.[0] || character.image;
+
+function CharacterProfileCard({ character }: { character: Character }) {
+  return (
+    <div className="character-profile-card" aria-label="Tác phẩm">
+      <BookOpen size={20} strokeWidth={1.8} />
+      <span>
+        <strong>{character.work}</strong>
+        <small>{character.author}</small>
+      </span>
+    </div>
+  );
+}
+
+function ChatHeader({ character }: { character: Character }) {
+  const chatImage = getCharacterImage(character);
+
+  return (
+    <header className="chat-header">
+      <div className="chat-identity">
+        {chatImage ? (
+          <img
+            className="avatar image-avatar"
+            src={chatImage}
+            alt={character.name}
+          />
+        ) : (
+          <div
+            className="avatar"
+            style={
+              {
+                "--art-a": character.artA,
+                "--art-b": character.artB,
+              } as React.CSSProperties
+            }
+          >
+            {character.initial}
+          </div>
+        )}
+        <div>
+          <h1>{character.name}</h1>
+          <p>
+            <span className="online-dot" />
+            Đang trò chuyện
+          </p>
+        </div>
+      </div>
+      <CharacterProfileCard character={character} />
+    </header>
+  );
+}
+
+function CharacterMessage({
   message,
   character,
 }: {
@@ -19,12 +76,12 @@ function MessageRow({
     return (
       <div className="message-row user">
         <div className="message user">{message.text}</div>
-        <small>Read</small>
       </div>
     );
   }
-  const avatar = character.avatar ? (
-    <img className="message-avatar" src={character.avatar} alt={character.name} />
+  const avatarImage = getCharacterImage(character);
+  const avatar = avatarImage ? (
+    <img className="message-avatar" src={avatarImage} alt={character.name} />
   ) : (
     <span className="message-avatar fallback">{character.initial}</span>
   );
@@ -33,6 +90,176 @@ function MessageRow({
       {avatar}
       <div className="message bot">{message.text}</div>
     </div>
+  );
+}
+
+function SuggestedQuestionChips({
+  prompts,
+  onSelect,
+}: {
+  prompts: string[];
+  onSelect: (prompt: string) => void;
+}) {
+  if (!prompts.length) return null;
+
+  return (
+    <div className="quick-row" aria-label="Câu hỏi gợi ý">
+      {prompts.map((prompt) => (
+        <button
+          key={prompt}
+          className="chip literary-chip"
+          type="button"
+          onClick={() => onSelect(prompt)}
+        >
+          {prompt}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ChatInput({
+  characterId,
+  character,
+  draft,
+  streaming,
+  suggestedQuestions,
+  onDraftChange,
+  onPromptSelect,
+  onSubmit,
+}: {
+  characterId: string;
+  character: Character;
+  draft: string;
+  streaming: string;
+  suggestedQuestions: string[];
+  onDraftChange: (draft: string) => void;
+  onPromptSelect: (prompt: string) => void;
+  onSubmit: (event: React.FormEvent) => void;
+}) {
+  const handleTextAreaKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      onSubmit(event);
+    }
+  };
+
+  return (
+    <form className="chat-form literary-chat-form" onSubmit={onSubmit}>
+      <SuggestedQuestionChips
+        prompts={suggestedQuestions}
+        onSelect={onPromptSelect}
+      />
+      <textarea
+        value={draft}
+        onChange={(e) => onDraftChange(e.target.value)}
+        onKeyDown={handleTextAreaKeyDown}
+        autoComplete="off"
+        rows={2}
+        placeholder={`Hỏi ${character.name} về bi kịch, biểu tượng, mâu thuẫn...`}
+      />
+      <Link
+        className="btn secondary deeper-button"
+        to={`/characters/${characterId}/challenge`}
+      >
+        <Sparkles size={19} strokeWidth={1.8} />
+        Hỏi sâu hơn
+      </Link>
+      <button
+        className="btn ghost send-button"
+        type="submit"
+        disabled={!!streaming || !draft.trim()}
+      >
+        <Send size={17} strokeWidth={1.8} />
+        Gửi
+      </button>
+    </form>
+  );
+}
+
+function ThemeTags({
+  themes,
+  character,
+  onSelect,
+}: {
+  themes: string[];
+  character: Character;
+  onSelect: (prompt: string) => void;
+}) {
+  return (
+    <div className="theme-tags">
+      {themes.map((theme) => (
+        <button
+          key={theme}
+          type="button"
+          onClick={() =>
+            onSelect(`${theme} được thể hiện như thế nào trong ${character.work}?`)
+          }
+        >
+          {theme}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function SymbolList({
+  symbols,
+  character,
+  onSelect,
+}: {
+  symbols: string[];
+  character: Character;
+  onSelect: (prompt: string) => void;
+}) {
+  return (
+    <div className="symbol-list">
+      {symbols.map((symbol) => (
+        <button
+          key={symbol}
+          type="button"
+          onClick={() =>
+            onSelect(`${symbol} có vai trò gì trong bi kịch của ${character.name}?`)
+          }
+        >
+          <span>{symbol}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function InsightPanel({
+  character,
+  onSelect,
+}: {
+  character: Character;
+  onSelect: (prompt: string) => void;
+}) {
+  const themes = character.interpretationThemes ?? [
+    character.conflict.split(";")[0],
+  ];
+  const symbols = character.symbols ?? character.sources.map((source) => source.split(" ")[0]);
+
+  return (
+    <aside className="panel source-panel insight-panel">
+      <section>
+        <h2>Chủ đề nên khám phá</h2>
+        <ThemeTags
+          themes={themes}
+          character={character}
+          onSelect={onSelect}
+        />
+      </section>
+      <section>
+        <h2>Biểu tượng quan trọng</h2>
+        <SymbolList
+          symbols={symbols}
+          character={character}
+          onSelect={onSelect}
+        />
+      </section>
+    </aside>
   );
 }
 
@@ -48,17 +275,25 @@ export default function Chat() {
   const [error, setError] = useState<string | null>(null);
   const threadRef = useRef<HTMLDivElement | null>(null);
 
+  const initialMessage: ChatMessage | null = character
+    ? {
+        from: "bot",
+        text: character.chatOpening ?? defaultOpening(character),
+      }
+    : null;
+  const storedMessages = id ? chats[id] ?? [] : [];
   const messages: ChatMessage[] =
-    id && chats[id]?.length
-      ? chats[id]
-      : character
-        ? [
-            {
-              from: "bot",
-              text: `Chào bạn. Tôi là ${character.name}. Bạn có thể hỏi về động cơ, mâu thuẫn, bối cảnh xã hội hoặc một chi tiết trong tác phẩm.`,
-            },
-          ]
-        : [];
+    character && initialMessage
+      ? storedMessages.length
+        ? storedMessages.map((message, index) =>
+            index === 0 &&
+            message.from === "bot" &&
+            message.text === legacyOpening(character)
+              ? initialMessage
+              : message,
+          )
+        : [initialMessage]
+      : [];
 
   useEffect(() => {
     threadRef.current?.scrollTo({
@@ -118,54 +353,23 @@ export default function Chat() {
     }
   };
 
+  const suggestedQuestions =
+    character.suggestedQuestions ?? character.challenge.slice(0, 3).map((q) => q.text);
+
   return (
     <section className="page chat-layout reference-chat">
       <div className="chat-card">
-        <header className="chat-header">
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {character.avatar ? (
-              <img
-                className="avatar image-avatar"
-                src={character.avatar}
-                alt={character.name}
-              />
-            ) : (
-              <div
-                className="avatar"
-                style={
-                  {
-                    "--art-a": character.artA,
-                    "--art-b": character.artB,
-                  } as React.CSSProperties
-                }
-              >
-                {character.initial}
-              </div>
-            )}
-            <div>
-              <h1 style={{ fontSize: 22 }}>{character.name}</h1>
-              <p style={{ margin: "4px 0 0", color: "var(--muted)", fontSize: 13 }}>
-                <span className="online-dot" />
-                Đang trò chuyện
-              </p>
-            </div>
-          </div>
-          <span className="work-pill">
-            <BookOpen size={14} />
-            {character.work}
-          </span>
-        </header>
+        <ChatHeader character={character} />
         <div className="chat-thread" ref={threadRef}>
-          <div className="chapter-pill">Chương I: Cuộc gặp đầu tiên</div>
           {messages.map((message, index) => (
-            <MessageRow
+            <CharacterMessage
               key={index}
               message={message}
               character={character}
             />
           ))}
           {streaming && (
-            <MessageRow
+            <CharacterMessage
               message={{ from: "bot", text: streaming }}
               character={character}
             />
@@ -183,68 +387,18 @@ export default function Chat() {
             </div>
           )}
         </div>
-        <form className="chat-form" onSubmit={handleSubmit}>
-          <div className="quick-row">
-            {QUICK_PROMPTS.map((prompt) => (
-              <button
-                key={prompt}
-                className="chip"
-                type="button"
-                onClick={() => setDraft(prompt)}
-              >
-                {prompt}
-              </button>
-            ))}
-          </div>
-          <input
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            autoComplete="off"
-            placeholder="Hỏi về động cơ, biểu tượng, bối cảnh..."
-          />
-          <Link
-            className="btn secondary"
-            to={`/characters/${id}/challenge`}
-          >
-            <Swords size={16} />
-            Thử thách
-          </Link>
-          <button
-            className="btn primary"
-            type="submit"
-            disabled={!!streaming || !draft.trim()}
-          >
-            Gửi
-          </button>
-        </form>
+        <ChatInput
+          characterId={id}
+          character={character}
+          draft={draft}
+          streaming={streaming}
+          suggestedQuestions={suggestedQuestions}
+          onDraftChange={setDraft}
+          onPromptSelect={setDraft}
+          onSubmit={handleSubmit}
+        />
       </div>
-      <aside className="panel source-panel">
-        <h2 style={{ fontSize: 24 }}>Nội dung trọng tâm</h2>
-        <p className="lead" style={{ fontSize: 15, marginTop: 6 }}>
-          {character.conflict.split(";")[0]}
-        </p>
-        <div className="understanding">
-          <span>Mức độ thấu hiểu</span>
-          <strong>Level 2</strong>
-          <i style={{ width: "35%" }} />
-        </div>
-        <p className="kicker">Bối cảnh văn học</p>
-        <div className="source-book">
-          <BookOpen size={16} />
-          <div>
-            <strong>{character.work}</strong>
-            <small>{character.author}</small>
-          </div>
-        </div>
-        <p className="kicker">Ghi chú đã duyệt</p>
-        <div className="source-list">
-          {character.sources.map((source) => (
-            <div key={source} className="source-item">
-              {source}
-            </div>
-          ))}
-        </div>
-      </aside>
+      <InsightPanel character={character} onSelect={setDraft} />
     </section>
   );
 }

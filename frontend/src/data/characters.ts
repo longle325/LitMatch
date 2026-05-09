@@ -26,6 +26,12 @@ const rawCharacters: SeedCharacter[] = [
     artB: "#8a3d22",
     artTitle: "Làng Vũ Đại",
     image: "/characters/chi-pheo.png",
+    images: [
+      "/characters/chi-pheo.png",
+      "/characters/chi-pheo-2.png",
+      "/characters/chi-pheo-3.png",
+    ],
+    genre: "truyện ngắn",
     imageBrief:
       "Người đàn ông gầy gò, mặt đầy sẹo, áo nâu sờn rách, tay cầm chai rượu, lảo đảo giữa làng quê.",
     bio: "Trai làng Vũ Đại. Bề ngoài hổ báo nhưng bên trong đầy vết xước. Khao khát lớn nhất là được làm người lương thiện.",
@@ -41,6 +47,17 @@ const rawCharacters: SeedCharacter[] = [
       "Bát cháo hành của Thị Nở đánh thức khát vọng sống lương thiện và được yêu thương.",
       "Cái lò gạch cũ gợi vòng luẩn quẩn của những kiếp người bị xã hội bỏ rơi.",
     ],
+    chatOpening:
+      "Tao là Chí Phèo. Người ta nhớ tao qua tiếng chửi, vết sẹo, men rượu và bát cháo hành. Nhưng nếu chỉ nhìn tao như một kẻ say rượu, có lẽ mày đã bỏ lỡ bi kịch lớn nhất của đời tao.",
+    suggestedQuestions: [],
+    interpretationThemes: [
+      "Tha hóa",
+      "Lương thiện",
+      "Định kiến",
+      "Tình thương",
+      "Quyền làm người",
+    ],
+    symbols: ["Tiếng chửi", "Bát cháo hành", "Vết sẹo", "Lò gạch cũ", "Rượu"],
     voice:
       "thô ráp, đau đớn, có lúc bừng lên mong muốn được công nhận là con người",
     challenge: [
@@ -110,7 +127,13 @@ const rawCharacters: SeedCharacter[] = [
     artA: "#1f2930",
     artB: "#6c7b58",
     artTitle: "Căn buồng Hồng Ngài",
-    image: "/characters/mi.png",
+    image: "/characters/mi-1.png",
+    images: [
+      "/characters/mi-1.png",
+      "/characters/mi-2.png",
+      "/characters/mi-3.png",
+    ],
+    genre: "Văn học hiện thực",
     imageBrief:
       "Thiếu nữ người Mông ngồi quay sợi bên cửa sổ nhỏ, ánh mắt hướng ra núi rừng Tây Bắc.",
     bio: "Từng thổi sáo rất hay, nay mắc kẹt trong kiếp con dâu gạt nợ. Bên trong vẻ lặng câm là sức sống đang hồi sinh.",
@@ -194,7 +217,13 @@ const rawCharacters: SeedCharacter[] = [
     artA: "#78341d",
     artB: "#0d2b45",
     artTitle: "Hà Nội Âu hóa",
-    image: "/characters/xuan-toc-do.png",
+    image: "/characters/xuan-toc-do-1.png",
+    images: [
+      "/characters/xuan-toc-do-1.png",
+      "/characters/xuan-toc-do-2.png",
+      "/characters/xuan-toc-do-3.png",
+    ],
+    genre: "Tiểu thuyết trào phúng",
     imageBrief:
       "Thanh niên tóc đỏ, vest tây lố lăng, cầm vợt tennis trước phố Hà Nội thời Pháp thuộc.",
     bio: "Từ nhặt bóng quần vợt và bán thuốc lậu, Xuân leo lên thành đốc tờ, vĩ nhân, anh hùng nhờ xã hội thượng lưu kệch cỡm.",
@@ -279,6 +308,12 @@ const rawCharacters: SeedCharacter[] = [
     artB: "#b78a3a",
     artTitle: "Chính khí Nam Bộ",
     image: "/characters/luc-van-tien.png",
+    images: [
+      "/characters/luc-van-tien.png",
+      "/characters/luc-van-tien-2.png",
+      "/characters/luc-van-tien-3.png",
+    ],
+    genre: "Truyện Thơ Nôm",
     imageBrief:
       "Nho sinh trẻ mặc áo dài, vung gậy đánh cướp Phong Lai, phía xa có kiệu Kiều Nguyệt Nga.",
     bio: "Nho sinh văn võ song toàn, trọng nghĩa khinh tài. Dù bị mù, bị phản bội, vẫn giữ vững khí tiết trung hiếu tiết nghĩa.",
@@ -362,7 +397,13 @@ const rawCharacters: SeedCharacter[] = [
     artA: "#0d2b45",
     artB: "#6c2d35",
     artTitle: "Lầu Ngưng Bích",
-    image: "/characters/thuy-kieu.png",
+    image: "/characters/thuy-kieu-1.png",
+    images: [
+      "/characters/thuy-kieu-1.png",
+      "/characters/thuy-kieu-2.png",
+      "/characters/thuy-kieu-3.png",
+    ],
+    genre: "Truyện Thơ Nôm",
     imageBrief:
       "Thiếu nữ tài sắc gảy đàn nguyệt, ánh mắt u buồn, khung cảnh lầu Ngưng Bích và sông Tiền Đường.",
     bio: "Tiểu thư họ Vương tài sắc vẹn toàn, bán mình chuộc cha rồi lưu lạc mười lăm năm giữa chữ hiếu, chữ tình và số phận.",
