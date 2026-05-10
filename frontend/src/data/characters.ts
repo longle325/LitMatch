@@ -479,6 +479,523 @@ const rawCharacters: SeedCharacter[] = [
       ),
     ],
   },
+
+  {
+    id: "lao-hac",
+    name: "Lão Hạc",
+    work: "Lão Hạc",
+    author: "Nam Cao",
+    initial: "L",
+    artA: "#4b3427",
+    artB: "#8c6a3f",
+    artTitle: "Vườn cũ và cậu Vàng",
+    image: "/characters/lao-hac.png",
+    images: [
+      "/characters/lao-hac.png",
+      "/characters/lao-hac-2.png",
+      "/characters/lao-hac-3.png",
+    ],
+    genre: "truyện ngắn",
+    imageBrief:
+      "Ông lão nông dân gầy guộc ôm con chó Vàng trước mái nhà tranh và mảnh vườn cũ.",
+    bio: "Ông lão nghèo cô độc, thương con và thương cậu Vàng, giữ lòng tự trọng đến tận cùng.",
+    quote: "Cậu Vàng đi đời rồi, ông giáo ạ!",
+    personality:
+      "Hiền lành, lương thiện, tự trọng, giàu tình thương nhưng đau đáu vì nghèo và vì con.",
+    conflict:
+      "Giằng xé giữa bản năng sống và quyết tâm không ăn vào mảnh vườn dành cho con.",
+    context:
+      "Làng quê nghèo trước Cách mạng tháng Tám, nơi người nông dân bị đói nghèo và định kiến bủa vây.",
+    sources: [
+      "Cậu Vàng là kỷ vật của con trai và chỗ dựa cô độc của lão.",
+      "Việc bán chó làm lão đau đớn vì cảm giác đã lừa một sinh linh tin mình.",
+      "Lão gửi ông giáo tiền ma chay và mảnh vườn để giữ trọn phần cho con.",
+    ],
+    voice:
+      "nhỏ nhẹ, lễ phép, nghẹn ngào, nhiều tự trọng và hay gọi người nghe là ông giáo",
+    chatOpening:
+      "Ông giáo đấy ư... Tôi chỉ có vài chuyện cũ, chuyện cậu Vàng, chuyện thằng con đi xa và mảnh vườn còn phải giữ cho nó.",
+    suggestedQuestions: [],
+    interpretationThemes: [
+      "Nhân phẩm",
+      "Tình phụ tử",
+      "Đói nghèo",
+      "Lòng tự trọng",
+      "Cô độc",
+    ],
+    symbols: ["Cậu Vàng", "Mảnh vườn", "Bả chó", "Tiền ma chay", "Ông giáo"],
+    challenge: [
+      q(
+        "Vì sao lão Hạc không bán mảnh vườn dù rất nghèo?",
+        [
+          "Vì muốn giữ tài sản cho con trai",
+          "Vì vườn không có giá trị",
+          "Vì ông giáo cấm",
+          "Vì lão định bỏ làng",
+        ],
+        0,
+        "Mảnh vườn là phần lão cố giữ cho con trai trở về lập nghiệp.",
+      ),
+      q(
+        "Cậu Vàng có ý nghĩa gì với lão Hạc?",
+        [
+          "Chỉ là tài sản để bán",
+          "Kỷ vật của con và người bạn trong cô độc",
+          "Con chó của ông giáo",
+          "Biểu tượng giàu sang",
+        ],
+        1,
+        "Lão thương cậu Vàng như người thân, nên việc bán chó trở thành vết thương đạo đức.",
+      ),
+      q(
+        "Sau khi bán cậu Vàng, tâm trạng lão Hạc ra sao?",
+        [
+          "Vui mừng vì có tiền",
+          "Dửng dưng",
+          "Đau đớn, ân hận vì thấy mình lừa con chó",
+          "Tự hào vì thắng lợi",
+        ],
+        2,
+        "Lão khóc vì cảm giác đã phản bội niềm tin của cậu Vàng.",
+      ),
+      q(
+        "Cái chết của lão Hạc làm nổi bật phẩm chất nào?",
+        [
+          "Tham lam",
+          "Lòng tự trọng và sự lương thiện",
+          "Sự vô trách nhiệm",
+          "Ham danh",
+        ],
+        1,
+        "Lão chọn cái chết dữ dội để không ăn vào tiền của con và không phiền lụy ai.",
+      ),
+      q(
+        "Vai trò của ông giáo trong truyện là gì?",
+        [
+          "Người chứng kiến và thấu hiểu phẩm giá lão Hạc",
+          "Kẻ trực tiếp hại lão",
+          "Con trai lão",
+          "Chủ nợ của lão",
+        ],
+        0,
+        "Ông giáo giúp người đọc nhìn ra chiều sâu đáng kính phía sau vẻ gàn dở của lão.",
+      ),
+    ],
+  },
+  {
+    id: "chi-dau",
+    name: "Chị Dậu",
+    work: "Tắt đèn",
+    author: "Ngô Tất Tố",
+    initial: "D",
+    artA: "#3f2a1d",
+    artB: "#a05b32",
+    artTitle: "Đông Xá mùa sưu",
+    image: "/characters/chi-dau.png",
+    images: [
+      "/characters/chi-dau.png",
+      "/characters/chi-dau-2.png",
+      "/characters/chi-dau-3.png",
+    ],
+    genre: "tiểu thuyết hiện thực",
+    imageBrief:
+      "Người phụ nữ nông dân áo nâu chắn trước chồng ốm, phía sau là nồi cháo và mái nhà tranh.",
+    bio: "Người vợ, người mẹ nghèo trong mùa sưu thuế, vừa nhẫn nhục cứu chồng con vừa có sức phản kháng dữ dội.",
+    quote: "Mày trói ngay chồng bà đi, bà cho mày xem!",
+    personality:
+      "Tháo vát, thương chồng con, nhẫn nhục khi cần nhưng quyết liệt khi bị dồn ép.",
+    conflict:
+      "Giằng xé giữa chịu nhịn để sống qua mùa sưu và vùng lên khi phẩm giá gia đình bị chà đạp.",
+    context:
+      "Nông thôn Bắc Bộ thời Pháp thuộc, sưu thuế và bộ máy hào lý đẩy dân nghèo vào đường cùng.",
+    sources: [
+      "Chị bán con và đàn chó để lấy tiền sưu cứu anh Dậu.",
+      "Nồi cháo vừa chín thì cai lệ xông vào đòi trói người ốm.",
+      "Sự đổi cách xưng hô từ cháu-ông sang bà-mày báo hiệu phản kháng.",
+    ],
+    voice:
+      "mộc mạc, gấp gáp, thương chồng con, có thể chuyển rất nhanh từ van xin sang đanh thép",
+    chatOpening:
+      "Các ông các bà hỏi gì thì hỏi mau cho tôi còn coi thầy em và bầy trẻ. Ngoài đình trống mõ cứ giục, trong nhà cháo còn chưa kịp nguội.",
+    suggestedQuestions: [],
+    interpretationThemes: [
+      "Tức nước vỡ bờ",
+      "Sưu thuế",
+      "Tình mẫu tử",
+      "Phản kháng",
+      "Hiện thực phê phán",
+    ],
+    symbols: ["Nồi cháo", "Sưu thuế", "Cai lệ", "Cái Tý", "Mái nhà tranh"],
+    challenge: [
+      q(
+        "Điều gì đẩy chị Dậu vào cảnh bán con và đàn chó?",
+        ["Món nợ cờ bạc", "Sưu thuế hà khắc", "Muốn làm giàu", "Bị chồng ép"],
+        1,
+        "Sưu thuế vô lý khiến gia đình chị phải bán cả những gì đau xót nhất.",
+      ),
+      q(
+        "Vì sao ban đầu chị Dậu van xin cai lệ?",
+        [
+          "Vì yếu hèn",
+          "Vì muốn bảo vệ chồng đang ốm bằng cách nhẫn nhục",
+          "Vì không thương chồng",
+          "Vì sợ con",
+        ],
+        1,
+        "Sự nhẫn nhục xuất phát từ tình thương và thế thấp cổ bé họng.",
+      ),
+      q(
+        "Sự thay đổi đại từ xưng hô của chị Dậu thể hiện điều gì?",
+        [
+          "Quên lễ phép",
+          "Quá trình phản kháng khi bị dồn đến chân tường",
+          "Muốn đùa cợt",
+          "Không hiểu cai lệ",
+        ],
+        1,
+        "Từ cháu-ông đến bà-mày là bước chuyển từ nhẫn nhục sang tự vệ.",
+      ),
+      q(
+        "Hành động đánh ngã cai lệ có ý nghĩa gì?",
+        [
+          "Bạo lực vô cớ",
+          "Quy luật tức nước vỡ bờ",
+          "Sự phản bội gia đình",
+          "Một trò hài",
+        ],
+        1,
+        "Đó là phản ứng tất yếu khi áp bức vượt quá giới hạn chịu đựng.",
+      ),
+      q(
+        "Chị Dậu tiêu biểu cho điều gì trong Tắt đèn?",
+        [
+          "Người nông dân bị áp bức nhưng giàu sức sống",
+          "Tầng lớp quan lại",
+          "Thị dân Âu hóa",
+          "Người lính chiến",
+        ],
+        0,
+        "Chị là chân dung đẹp của người phụ nữ nông dân trong hiện thực tăm tối.",
+      ),
+    ],
+  },
+  {
+    id: "ong-sau",
+    name: "Ông Sáu",
+    work: "Chiếc lược ngà",
+    author: "Nguyễn Quang Sáng",
+    initial: "S",
+    artA: "#2f4538",
+    artB: "#b88a45",
+    artTitle: "Căn cứ Nam Bộ",
+    image: "/characters/ong-sau.png",
+    images: [
+      "/characters/ong-sau.png",
+      "/characters/ong-sau-2.png",
+      "/characters/ong-sau-3.png",
+    ],
+    genre: "truyện ngắn",
+    imageBrief:
+      "Người lính Nam Bộ có vết thẹo trên mặt, tay cầm chiếc lược ngà nhỏ trong rừng căn cứ.",
+    bio: "Người cha, người lính xa con vì chiến tranh, dồn tình thương vào lời hứa làm chiếc lược ngà.",
+    quote: "Ba về! Ba mua cho con một cây lược nghe con!",
+    personality:
+      "Nồng hậu, nóng lòng, vụng về trong biểu lộ tình cha, kiên trì và sâu nặng.",
+    conflict:
+      "Khao khát được con nhận cha đối lập với vết thẹo và khoảng cách chiến tranh tạo ra.",
+    context:
+      "Nam Bộ thời kháng chiến, chiến tranh chia cắt gia đình và làm tổn thương tình phụ tử.",
+    sources: [
+      "Vết thẹo khiến bé Thu không nhận ra cha.",
+      "Tiếng gọi ba đến đúng lúc chia tay làm hạnh phúc hóa thành xót xa.",
+      "Chiếc lược ngà là vật kết tinh tình cha và lời hứa cuối đời.",
+    ],
+    voice: "chân chất Nam Bộ, trầm, thương con đến nghẹn, hay gọi con là Thu",
+    chatOpening:
+      "Tôi là Sáu. Mấy năm đi kháng chiến, chỉ mong có ngày con nhỏ chịu kêu mình một tiếng ba. Vậy mà về tới nhà, con lại ngó tôi như người dưng.",
+    suggestedQuestions: [],
+    interpretationThemes: [
+      "Tình phụ tử",
+      "Chiến tranh",
+      "Xa cách",
+      "Lời hứa",
+      "Hy sinh",
+    ],
+    symbols: [
+      "Chiếc lược ngà",
+      "Vết thẹo",
+      "Tiếng gọi ba",
+      "Ba ngày phép",
+      "Khu căn cứ",
+    ],
+    challenge: [
+      q(
+        "Vì sao bé Thu không nhận ông Sáu là cha?",
+        [
+          "Vì ghét cha",
+          "Vì vết thẹo làm ông khác ảnh cũ",
+          "Vì ông Sáu quên con",
+          "Vì bác Ba ngăn cản",
+        ],
+        1,
+        "Vết thẹo chiến tranh làm bé Thu không nhận ra gương mặt cha.",
+      ),
+      q(
+        "Điều ông Sáu khao khát nhất khi về thăm nhà là gì?",
+        [
+          "Được con gọi một tiếng ba",
+          "Được thăng chức",
+          "Được mua ruộng",
+          "Được rời kháng chiến",
+        ],
+        0,
+        "Sau nhiều năm xa cách, tiếng gọi ba là niềm mong mỏi lớn nhất.",
+      ),
+      q(
+        "Chiếc lược ngà biểu tượng cho điều gì?",
+        [
+          "Tình cha sâu nặng và lời hứa với con",
+          "Sự giàu sang",
+          "Một chiến lợi phẩm",
+          "Sự phản bội",
+        ],
+        0,
+        "Ông Sáu gửi toàn bộ nhớ thương và ân hận vào chiếc lược.",
+      ),
+      q(
+        "Bi kịch của ông Sáu chủ yếu do đâu?",
+        [
+          "Chiến tranh chia cắt và làm biến dạng quan hệ gia đình",
+          "Ông không yêu con",
+          "Bé Thu không có cá tính",
+          "Gia đình giàu có",
+        ],
+        0,
+        "Chiến tranh tạo xa cách, vết thẹo và cuộc chia ly cuối cùng.",
+      ),
+      q(
+        "Trước khi hy sinh, ông Sáu trao chiếc lược cho bác Ba nhằm gì?",
+        [
+          "Bán lấy tiền",
+          "Gửi lại lời hứa và tình cha cho bé Thu",
+          "Tặng bác Ba",
+          "Giấu kỷ vật",
+        ],
+        1,
+        "Cử chỉ ấy cho thấy ông vẫn hướng về con đến phút cuối.",
+      ),
+    ],
+  },
+  {
+    id: "ong-hai",
+    name: "Ông Hai",
+    work: "Làng",
+    author: "Kim Lân",
+    initial: "H",
+    artA: "#33422f",
+    artB: "#b9914b",
+    artTitle: "Làng Chợ Dầu",
+    image: "/characters/ong-hai.png",
+    images: [
+      "/characters/ong-hai.png",
+      "/characters/ong-hai-2.png",
+      "/characters/ong-hai-3.png",
+    ],
+    genre: "truyện ngắn",
+    imageBrief:
+      "Ông nông dân tản cư khăn nâu áo vải, vừa nghe tin làng Chợ Dầu trong quán nước kháng chiến.",
+    bio: "Người nông dân yêu làng tha thiết, trải qua cú sốc tin làng theo Tây để nhận ra tình yêu nước lớn hơn tình làng.",
+    quote: "Làng thì yêu thật, nhưng làng theo Tây mất rồi thì phải thù.",
+    personality:
+      "Hay khoe làng, chất phác, dễ xúc động, trung thành với kháng chiến và Cụ Hồ.",
+    conflict:
+      "Tình yêu làng xung đột với lòng yêu nước khi nghe tin làng Chợ Dầu theo Tây.",
+    context:
+      "Những năm đầu kháng chiến chống Pháp, dân quê đi tản cư và sống bằng tin tức chiến khu.",
+    sources: [
+      "Ông Hai luôn khoe làng Chợ Dầu ở nơi tản cư.",
+      "Tin làng theo Tây khiến ông tủi nhục, sợ hãi và khủng hoảng.",
+      "Khi tin cải chính, ông vui đến mức khoe cả nhà mình bị Tây đốt.",
+    ],
+    voice:
+      "nông dân Bắc Bộ, hồ hởi khi khoe làng, nghẹn lại khi nhắc tiếng Việt gian",
+    chatOpening:
+      "Ấy, nói đến làng Chợ Dầu của tôi thì... mà khoan, dạo này nghe tin tức phải cẩn thận. Làng tôi theo kháng chiến, theo Cụ Hồ, chứ nhục gì bằng mang tiếng Việt gian.",
+    suggestedQuestions: [],
+    interpretationThemes: [
+      "Tình yêu làng",
+      "Lòng yêu nước",
+      "Tản cư",
+      "Tin đồn",
+      "Danh dự cộng đồng",
+    ],
+    symbols: [
+      "Làng Chợ Dầu",
+      "Tin cải chính",
+      "Nhà bị đốt",
+      "Quán nước",
+      "Cụ Hồ",
+    ],
+    challenge: [
+      q(
+        "Trước khi nghe tin dữ, ông Hai thường làm gì ở nơi tản cư?",
+        [
+          "Khoe và nhớ làng Chợ Dầu",
+          "Chê làng mình",
+          "Bỏ kháng chiến",
+          "Đi buôn xa",
+        ],
+        0,
+        "Ông yêu làng nên hay kể, hay khoe về làng.",
+      ),
+      q(
+        "Tin làng Chợ Dầu theo Tây gây cho ông Hai tâm trạng gì?",
+        ["Sung sướng", "Xấu hổ, đau đớn, khủng hoảng", "Bình thản", "Tự hào"],
+        1,
+        "Tin ấy đánh vào danh dự làng và lòng yêu nước của ông.",
+      ),
+      q(
+        "Câu 'làng thì yêu thật...' cho thấy điều gì?",
+        [
+          "Ông đặt lòng yêu nước cao hơn tình làng hẹp",
+          "Ông ghét quê từ đầu",
+          "Ông không hiểu kháng chiến",
+          "Ông muốn theo Tây",
+        ],
+        0,
+        "Ông đau nhưng vẫn chọn đứng về phía kháng chiến.",
+      ),
+      q(
+        "Vì sao ông Hai vui khi khoe nhà mình bị Tây đốt?",
+        [
+          "Vì được bồi thường",
+          "Vì đó là bằng chứng làng không theo Tây",
+          "Vì không thích nhà cũ",
+          "Vì muốn chuyển nhà",
+        ],
+        1,
+        "Mất nhà còn nhẹ hơn mất danh dự yêu nước của làng.",
+      ),
+      q(
+        "Ông Hai tiêu biểu cho kiểu tình cảm nào?",
+        [
+          "Tình yêu làng hòa vào lòng yêu nước",
+          "Tình yêu cá nhân ích kỷ",
+          "Thói sính Tây",
+          "Bi kịch tình yêu đôi lứa",
+        ],
+        0,
+        "Kim Lân khắc họa sự chuyển hóa tự nhiên từ yêu làng đến yêu nước.",
+      ),
+    ],
+  },
+  {
+    id: "vu-nuong",
+    name: "Vũ Nương",
+    work: "Chuyện người con gái Nam Xương",
+    author: "Nguyễn Dữ",
+    initial: "V",
+    artA: "#27433d",
+    artB: "#c1926a",
+    artTitle: "Bến Hoàng Giang",
+    image: "/characters/vu-nuong.png",
+    images: [
+      "/characters/vu-nuong.png",
+      "/characters/vu-nuong-2.png",
+      "/characters/vu-nuong-3.png",
+    ],
+    genre: "truyền kỳ",
+    imageBrief:
+      "Thiếu phụ áo tứ thân đứng bên bến Hoàng Giang, bóng đèn in trên vách và đứa con nhỏ phía xa.",
+    bio: "Người phụ nữ đẹp nết bị nghi oan bởi chiếc bóng, chọn sông Hoàng Giang để giữ danh tiết.",
+    quote: "Thiếp nếu đoan trang giữ tiết, trinh bạch gìn lòng...",
+    personality:
+      "Thùy mị, nết na, thủy chung, hiếu thảo, tự trọng và đau đớn khi bị nghi oan.",
+    conflict:
+      "Đức hạnh và lời thanh minh của nàng bị nam quyền, ghen tuông và định kiến phủ nhận.",
+    context:
+      "Xã hội phong kiến và chiến tranh ly tán, nơi người phụ nữ ít quyền được tin và được tự bảo vệ.",
+    sources: [
+      "Chiếc bóng trên vách là nguồn gốc hiểu lầm oan nghiệt.",
+      "Vũ Nương chăm mẹ chồng, nuôi con, giữ lòng thủy chung khi chồng đi lính.",
+      "Sự trở về trong thủy cung minh oan nhưng không trả lại hạnh phúc trần thế.",
+    ],
+    voice: "dịu, trang trọng, xưng thiếp, nhiều uất ức nhưng giữ phẩm giá",
+    chatOpening:
+      "Thiếp là Vũ Thị Thiết, người con gái Nam Xương. Một chiếc bóng vốn để dỗ con thơ, ngờ đâu thành nỗi oan không sao gột giữa cõi người.",
+    suggestedQuestions: [],
+    interpretationThemes: [
+      "Oan khuất",
+      "Danh tiết",
+      "Nam quyền",
+      "Chiếc bóng",
+      "Nhân đạo",
+    ],
+    symbols: [
+      "Chiếc bóng",
+      "Bến Hoàng Giang",
+      "Bé Đản",
+      "Lời thề",
+      "Thủy cung",
+    ],
+    challenge: [
+      q(
+        "Nguyên nhân trực tiếp khiến Vũ Nương bị nghi oan là gì?",
+        [
+          "Chiếc bóng trên vách qua lời bé Đản",
+          "Nàng bỏ nhà đi",
+          "Lời ông giáo",
+          "Một bức thư giả",
+        ],
+        0,
+        "Câu nói ngây thơ của bé Đản về chiếc bóng làm Trương Sinh hiểu lầm.",
+      ),
+      q(
+        "Vũ Nương hiện lên với phẩm chất nào?",
+        [
+          "Thủy chung, hiếu thảo, tự trọng",
+          "Lọc lừa",
+          "Ham danh",
+          "Vô trách nhiệm",
+        ],
+        0,
+        "Nàng chăm mẹ chồng, nuôi con, giữ lòng với chồng và giữ danh tiết.",
+      ),
+      q(
+        "Bi kịch của Vũ Nương tố cáo điều gì?",
+        [
+          "Xã hội nam quyền và thói ghen tuông hồ đồ",
+          "Sự lười biếng",
+          "Cuộc sống đô thị",
+          "Phong trào Âu hóa",
+        ],
+        0,
+        "Nàng không được tin và không có quyền tự bảo vệ trước nghi kỵ của chồng.",
+      ),
+      q(
+        "Yếu tố truyền kỳ ở cuối truyện có tác dụng gì?",
+        [
+          "Minh oan và thể hiện ước mơ công lý",
+          "Xóa hết bi kịch",
+          "Làm truyện thành hài",
+          "Ca ngợi Trương Sinh",
+        ],
+        0,
+        "Vũ Nương được minh oan nhưng không thể trở lại hạnh phúc trần thế.",
+      ),
+      q(
+        "Chiếc bóng mang ý nghĩa biểu tượng gì?",
+        [
+          "Tình thương con biến thành nguyên cớ oan khuất",
+          "Sự giàu sang",
+          "Quyền lực quan lại",
+          "Niềm vui hội làng",
+        ],
+        0,
+        "Chiếc bóng vừa là trò dỗ con vừa là nút thắt bi kịch.",
+      ),
+    ],
+  },
 ];
 
 // Inject question ids of the form `${characterId}-q${1-based index}`.

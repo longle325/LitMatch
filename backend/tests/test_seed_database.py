@@ -10,10 +10,21 @@ from scripts.seed_database import (
 
 
 class SeedDatabaseTests(unittest.TestCase):
-    def test_character_seeds_cover_the_five_mvp_characters(self):
+    def test_character_seeds_cover_the_seeded_characters(self):
         self.assertEqual(
             {character["slug"] for character in CHARACTER_SEEDS},
-            {"chi_pheo", "mi", "xuan_toc_do", "luc_van_tien", "thuy_kieu"},
+            {
+                "chi_pheo",
+                "mi",
+                "xuan_toc_do",
+                "luc_van_tien",
+                "thuy_kieu",
+                "lao_hac",
+                "chi_dau",
+                "ong_sau",
+                "ong_hai",
+                "vu_nuong",
+            },
         )
 
     def test_each_character_has_five_well_formed_challenge_questions(self):
