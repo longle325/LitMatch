@@ -17,14 +17,19 @@ A gamified Vietnamese literature learning app. Swipe to discover characters, cha
 
 ## First-time setup
 
+Run these commands from the project root unless a step explicitly changes
+directory.
+
 ```sh
 # 1. Env
 cp .env.example .env   # then add OPENAI_API_KEY
 
-# 2. Frontend
-cd frontend && npm install && cd ..
+# 2. Frontend dependencies
+cd frontend
+npm install
+cd ..
 
-# 3. Backend
+# 3. Backend dependencies
 cd backend
 python3 -m venv .venv
 ./.venv/bin/pip install -r requirements.txt
@@ -32,7 +37,14 @@ cd ..
 
 # 4. Postgres + schema + seed (characters, challenges, demo users)
 docker compose up -d postgres
-cd backend && ./.venv/bin/python scripts/seed_database.py && cd ..
+
+# Wait until `docker compose ps postgres` shows the service as healthy.
+# If your shell exports DEBUG=release, unset it first because the backend
+# expects DEBUG to be a boolean.
+unset DEBUG
+cd backend
+./.venv/bin/python scripts/seed_database.py
+cd ..
 
 # 5. Knowledge-base embeddings — restore the team's pre-embedded
 #    pgvector dump from Drive (no OpenAI cost, ~1s):
@@ -43,12 +55,34 @@ bash scripts/restore-knowledge-chunks.sh
 ## Run locally
 
 ```sh
-docker compose up -d postgres                                              # one-time
-cd backend && ./.venv/bin/python -m uvicorn main:app --reload --port 8081  # T1
-cd frontend && npm run dev                                                 # T2
+# Terminal 1: database, from the project root
+docker compose up -d postgres
+
+# Terminal 2: backend API, from the project root
+unset DEBUG
+cd backend
+./.venv/bin/python -m uvicorn main:app --reload --port 8081
+
+# Terminal 3: frontend, from the project root
+cd frontend
+npm run dev
 ```
 
 Open <http://127.0.0.1:5173/>.
+
+## Troubleshooting Setup
+
+- `npm ERR! enoent Could not read package.json`: run npm commands from
+  `frontend/`, or use `npm --prefix frontend run dev` from the project root.
+- `cd: no such file or directory: backend`: you are already inside `backend/`.
+  Run `pwd` to confirm, then run `./.venv/bin/python scripts/seed_database.py`
+  directly.
+- `ConnectionResetError: [Errno 54] Connection reset by peer` while seeding:
+  Postgres may still be finishing first-time initialization. Wait until
+  `docker compose ps postgres` shows `healthy`, then rerun the seed command.
+- `DEBUG Input should be a valid boolean`: your shell is overriding `.env` with
+  a non-boolean value such as `DEBUG=release`. Run `unset DEBUG`, or prefix the
+  command with `env DEBUG=false`.
 
 ## Project layout
 
